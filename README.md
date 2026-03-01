@@ -97,6 +97,19 @@ the **Administration** panel after login.
 
 ---
 
+## Development
+
+**Prerequisites:** PHP ≥ 8.4, Composer ≥ 2.0, Node.js / npm
+
+1. Clone the repository
+2. Run the development setup:
+   ```bash
+   composer dev-setup
+   ```
+3. Edit `phpunit.xml` and set your local test database credentials (see [TESTING.md](TESTING.md))
+
+---
+
 ## Tests
 
 The test suite uses PHPUnit 13 against a dedicated `pxmboard_test` database.
