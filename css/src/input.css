@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-/* Scan HTMX skin templates for Tailwind class detection */
-@source "../../../skins/htmx/";
+/* Scan PXM skin templates for Tailwind class detection */
+@source "../../skins/pxm/";
 
 /* Remove focus outline on links (Chrome treats clicked links as focus-visible) */
 a:focus {
