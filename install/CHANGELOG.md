@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.0.0] - 2026-02-10
+## [3.0.0-alpha] (unreleased - in development) - 2026-02-10 
 
 ### System Requirements
 
