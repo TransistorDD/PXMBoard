@@ -1,0 +1,926 @@
+@import "tailwindcss";
+
+/* Scan HTMX skin templates for Tailwind class detection */
+@source "../../../skins/htmx/";
+
+/* Remove focus outline on links (Chrome treats clicked links as focus-visible) */
+a:focus {
+  outline: none;
+}
+/* Remove focus outline on buttons for mouse clicks; keep for keyboard navigation */
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ======================================================================
+   THEME: Semantic color tokens for HTMX Skin
+   All colors are role-based, no color names as identifiers.
+   ====================================================================== */
+@theme {
+  /* Surface colors (backgrounds) */
+  --color-surface-primary: #ffffff;
+  --color-surface-secondary: #f3f4f6;
+  --color-surface-tertiary: #e9ecef;
+  --color-surface-header: #17A2B8;
+  --color-surface-header-mid: #0E8A9F;
+  --color-surface-header-end: #0C7489;
+  --color-surface-header-alt: #0a8882;
+
+  /* Content colors (text) */
+  --color-content-primary: #2c3e50;
+  --color-content-secondary: #6c757d;
+  --color-content-inverse: #ffffff;
+  --color-content-header-icon: rgba(255, 255, 255, 0.85);
+
+  /* Accent colors */
+  --color-accent: #17a2b8;
+  --color-accent-hover: #0e8a9f;
+  --color-accent-deep: #0c7489;
+  --color-accent-tint: rgba(23, 162, 184, 0.12);
+  --color-accent-danger: #e74c3c;
+  --color-accent-danger-hover: #c0392b;
+  --color-accent-success: #22c55e;
+  --color-accent-warning: #f59e0b;
+
+  /* Link colors */
+  --color-link: #0e8a9f;
+  --color-link-hover: #0c7489;
+
+  /* Border colors */
+  --color-border-default: #dee2e6;
+  --color-border-light: #e5e7eb;
+
+  /* Interactive states */
+  --color-hover-bg: #f3f4f6;
+
+  /* Status colors (thread status) */
+  --color-status-active: #22c55e;
+  --color-status-pinned: #f59e0b;
+  --color-status-closed: #6b7280;
+
+  /* Board status colors */
+  --color-board-open: #22c55e;
+  --color-board-locked: #eab308;
+  --color-board-viewonly: #3b82f6;
+  --color-board-protected: #8b5cf6;
+  --color-board-closed: #ef4444;
+}
+
+/* Dark Theme Override */
+[data-theme="dark"] {
+  /* Surface hierarchy (tiefstes → erhoben):
+     secondary = Seiten-Canvas (dunkelste Ebene)
+     primary   = Karten, Panele, Modal (erhöht über dem Canvas)
+     tertiary  = Buttons, Tags innerhalb von Karten */
+  --color-surface-primary: #1e3148;
+  --color-surface-secondary: #0c1727;
+  --color-surface-tertiary: #253a54;
+
+  /* Content colors */
+  --color-content-primary: #dde6f0;
+  --color-content-secondary: #8a9db8;
+  --color-content-inverse: #ffffff;
+
+  /* Accent tint (slightly more visible on dark backgrounds) */
+  --color-accent-tint: rgba(23, 162, 184, 0.2);
+
+  /* Link colors (brighter for contrast on dark backgrounds) */
+  --color-link: #38bdf8;
+  --color-link-hover: #7dd3fc;
+
+  /* Border colors */
+  --color-border-default: #2e4560;
+  --color-border-light: #192d44;
+
+  /* Interactive states */
+  --color-hover-bg: #243a52;
+}
+
+/* ======================================================================
+   COMPONENT CLASSES
+   ====================================================================== */
+@layer components {
+
+  /* --- Loading Indicator (HTMX) --- */
+  .htmx-indicator {
+    display: none;
+  }
+  .htmx-request .htmx-indicator,
+  .htmx-request.htmx-indicator {
+    display: block;
+  }
+  .htmx-indicator-spinner {
+    @apply inline-block;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid var(--color-border-default);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: htmx-spin 0.6s linear infinite;
+  }
+
+  /* --- Loading Bar (top progress bar) --- */
+  .htmx-loading-bar {
+    @apply fixed top-0 left-0 right-0 z-[9999];
+    height: 3px;
+    background-color: var(--color-accent);
+    animation: htmx-progress 1s ease-in-out infinite;
+  }
+  @keyframes htmx-spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes htmx-progress {
+    0% { transform: scaleX(0); transform-origin: left; }
+    50% { transform: scaleX(1); transform-origin: left; }
+    50.01% { transform: scaleX(1); transform-origin: right; }
+    100% { transform: scaleX(0); transform-origin: right; }
+  }
+
+  /* --- Buttons --- */
+  .htmx-btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors text-sm;
+    color: var(--color-content-primary);
+    background-color: var(--color-surface-tertiary);
+    border: 1px solid var(--color-border-default);
+  }
+  .htmx-btn:hover {
+    background-color: var(--color-hover-bg);
+    border-color: var(--color-content-secondary);
+  }
+  .htmx-btn-primary {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors text-sm;
+    color: var(--color-content-inverse);
+    background-color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+  }
+  .htmx-btn-primary:hover {
+    background-color: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+  }
+  .htmx-btn-danger {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors text-sm;
+    color: var(--color-content-inverse);
+    background-color: var(--color-accent-danger);
+    border: 1px solid var(--color-accent-danger);
+  }
+  .htmx-btn-danger:hover {
+    background-color: var(--color-accent-danger-hover);
+    border-color: var(--color-accent-danger-hover);
+  }
+  .htmx-btn-outline {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors text-sm;
+    color: var(--color-accent);
+    background-color: transparent;
+    border: 1px solid var(--color-accent);
+  }
+  .htmx-btn-outline:hover {
+    color: var(--color-content-inverse);
+    background-color: var(--color-accent);
+  }
+
+  /* --- Header --- */
+  .htmx-header {
+    background: linear-gradient(90deg, var(--color-surface-header) 0%, var(--color-surface-header-mid) 50%, var(--color-surface-header-end) 100%);
+    color: var(--color-content-inverse);
+    @apply shadow-md;
+  }
+  .htmx-header nav a,
+  .htmx-header nav button,
+  .htmx-header nav > div > button {
+    color: var(--color-content-header-icon);
+  }
+
+  /* --- Table --- */
+  .htmx-table {
+    @apply w-full border-collapse text-sm;
+  }
+  .htmx-table th {
+    @apply px-3 py-2 text-left;
+    background-color: var(--color-surface-secondary);
+    color: var(--color-content-secondary);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  .htmx-table td {
+    @apply px-3 py-1.5;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  /* --- Thread List Grid --- */
+  .htmx-thread-list-header {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(6rem, 1fr) 8rem 7rem 3rem 3rem 9rem;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--color-surface-secondary);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-content-secondary);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  .htmx-thread-list-header a {
+    color: var(--color-content-secondary);
+  }
+  .htmx-thread-list-header a:hover {
+    color: var(--color-content-primary);
+  }
+  .htmx-thread-row {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(6rem, 1fr) 8rem 7rem 3rem 3rem 9rem;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  .htmx-thread-row:hover {
+    background-color: var(--color-hover-bg);
+  }
+  .htmx-thread-row--unread .htmx-col-subject {
+    font-weight: 600;
+  }
+  .htmx-thread-row-pinned { --thread-status-color: var(--color-status-pinned); }
+  .htmx-thread-row-active { --thread-status-color: var(--color-status-active); }
+  .htmx-thread-row-closed { --thread-status-color: var(--color-status-closed); }
+
+  .htmx-col-status { display: flex; align-items: center; }
+  .htmx-col-subject { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .htmx-col-author { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Read tracking: visited links appear dimmer (works for all users, primary
+     indicator for non-logged-in users who have no server-side read status) */
+  a.htmx-col-subject:visited {
+    color: var(--color-content-secondary);
+  }
+  .htmx-thread-msg-row a:visited {
+    color: var(--color-content-secondary);
+  }
+
+  /* --- Thread Tree --- */
+  .htmx-thread-tree {
+    @apply ml-2 pl-4 my-0;
+    list-style-type: disc;
+    list-style-position: outside;
+  }
+  .htmx-thread-tree li {
+    @apply my-0 py-0;
+  }
+  .htmx-thread-msg-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+  }
+  .htmx-msg-meta {
+    display: inline;
+    color: var(--color-content-secondary);
+    font-size: 0.8125rem;
+  }
+  .htmx-msg-selected {
+    background-color: var(--color-accent-tint);
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.25rem;
+    outline: 1px solid var(--color-accent);
+    outline-offset: -1px;
+  }
+
+  /* --- Thread Root Header (first/root message shown as sticky header row) --- */
+  .htmx-thread-root-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    background-color: var(--color-surface-secondary);
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  .htmx-thread-root-header a {
+    color: var(--color-link);
+  }
+  .htmx-thread-root-header a:hover {
+    text-decoration: underline;
+  }
+
+  /* --- Prose Styles (message content) --- */
+  .prose blockquote {
+    @apply border-l-4 pl-4 ml-0 my-3;
+    border-color: var(--color-accent);
+    color: var(--color-content-secondary);
+  }
+  .prose a {
+    color: var(--color-link);
+    @apply hover:underline;
+  }
+  .prose a:hover {
+    color: var(--color-link-hover);
+  }
+  .prose img {
+    @apply max-w-full h-auto rounded;
+  }
+
+  /* --- TipTap Editor --- */
+  .tiptap-editor {
+    @apply rounded-lg overflow-hidden;
+    border: 1px solid var(--color-border-default);
+    background-color: var(--color-surface-primary);
+  }
+  .tiptap-editor .ProseMirror {
+    @apply outline-none p-4 min-h-[200px] max-h-[600px] overflow-y-auto;
+  }
+  .tiptap-editor .ProseMirror > * + * {
+    @apply mt-3;
+  }
+  .tiptap-editor .ProseMirror blockquote {
+    @apply border-l-4 pl-4 ml-0;
+    border-color: var(--color-accent);
+    color: var(--color-content-secondary);
+  }
+  .tiptap-editor .ProseMirror img {
+    @apply max-w-full h-auto rounded;
+  }
+  .tiptap-editor .ProseMirror a {
+    color: var(--color-link);
+    @apply hover:underline;
+  }
+  .tiptap-editor .ProseMirror .spoiler {
+    @apply px-3 py-2 rounded border border-dashed my-2;
+    background-color: var(--color-surface-secondary);
+    border-color: var(--color-border-default);
+  }
+  .tiptap-editor .ProseMirror .member-content {
+    @apply px-3 py-2 rounded border-l-2 my-2;
+    border-color: var(--color-accent);
+    background-color: var(--color-surface-secondary);
+  }
+  .tiptap-editor .ProseMirror .mention {
+    color: var(--color-accent);
+    @apply font-medium;
+  }
+
+  /* Video Embeds in Editor */
+  .tiptap-editor .ProseMirror .youtube-embed,
+  .tiptap-editor .ProseMirror .twitch-embed {
+    @apply my-4;
+  }
+  .tiptap-editor .ProseMirror .youtube-embed iframe,
+  .tiptap-editor .ProseMirror .twitch-embed iframe {
+    @apply max-w-full rounded;
+  }
+  .tiptap-editor .ProseMirror .youtube-placeholder,
+  .tiptap-editor .ProseMirror .twitch-placeholder {
+    @apply flex items-center gap-3 px-4 py-3 my-4 border-2 rounded-lg cursor-pointer;
+    background-color: var(--color-surface-secondary);
+    border-color: var(--color-border-default);
+  }
+  .tiptap-editor .ProseMirror .youtube-placeholder:hover,
+  .tiptap-editor .ProseMirror .twitch-placeholder:hover {
+    border-color: var(--color-accent);
+    background-color: var(--color-hover-bg);
+  }
+  .tiptap-editor .ProseMirror .video-placeholder-icon {
+    @apply text-3xl flex-shrink-0;
+  }
+  .tiptap-editor .ProseMirror .video-placeholder-text {
+    @apply text-sm font-medium truncate;
+    color: var(--color-content-primary);
+  }
+
+  /* TipTap Toolbar */
+  .tiptap-toolbar {
+    @apply flex flex-wrap gap-1 p-2 border-b;
+    background-color: var(--color-surface-secondary);
+    border-color: var(--color-border-default);
+  }
+  .tiptap-toolbar button {
+    @apply px-3 py-1.5 text-sm font-medium rounded border transition-colors;
+    color: var(--color-content-primary);
+    background-color: var(--color-surface-primary);
+    border-color: var(--color-border-default);
+  }
+  .tiptap-toolbar button:hover {
+    background-color: var(--color-hover-bg);
+  }
+  .tiptap-toolbar button.is-active {
+    color: var(--color-content-inverse);
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+  .tiptap-toolbar button:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  /* Responsive Video Embeds in parsed content */
+  .prose .youtube-embed,
+  .prose .twitch-embed {
+    @apply relative my-4 rounded overflow-hidden;
+    padding-bottom: 56.25%;
+    height: 0;
+  }
+  .prose .youtube-embed iframe,
+  .prose .twitch-embed iframe {
+    @apply absolute top-0 left-0 w-full h-full rounded;
+  }
+
+  /* --- Toggle Switch --- */
+  .toggle-switch {
+    @apply relative inline-block cursor-pointer;
+    width: 2.75rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+  }
+  .toggle-switch input {
+    @apply absolute opacity-0 w-0 h-0;
+  }
+  .toggle-switch-track {
+    @apply absolute inset-0 rounded-full transition-colors;
+    background-color: var(--color-border-default);
+  }
+  .toggle-switch-track::before {
+    @apply absolute rounded-full transition-transform;
+    content: '';
+    width: 1.125rem;
+    height: 1.125rem;
+    left: 0.1875rem;
+    bottom: 0.1875rem;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+  .toggle-switch input:checked + .toggle-switch-track {
+    background-color: var(--color-accent);
+  }
+  .toggle-switch input:checked + .toggle-switch-track::before {
+    transform: translateX(1.25rem);
+  }
+  .toggle-switch input:focus-visible + .toggle-switch-track {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* --- Close Button --- */
+  .htmx-close-btn {
+    @apply rounded-full flex items-center justify-center transition-colors;
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--color-content-secondary);
+    outline: none;
+  }
+  .htmx-close-btn:hover {
+    color: var(--color-content-primary);
+    background-color: var(--color-hover-bg);
+  }
+  .htmx-close-btn:focus {
+    outline: none;
+  }
+
+  /* --- Form Labels --- */
+  .htmx-formlabel {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-content-secondary);
+  }
+
+  /* --- Board Layout Modes --- */
+  .htmx-board-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  /* Divider drag handles between panels */
+  .htmx-divider {
+    flex-shrink: 0;
+    position: relative;
+    background-color: transparent;
+    z-index: 1;
+  }
+  /* Visual indicator: thin 2px line with inset so it doesn't span full height/width */
+  .htmx-divider::after {
+    content: '';
+    position: absolute;
+    background-color: var(--color-border-light);
+    border-radius: 1px;
+    transition: background-color 0.15s;
+  }
+  .htmx-divider:hover::after,
+  .htmx-divider.htmx-dragging::after {
+    background-color: var(--color-accent);
+  }
+  .htmx-divider[data-divider="h"],
+  .htmx-divider[data-divider="h2"] {
+    height: 6px;
+    cursor: row-resize;
+  }
+  .htmx-divider[data-divider="h"]::after,
+  .htmx-divider[data-divider="h2"]::after {
+    left: 12px;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 2px;
+  }
+  .htmx-divider[data-divider="v"] {
+    width: 6px;
+    cursor: col-resize;
+  }
+  .htmx-divider[data-divider="v"]::after {
+    top: 12px;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+  }
+
+  /* --- Desktop: side-by-side layout (>= 1025px) --- */
+  @media (min-width: 1025px) {
+    .htmx-board-layout[data-layout="sidebyside"],
+    .htmx-board-layout:not([data-layout]) {
+      display: grid;
+      /* Default: 60% content column, 6px divider, 40% thread column */
+      grid-template-columns: 3fr 6px 2fr;
+      /* Default: 50% threadlist row, 6px divider, 50% message row */
+      grid-template-rows: 1fr 6px 1fr;
+      grid-template-areas:
+        "threadlist divider-v thread"
+        "divider-h  divider-v thread"
+        "message    divider-v thread";
+    }
+    .htmx-board-layout[data-layout="sidebyside"] #threadlist-container,
+    .htmx-board-layout:not([data-layout]) #threadlist-container {
+      grid-area: threadlist; overflow: auto; min-height: 0; min-width: 0;
+    }
+    .htmx-board-layout[data-layout="sidebyside"] #thread-container,
+    .htmx-board-layout:not([data-layout]) #thread-container {
+      grid-area: thread; overflow: auto; min-height: 0; min-width: 0;
+    }
+    .htmx-board-layout[data-layout="sidebyside"] #message-container,
+    .htmx-board-layout:not([data-layout]) #message-container {
+      grid-area: message; overflow: auto; min-height: 0; min-width: 0;
+    }
+    .htmx-board-layout[data-layout="sidebyside"] .htmx-divider[data-divider="h"],
+    .htmx-board-layout:not([data-layout]) .htmx-divider[data-divider="h"] {
+      grid-area: divider-h; height: auto;
+    }
+    .htmx-board-layout[data-layout="sidebyside"] .htmx-divider[data-divider="v"],
+    .htmx-board-layout:not([data-layout]) .htmx-divider[data-divider="v"] {
+      grid-area: divider-v; width: auto;
+    }
+    /* h2 divider is stacked-only: hide in side-by-side */
+    .htmx-board-layout[data-layout="sidebyside"] .htmx-divider[data-divider="h2"],
+    .htmx-board-layout:not([data-layout]) .htmx-divider[data-divider="h2"] {
+      display: none;
+    }
+  }
+
+  /* --- Stacked layout (forced at any viewport width) --- */
+  .htmx-board-layout[data-layout="stacked"] {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 6px 1fr 6px 1fr;
+    grid-template-areas:
+      "threadlist"
+      "divider-h"
+      "thread"
+      "divider-h2"
+      "message";
+  }
+  .htmx-board-layout[data-layout="stacked"] #threadlist-container {
+    grid-area: threadlist; overflow: auto; min-height: 0;
+  }
+  .htmx-board-layout[data-layout="stacked"] #thread-container {
+    grid-area: thread; overflow: auto; min-height: 0;
+  }
+  .htmx-board-layout[data-layout="stacked"] #message-container {
+    grid-area: message; overflow: auto; min-height: 0;
+  }
+  .htmx-board-layout[data-layout="stacked"] .htmx-divider[data-divider="h"] {
+    grid-area: divider-h; height: auto;
+  }
+  .htmx-board-layout[data-layout="stacked"] .htmx-divider[data-divider="h2"] {
+    grid-area: divider-h2; height: auto;
+  }
+  .htmx-board-layout[data-layout="stacked"] .htmx-divider[data-divider="v"] {
+    display: none;
+  }
+
+  /* --- Narrow screens: auto-stacked (<= 1024px, unless forced sidebyside) --- */
+  @media (max-width: 1024px) {
+    .htmx-board-layout:not([data-layout="sidebyside"]) {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr 6px 1fr 6px 1fr;
+      grid-template-areas:
+        "threadlist"
+        "divider-h"
+        "thread"
+        "divider-h2"
+        "message";
+    }
+    .htmx-board-layout:not([data-layout="sidebyside"]) #threadlist-container {
+      grid-area: threadlist; overflow: auto; min-height: 0;
+    }
+    .htmx-board-layout:not([data-layout="sidebyside"]) #thread-container {
+      grid-area: thread; overflow: auto; min-height: 0;
+    }
+    .htmx-board-layout:not([data-layout="sidebyside"]) #message-container {
+      grid-area: message; overflow: auto; min-height: 0;
+    }
+    .htmx-board-layout:not([data-layout="sidebyside"]) .htmx-divider[data-divider="h"] {
+      grid-area: divider-h; height: auto;
+    }
+    .htmx-board-layout:not([data-layout="sidebyside"]) .htmx-divider[data-divider="h2"] {
+      grid-area: divider-h2; height: auto;
+    }
+    .htmx-board-layout:not([data-layout="sidebyside"]) .htmx-divider[data-divider="v"] {
+      display: none;
+    }
+  }
+}
+
+/* ======================================================================
+   MODAL DIALOG
+   ====================================================================== */
+dialog#htmxModal::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+dialog#htmxModal[open] {
+  animation: htmx-modal-in 0.15s ease-out;
+}
+@keyframes htmx-modal-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Dropdown options theme-aware */
+select option {
+  color: var(--color-content-primary);
+  background-color: var(--color-surface-primary);
+}
+
+/* Parsed content styles (from cPxmParser.php) */
+.spoiler-button {
+  @apply inline-flex items-center gap-1 px-2 py-1 text-sm font-medium;
+  color: var(--color-content-primary);
+  background-color: var(--color-surface-secondary);
+  border-radius: 0.25rem;
+  border: 1px solid var(--color-border-default);
+  transition: background-color 0.15s ease-in-out;
+}
+.spoiler-button:hover {
+  background-color: var(--color-hover-bg);
+}
+.spoiler-button .spoiler-emoji {
+  @apply text-base;
+}
+
+.member-content {
+  @apply inline-flex items-center;
+}
+.member-content .member-icon {
+  @apply text-base mr-1;
+}
+
+.member-locked {
+  @apply inline-flex items-center gap-1 px-3 py-2 text-sm rounded;
+  color: var(--color-content-secondary);
+  background-color: var(--color-surface-secondary);
+  border: 1px solid var(--color-border-default);
+}
+.member-locked .member-icon {
+  @apply text-base;
+}
+
+/* YouTube & Twitch Embeds (parsed content) */
+.youtube-embed,
+.twitch-embed {
+  @apply my-4;
+}
+.youtube-embed iframe,
+.twitch-embed iframe {
+  @apply max-w-full rounded;
+}
+
+/* ======================================================================
+   HTMX REQUEST OVERLAY: Dim target area during loading
+   ====================================================================== */
+.htmx-request {
+  opacity: 0.6;
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* ======================================================================
+   DETAIL PAGE WRAPPER
+   In desktop mode: transparent to CSS Grid (children participate in
+   parent grid via display:contents). In mobile: real flex container.
+   ====================================================================== */
+#detail-page {
+  display: contents;
+}
+
+
+/* ======================================================================
+   MOBILE VIEW
+   Activated by: html.is-mobile (set by JS based on data-view="mobile" or
+   auto-detection when viewport <= 768px without data-view="desktop").
+   ====================================================================== */
+
+/* --- Mobile-hide utility: hide header elements in mobile --- */
+html.is-mobile .mobile-hide {
+  display: none;
+}
+
+/* --- Mobile Footer --- */
+:root {
+  --mobile-footer-height: 3.25rem; /* 2.25rem button + 0.5rem padding top + 0.5rem padding bottom */
+}
+.htmx-mobile-footer {
+  display: none;
+}
+html.is-mobile .htmx-mobile-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  border-top: 1px solid var(--color-border-default);
+  background-color: var(--color-surface-primary);
+  color: var(--color-content-primary);
+}
+html.is-mobile #main-content {
+  overflow: hidden;
+  padding-bottom: var(--mobile-footer-height);
+}
+.htmx-mobile-footer-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  color: var(--color-content-primary);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.htmx-mobile-footer-btn:hover {
+  background-color: var(--color-hover-bg);
+}
+.htmx-mobile-footer-newpost {
+  margin-left: auto;
+  padding: 0.375rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 1.5rem;
+  cursor: pointer;
+  color: var(--color-content-inverse);
+  background-color: var(--color-accent-danger);
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+.htmx-mobile-footer-newpost:hover {
+  background-color: var(--color-accent-danger-hover);
+}
+
+/* --- Mobile Board Layout: Two-Page Slide System --- */
+html.is-mobile .htmx-board-layout {
+  display: grid;
+  grid-template-columns: 100% 100%;
+  grid-template-rows: 1fr;
+  grid-template-areas: none;
+  transition: transform 0.3s ease;
+}
+html.is-mobile .htmx-board-layout.mobile-show-detail {
+  transform: translateX(-100%);
+}
+html.is-mobile .htmx-board-layout > .htmx-divider {
+  display: none;
+}
+/* h2 divider (message/thread split) is inside #detail-page, not a direct child;
+   re-show it in mobile so users can adjust the panel heights */
+html.is-mobile #detail-page .htmx-divider[data-divider="h2"] {
+  display: block;
+  width: 100%;
+}
+html.is-mobile #threadlist-container {
+  grid-column: 1;
+  grid-row: 1;
+  overflow-y: auto;
+  min-height: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+html.is-mobile #detail-page {
+  display: flex;
+  flex-direction: column;
+  grid-column: 2;
+  grid-row: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+html.is-mobile #message-container {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+html.is-mobile #thread-container {
+  flex: 0 0 auto;
+  max-height: 40%;
+  overflow-y: auto;
+  min-height: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+
+/* --- Mobile Threadlist: Card Layout --- */
+html.is-mobile .htmx-thread-list-header {
+  display: none;
+}
+html.is-mobile .htmx-thread-row {
+  grid-template-columns: 1.25rem 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: start;
+  padding: 0.75rem;
+  margin: 0.375rem 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border-light);
+  background-color: var(--color-surface-primary);
+  cursor: pointer;
+  gap: 0.125rem 0.5rem;
+}
+html.is-mobile .htmx-thread-row:hover {
+  background-color: var(--color-hover-bg);
+}
+html.is-mobile .htmx-col-status {
+  grid-column: 1;
+  grid-row: 1;
+  padding-top: 0.125rem;
+}
+html.is-mobile .htmx-col-subject {
+  grid-column: 2;
+  grid-row: 1;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  font-weight: 500;
+}
+html.is-mobile .htmx-col-author {
+  grid-column: 2;
+  grid-row: 2;
+  font-size: 0.75rem;
+}
+html.is-mobile .htmx-col-date {
+  display: none;
+}
+html.is-mobile .htmx-col-views {
+  display: none;
+}
+html.is-mobile .htmx-col-replies {
+  grid-column: 3;
+  grid-row: 1;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 2rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 1rem;
+  background-color: var(--color-surface-tertiary);
+  color: var(--color-content-secondary);
+}
+html.is-mobile .htmx-col-lastpost {
+  grid-column: 3;
+  grid-row: 2;
+  font-size: 0.6875rem;
+  text-align: right;
+}
+
+/* --- Mobile Header Adjustments --- */
+html.is-mobile .htmx-header {
+  height: 3rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+html.is-mobile .htmx-header img {
+  height: 1.75rem;
+}
+html.is-mobile .htmx-header nav {
+  gap: 0.5rem;
+}
+

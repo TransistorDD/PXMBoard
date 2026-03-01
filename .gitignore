@@ -1,0 +1,50 @@
+# Credentials / local config
+config/pxmboard-config.php
+public/pxmboard-basedir.php
+phpunit.xml
+
+# Local deployment (shell scripts, not project source)
+*.sh
+deploy/
+
+# AI guidelines (not committed)
+Agents.md
+
+# User stories (local workflow)
+stories/
+
+# Smarty template cache
+skins/pxm/cache/*
+!skins/pxm/cache/DELETEME
+
+# Legacy skins (maintained separately or to be removed)
+skins/pp/
+
+# Legacy CSS / JS
+css/deprecated/
+public/js/deprecated/
+
+# User-uploaded profile pictures
+public/images/profile/*
+!public/images/profile/DELETEME
+
+# Generated: CSS build output (npm run build:css)
+public/css/pxmboard.css
+
+# Generated: JS build output (npm run build / Vite)
+public/js/editor-bundle.js
+public/js/alpine.min.js
+public/js/htmx.min.js
+build/dist/
+
+# Composer dependencies
+/vendor/
+
+# NPM dependencies
+node_modules/
+
+# PHPUnit cache and generated reports
+.phpunit.cache/
+.phpunit.result.cache
+/coverage/
+/reports/

@@ -1,0 +1,37 @@
+{
+    "name": "transistor/pxmboard",
+    "type": "project",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Torsten Rentsch",
+            "email": "forum@torsten-rentsch.de"
+        }
+    ],
+    "require": {
+        "php": ">=8.4",
+        "smarty/smarty": "^5.8"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^13.0",
+        "elasticsearch/elasticsearch": "^9.3"
+    },
+    "suggest": {
+        "elasticsearch/elasticsearch": "^9.3 (Wird für die erweiterte Volltextsuche benötigt. Ohne dieses Paket steht nur die Basissuche zur Verfügung.)"
+    },
+    "autoload-dev": {
+        "classmap": [
+            "src/"
+        ],
+        "psr-4": {
+            "PXMBoard\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "php-http/discovery": false
+        }
+    }
+}

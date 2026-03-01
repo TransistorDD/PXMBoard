@@ -1,0 +1,140 @@
+<?php
+require_once(SRCDIR . '/Model/cBoard.php');
+require_once(SRCDIR . '/Enum/eBoardStatus.php');
+/**
+ * boardlist handling
+ *
+ * @link      https://github.com/TransistorDD/PXMBoard
+ * @author    Torsten Rentsch <forum@torsten-rentsch.de>
+ * @copyright 2001-2026 Torsten Rentsch
+ * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
+ */
+class cBoardList{
+
+	protected array $m_arrBoards;			// boards
+
+	/**
+	 * Constructor
+	 *
+	 * @return void
+	 */
+	public function __construct(){
+		$this->m_arrBoards = array();
+	}
+
+	/**
+	 * get data from database
+	 *
+	 * @return boolean success / failure
+	 */
+	public function loadData(){
+
+
+		if($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT b_id,b_name,b_description,b_position,b_lastmsgtstmp,b_status FROM pxm_board ORDER BY b_position ASC")){
+
+			while($objResultRow = $objResultSet->getNextResultRowObject()){
+
+				$objBoard = new cBoard();
+
+				$objBoard->setId($objResultRow->b_id);
+				$objBoard->setName($objResultRow->b_name);
+				$objBoard->setDescription($objResultRow->b_description);
+				$objBoard->setPosition($objResultRow->b_position);
+				$objBoard->setLastMessageTimestamp($objResultRow->b_lastmsgtstmp);
+				$objBoard->setStatus(BoardStatus::from($objResultRow->b_status));
+
+				$objBoard->loadModData();
+
+				$this->m_arrBoards[] = $objBoard;
+			}
+			$objResultSet->freeResult();
+		}
+		else{
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * get basic data from database (without description, last message date and moderators)
+	 *
+	 * @return boolean success / failure
+	 */
+	public function loadBasicData(){
+
+
+		if($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT b_id,b_name,b_position,b_status FROM pxm_board ORDER BY b_position ASC")){
+
+			while($objResultRow = $objResultSet->getNextResultRowObject()){
+
+				$objBoard = new cBoard();
+
+				$objBoard->setId($objResultRow->b_id);
+				$objBoard->setName($objResultRow->b_name);
+				$objBoard->setPosition($objResultRow->b_position);
+				$objBoard->setStatus(BoardStatus::from($objResultRow->b_status));
+
+				$this->m_arrBoards[] = $objBoard;
+			}
+			$objResultSet->freeResult();
+		}
+		else{
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * open boards - sets status to PUBLIC for specified boards
+	 *
+	 * @param array $arrBoardIds board ids
+	 * @return boolean success / failure
+	 */
+	public function openBoards($arrBoardIds){
+
+
+		if(sizeof($arrBoardIds)>0){
+			if(!cDBFactory::getInstance()->executeQuery("UPDATE pxm_board SET b_status=1 WHERE b_id IN (".implode(",",$arrBoardIds).")")){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * close all boards - sets status to CLOSED for all boards
+	 *
+	 * @return array closed boards
+	 */
+	public function closeAllBoards(){
+
+		$arrClosedBoards = array();
+
+		if($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT b_id FROM pxm_board WHERE b_status!=5")){
+			while($objResultRow = $objResultSet->getNextResultRowObject()){
+				$arrClosedBoards[] = $objResultRow->b_id;
+			}
+			cDBFactory::getInstance()->executeQuery("UPDATE pxm_board SET b_status=5");
+		}
+		return $arrClosedBoards;
+	}
+
+	/**
+	 * get membervariables as array
+	 *
+	 * @param integer $iTimeOffset time offset in seconds
+	 * @param string $sDateFormat php date format
+	 * @param integer $iLastOnlineTimestamp last online timestamp for user
+	 * @param object $objParser message parser (for signature)
+	 * @return array member variables
+	 */
+	public function getDataArray($iTimeOffset,$sDateFormat,$iLastOnlineTimestamp,$objParser){
+
+		$arrOutput = array();
+		foreach ($this->m_arrBoards as $objBoard) {
+    		$arrOutput[] = $objBoard->getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp, $objParser);
+		}
+		return $arrOutput;
+	}
+}
+?>

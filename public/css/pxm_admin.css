@@ -1,0 +1,558 @@
+/*
+ * PXMBoard Admin / Installer CSS
+ *
+ * Standalone stylesheet for the installer and admin area.
+ * No dependencies on TailwindCSS or the main skin CSS.
+ * Color scheme: Teal/Cyan primary (#008080 / #20b2aa), neutral grays.
+ *
+ * @author    Torsten Rentsch <forum@torsten-rentsch.de>
+ * @copyright 2001-2026 Torsten Rentsch
+ */
+
+:root {
+    --pxm-primary:       #008080;
+    --pxm-primary-light: #20b2aa;
+    --pxm-primary-dark:  #006666;
+    --pxm-danger:        #c0392b;
+    --pxm-danger-dark:   #a93226;
+    --pxm-success-bg:    #eafaf1;
+    --pxm-success-border:#27ae60;
+    --pxm-success-text:  #1e8449;
+    --pxm-error-bg:      #fdf2f2;
+    --pxm-error-border:  #e74c3c;
+    --pxm-error-text:    #c0392b;
+    --pxm-warning-bg:    #fef9e7;
+    --pxm-warning-border:#f39c12;
+    --pxm-warning-text:  #9a7d0a;
+    --pxm-gray-50:       #f8f9fa;
+    --pxm-gray-100:      #f1f3f5;
+    --pxm-gray-200:      #e9ecef;
+    --pxm-gray-400:      #ced4da;
+    --pxm-gray-600:      #6c757d;
+    --pxm-gray-800:      #343a40;
+    --pxm-text:          #212529;
+    --pxm-radius:        4px;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--pxm-gray-100);
+    color: var(--pxm-text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+h1, h2, h3 {
+    margin: 0 0 0.75rem 0;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.2rem; }
+h3 { font-size: 1rem; }
+
+p {
+    margin: 0 0 0.75rem 0;
+}
+
+a {
+    color: var(--pxm-primary);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* -----------------------------------------------------------------------
+   Header with logo
+----------------------------------------------------------------------- */
+
+.pxm-admin-header {
+    background: var(--pxm-primary);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+}
+
+.pxm-admin-header img {
+    height: 40px;
+    width: auto;
+}
+
+/* -----------------------------------------------------------------------
+   Page container
+----------------------------------------------------------------------- */
+
+.pxm-admin-container {
+    max-width: 820px;
+    margin: 32px auto;
+    padding: 0 16px;
+}
+
+/* -----------------------------------------------------------------------
+   Card (form section)
+----------------------------------------------------------------------- */
+
+.pxm-admin-card {
+    background: #fff;
+    border: 1px solid var(--pxm-gray-200);
+    border-radius: var(--pxm-radius);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.pxm-admin-card__header {
+    background: var(--pxm-primary);
+    color: #fff;
+    padding: 10px 16px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+}
+
+.pxm-admin-card__body {
+    padding: 20px 16px;
+}
+
+/* -----------------------------------------------------------------------
+   Form groups
+----------------------------------------------------------------------- */
+
+.pxm-form-group {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 8px 16px;
+    align-items: start;
+    margin-bottom: 14px;
+}
+
+.pxm-form-group label {
+    padding-top: 6px;
+    font-weight: 500;
+    color: var(--pxm-gray-800);
+    word-break: break-word;
+}
+
+.pxm-form-group .pxm-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.pxm-form-group .pxm-hint {
+    font-size: 0.82rem;
+    color: var(--pxm-gray-600);
+}
+
+.pxm-form-group .pxm-inline-error {
+    font-size: 0.82rem;
+    color: var(--pxm-error-text);
+}
+
+/* -----------------------------------------------------------------------
+   Inputs
+----------------------------------------------------------------------- */
+
+input[type="text"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--pxm-gray-400);
+    border-radius: var(--pxm-radius);
+    font-size: 14px;
+    color: var(--pxm-text);
+    background: #fff;
+    transition: border-color 0.15s;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+select:focus {
+    outline: none;
+    border-color: var(--pxm-primary-light);
+    box-shadow: 0 0 0 2px rgba(32, 178, 170, 0.2);
+}
+
+input[type="text"]:disabled,
+input[type="password"]:disabled,
+select:disabled {
+    background: var(--pxm-gray-100);
+    color: var(--pxm-gray-600);
+    cursor: not-allowed;
+}
+
+input[type="text"].pxm-input--inline {
+    width: auto;
+    display: inline;
+}
+
+.pxm-radio-group,
+.pxm-checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 4px;
+}
+
+.pxm-radio-group label,
+.pxm-checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--pxm-primary);
+    cursor: pointer;
+}
+
+input[type="radio"]:disabled,
+input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.pxm-greyed {
+    color: var(--pxm-gray-600);
+}
+
+/* Collapsible sub-fields (ES options) */
+.pxm-sub-fields {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--pxm-gray-50);
+    border: 1px solid var(--pxm-gray-200);
+    border-radius: var(--pxm-radius);
+}
+
+/* -----------------------------------------------------------------------
+   Buttons
+----------------------------------------------------------------------- */
+
+.pxm-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border: none;
+    border-radius: var(--pxm-radius);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s, opacity 0.15s;
+}
+
+.pxm-btn--primary {
+    background: var(--pxm-primary);
+    color: #fff;
+}
+
+.pxm-btn--primary:hover {
+    background: var(--pxm-primary-dark);
+    color: #fff;
+    text-decoration: none;
+}
+
+.pxm-btn--danger {
+    background: var(--pxm-danger);
+    color: #fff;
+}
+
+.pxm-btn--danger:hover {
+    background: var(--pxm-danger-dark);
+    color: #fff;
+    text-decoration: none;
+}
+
+.pxm-btn-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 8px;
+}
+
+/* -----------------------------------------------------------------------
+   Alerts
+----------------------------------------------------------------------- */
+
+.pxm-alert {
+    padding: 12px 16px;
+    border-radius: var(--pxm-radius);
+    border-left: 4px solid transparent;
+    margin-bottom: 20px;
+}
+
+.pxm-alert--success {
+    background: var(--pxm-success-bg);
+    border-color: var(--pxm-success-border);
+    color: var(--pxm-success-text);
+}
+
+.pxm-alert--error {
+    background: var(--pxm-error-bg);
+    border-color: var(--pxm-error-border);
+    color: var(--pxm-error-text);
+}
+
+.pxm-alert--warning {
+    background: var(--pxm-warning-bg);
+    border-color: var(--pxm-warning-border);
+    color: var(--pxm-warning-text);
+}
+
+/* -----------------------------------------------------------------------
+   Responsive: narrow viewports
+----------------------------------------------------------------------- */
+
+@media (max-width: 560px) {
+    .pxm-form-group {
+        grid-template-columns: 1fr;
+    }
+
+    .pxm-form-group label {
+        padding-top: 0;
+    }
+}
+
+/* -----------------------------------------------------------------------
+   Two-column admin layout (sidebar + main content)
+----------------------------------------------------------------------- */
+
+.pxm-admin-layout {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    min-height: calc(100vh - 72px);
+    align-items: start;
+}
+
+.pxm-admin-sidebar {
+    background: var(--pxm-gray-100);
+    border-right: 1px solid var(--pxm-gray-200);
+    min-height: calc(100vh - 72px);
+    padding: 16px 0;
+    position: sticky;
+    top: 0;
+}
+
+.pxm-admin-main {
+    padding: 24px 28px;
+    max-width: 900px;
+}
+
+/* -----------------------------------------------------------------------
+   Sidebar navigation
+----------------------------------------------------------------------- */
+
+.pxm-admin-nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pxm-admin-nav__title {
+    display: block;
+    padding: 10px 16px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #fff;
+    background: var(--pxm-primary);
+    text-decoration: none;
+}
+
+.pxm-admin-nav__title:hover {
+    background: var(--pxm-primary-dark);
+    color: #fff;
+    text-decoration: none;
+}
+
+.pxm-admin-nav__label {
+    display: block;
+    padding: 8px 16px 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--pxm-gray-600);
+    margin-top: 8px;
+}
+
+.pxm-admin-nav li a {
+    display: block;
+    padding: 6px 16px 6px 24px;
+    color: var(--pxm-gray-800);
+    font-size: 0.875rem;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: background 0.1s, border-color 0.1s;
+}
+
+.pxm-admin-nav li a:hover {
+    background: var(--pxm-gray-200);
+    border-left-color: var(--pxm-primary-light);
+    text-decoration: none;
+}
+
+.pxm-admin-sidebar__footer {
+    padding: 16px;
+    margin-top: 24px;
+    border-top: 1px solid var(--pxm-gray-200);
+    color: var(--pxm-gray-600);
+    font-size: 0.78rem;
+}
+
+/* -----------------------------------------------------------------------
+   Data tables (user list, skin list, template list, etc.)
+----------------------------------------------------------------------- */
+
+.pxm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+}
+
+.pxm-table th {
+    background: var(--pxm-primary);
+    color: #fff;
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.pxm-table th a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.pxm-table th a:hover {
+    text-decoration: underline;
+}
+
+.pxm-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--pxm-gray-200);
+    vertical-align: top;
+}
+
+.pxm-table tr:nth-child(even) td {
+    background: var(--pxm-gray-50);
+}
+
+.pxm-table tfoot td,
+.pxm-table tr.pxm-table__footer td {
+    background: var(--pxm-gray-100);
+    font-weight: 600;
+    border-top: 2px solid var(--pxm-gray-400);
+}
+
+.pxm-table tr.pxm-table__special td {
+    background: var(--pxm-gray-50);
+    font-style: italic;
+    border-top: 1px solid var(--pxm-gray-300);
+    border-bottom: 1px solid var(--pxm-gray-300);
+}
+
+.pxm-table .pxm-table__num {
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* -----------------------------------------------------------------------
+   Status badges
+----------------------------------------------------------------------- */
+
+.pxm-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+.pxm-badge--ok {
+    background: var(--pxm-success-bg);
+    color: var(--pxm-success-text);
+    border: 1px solid var(--pxm-success-border);
+}
+
+.pxm-badge--warn {
+    background: #fde;
+    color: var(--pxm-danger);
+    border: 1px solid var(--pxm-error-border);
+}
+
+/* -----------------------------------------------------------------------
+   Thread-move dialog
+----------------------------------------------------------------------- */
+
+dialog.pxm-dialog {
+    border: 1px solid var(--pxm-gray-200);
+    border-radius: var(--pxm-radius);
+    padding: 0;
+    min-width: 340px;
+    max-width: 480px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.15);
+}
+
+dialog.pxm-dialog::backdrop {
+    background: rgba(0,0,0,.4);
+}
+
+.pxm-dialog__header {
+    background: var(--pxm-primary);
+    color: #fff;
+    padding: 12px 16px;
+    font-weight: 600;
+}
+
+.pxm-dialog__body {
+    padding: 20px 16px;
+}
+
+.pxm-dialog__body select {
+    margin-top: 8px;
+}
+
+.pxm-dialog__footer {
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    border-top: 1px solid var(--pxm-gray-200);
+}
+
+/* -----------------------------------------------------------------------
+   Responsive: collapse sidebar on narrow viewports
+----------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+    .pxm-admin-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .pxm-admin-sidebar {
+        min-height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid var(--pxm-gray-200);
+    }
+
+    .pxm-admin-main {
+        padding: 16px;
+    }
+}

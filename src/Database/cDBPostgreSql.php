@@ -1,0 +1,216 @@
+<?php
+require_once(SRCDIR . '/Database/cDB.php');
+/**
+ * abstraction layer for DB handling (PostgreSql)
+ *
+ * @link      https://github.com/TransistorDD/PXMBoard
+ * @author    Torsten Rentsch <forum@torsten-rentsch.de>
+ * @copyright 2001-2026 Torsten Rentsch
+ * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
+ */
+class cDBPostgreSql extends cDB{
+
+	/**
+	 * open a connection to a DB Server
+	 *
+	 * @param string $sHostName hostname
+	 * @param string $sUserName username
+	 * @param string $sPassword password
+	 * @param string $sDBName db name
+	 * @return boolean success / failure
+	 */
+	public function connectDBServer(string $sHostName = "localhost",string $sUserName = "defaultuser",string $sPassword = "",string $sDBName = ""): bool{
+		if($this->m_resDBLink = @pg_connect("host=$sHostName dbname=$sDBName user=$sUserName password=$sPassword")){
+			return true;
+		}
+		$this->_handleError("couldn't connect to server");
+		return false;
+	}
+
+	/**
+	 * execute a query
+	 *
+	 * @param string $sQuery query string
+	 * @param integer $iLimit row limit
+	 * @param integer $iOffset row offset
+	 * @return cDBResultSet|null query result set
+	 */
+	public function executeQuery(string $sQuery,int $iLimit = 0,int $iOffset = 0): ?cDBResultSet{
+
+		if(empty($sQuery)){
+			$this->_handleError("invalid querystring");
+			return null;
+		}
+		else{
+			if(!empty($iLimit)){
+				$sQuery .= " LIMIT $iLimit";
+			}
+			if(!empty($iOffset)){
+				$sQuery .= " OFFSET $iOffset";
+			}
+
+ 			if($mResult = @pg_query($this->m_resDBLink,$sQuery)){
+				// TODO: pg_query returns object in PHP 8.1+, not resource
+				if($mResult === true){
+					$mResult = null;
+				}
+				return new cDBPostgreSqlResultSet($mResult);
+			}
+			else{
+ 				$this->m_sLastErrorMessage	= pg_last_error();
+				$this->_handleError("couldn't execute query");
+				return null;
+			}
+ 		}
+	}
+
+	/**
+	 * get the id generated from the previous insert operation
+	 *
+	 * @param string $sTableName table name
+	 * @param string $sColumnName column name
+	 * @return integer insert id
+	 */
+	public function getInsertID(string $sTableName,string $sColumnName): int{
+		if($objResultSet = $this->executeQuery("SELECT currval('".$sTableName."_".$sColumnName."_seq') AS lastid")){
+			if($objResultRow = $objResultSet->getNextResultRowObject()){
+				return $objResultRow->lastid;
+			}
+		}
+		return 0;
+	}
+
+	/**
+	 * close a connection to a DB Server
+	 *
+	 * @return void
+	 */
+ 	public function disconnectDBServer(){
+ 		@pg_close($this->m_resDBLink);
+	}
+
+	/**
+	 * get the type of the connection
+	 *
+	 * @return void
+	 */
+ 	function getDBType(): string{
+		return "PostgreSQL";
+	}
+
+	/**
+	 * get the version of the db
+	 *
+	 * @return string db version
+	 */
+ 	public function getDBVersion(): string{
+		return pg_version()["client"];
+	}
+
+	/**
+	 * get the column metatype (integer, string)
+	 *
+	 * @param string $sMetaType meta name of the column type (integer, string)
+	 * @param integer $iSize size of the requested field
+	 * @return string db dependent column type
+	 */
+ 	public function getMetaType(string $sMetaType,int $iSize = -1): string{
+		$sColumnType = "";
+		switch($sMetaType){
+			case "integer"	:	$sColumnType = "INT4";
+								break;
+			case "string"	:	$sColumnType = "VARCHAR($iSize)";
+								break;
+		}
+		return $sColumnType;
+	}
+
+	/**
+	 * escape special chars in the string for use in a db query
+	 * Overrides cDB::quote() to use pg_escape_string instead of addslashes
+	 *
+	 * @param string $sString string to quote
+	 * @return string quoted string
+	 */
+	public function quote(string $sString): string{
+		return "'".pg_escape_string($this->m_resDBLink, $sString)."'";
+	}
+}
+
+/**
+ * database resultset (PostgreSql)
+ *
+ * @author Torsten Rentsch <forum@torsten-rentsch.de>
+ * @copyright Torsten Rentsch 2001 - 2026
+ */
+class cDBPostgreSqlResultSet extends cDBResultSet{
+
+	protected int $m_iRowPointer = 0;				// row pointer
+
+	/**
+	 * get next result row as an object
+	 *
+	 * @return object|false result row
+	 */
+	public function getNextResultRowObject(): object|false{
+		return @pg_fetch_object($this->m_resResultSet,$this->m_iRowPointer++);
+	}
+
+	/**
+	 * get next result row as an associative array
+	 *
+	 * @return array result row
+	 */
+	public function getNextResultRowAssociative(): array{
+		return @pg_fetch_array($this->m_resResultSet,$this->m_iRowPointer++,PGSQL_ASSOC);
+	}
+
+	/**
+	 * get next result row as an numeric array
+	 *
+	 * @return array result row
+	 */
+	public function getNextResultRowNumeric(): array{
+		return @pg_fetch_array($this->m_resResultSet,$this->m_iRowPointer++,PGSQL_NUM);
+	}
+
+	/**
+	 * set result pointer to ...
+	 *
+	 * @param integer $iRowId id of the row
+	 * @return boolean success / failure
+	 */
+	public function setResultPointer(int $iRowId = 0): bool{
+		$this->m_iRowPointer = $iRowId;
+
+		return true;
+	}
+
+	/**
+	 * get number of rows in result (for select)
+	 *
+	 * @return integer number of rows
+	 */
+	public function getNumRows(): int{
+		return @pg_num_rows($this->m_resResultSet);
+	}
+
+	/**
+	 * get number of affected rows (for insert, update and delete)
+	 *
+	 * @return integer number of rows
+	 */
+	public function getAffectedRows(): int{
+		return @pg_affected_rows($this->m_resResultSet);
+	}
+
+	/**
+	 * free result memory
+	 *
+	 * @return void
+	 */
+	public function freeResult(){
+		@pg_free_result($this->m_resResultSet);
+	}
+}
+?>

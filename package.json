@@ -1,0 +1,32 @@
+{
+  "name": "pxmboard",
+  "version": "3.0.0",
+  "private": false,
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build:css": "tailwindcss -i css/src/input.css -o public/css/pxmboard.css --minify",
+    "build:libs": "cp node_modules/alpinejs/dist/cdn.min.js public/js/alpine.min.js && cp node_modules/htmx.org/dist/htmx.min.js public/js/htmx.min.js",
+    "build": "npm run build:css && npm run build:libs && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.1",
+    "tailwindcss": "^4.2.1",
+    "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "@tiptap/core": "^3.20.0",
+    "@tiptap/extension-image": "^3.20.0",
+    "@tiptap/extension-link": "^3.20.0",
+    "@tiptap/extension-mention": "^3.20.0",
+    "@tiptap/extension-twitch": "^3.20.0",
+    "@tiptap/extension-underline": "^3.20.0",
+    "@tiptap/extension-youtube": "^3.20.0",
+    "@tiptap/pm": "^3.20.0",
+    "@tiptap/starter-kit": "^3.20.0",
+    "alpinejs": "^3.15.8",
+    "htmx.org": "^2.0.8"
+  }
+}
