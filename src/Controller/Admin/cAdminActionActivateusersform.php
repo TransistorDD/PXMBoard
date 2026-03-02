@@ -33,6 +33,7 @@ class cAdminActionActivateusersform extends cAdminAction{
 
 			$this->m_sOutput .= "<div class=\"pxm-admin-card\"><div class=\"pxm-admin-card__header\">activate users</div><div class=\"pxm-admin-card__body\">\n";
 			$this->m_sOutput .= "<form action=\"pxmboard.php\" method=\"post\" onsubmit=\"return confirm('activate / delete useres?')\">".$this->_getHiddenField("mode","admactivateusers");
+			$this->m_sOutput .= $this->_getHiddenCsrfField();
 			$this->m_sOutput .= "<table class=\"pxm-table\"><thead><tr><th>username</th><th>first name</th><th>last name</th>";
 			$this->m_sOutput .= "<th>private mail</th><th>date of registration</th><th>act</th><th>del</th><th>reason</th></tr></thead>\n";
 

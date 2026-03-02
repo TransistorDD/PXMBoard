@@ -8,6 +8,7 @@
 		   hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$msg.id}"
 		   hx-target="#message-container"
 		   hx-swap="innerHTML"
+		   hx-sync="#message-container:replace"
 		   onclick="selectMessage({$msg.id})"
 		   name="p{$msg.id}"
 		   data-msgid="{$msg.id}"
@@ -38,6 +39,7 @@
 			   hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$root.id}"
 			   hx-target="#message-container"
 			   hx-swap="innerHTML"
+			   hx-sync="#message-container:replace"
 			   onclick="selectMessage({$root.id})"
 			   data-msgid="{$root.id}"
 			   class="hover:underline">{$root.subject}</a>
@@ -69,3 +71,4 @@
 	</div>
 </div>
 {/if}
+{if $config.logedin == 1}<span id="badge-data" data-pm="{$config.user.priv_message_unread_count}" data-notif="{$config.user.notification_unread_count}" hidden></span>{/if}

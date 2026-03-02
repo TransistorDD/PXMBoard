@@ -48,6 +48,7 @@ class cAdminActionBoardform extends cAdminAction{
 		}
 
 		$this->m_sOutput .= "<form action=\"pxmboard.php\" method=\"post\" onsubmit=\"return confirm('update configuration?')\">".$this->_getHiddenField("mode","admboardsave");
+		$this->m_sOutput .= $this->_getHiddenCsrfField();
 
 		$this->m_sOutput .= "<div class=\"pxm-admin-card\"><div class=\"pxm-admin-card__header\">$sCardTitle</div><div class=\"pxm-admin-card__body\">\n";
 		$this->m_sOutput .= "<div class=\"pxm-form-group\"><label>ID</label><div class=\"pxm-field\">$iBoardId".$this->_getHiddenField("id",$iBoardId)."</div></div>\n";
@@ -96,7 +97,8 @@ class cAdminActionBoardform extends cAdminAction{
 		$this->m_sOutput .= "</form>";
 
 		if($iBoardId>0){
-			$this->m_sOutput .= "<div class=\"pxm-admin-card\"><div class=\"pxm-admin-card__header\">change board position</div><div class=\"pxm-admin-card__body\">\n";
+			$this->m_sOutput .= "<br>\n<div class=\"pxm-admin-card\"><div class=\"pxm-admin-card__header\">change board position</div><div class=\"pxm-admin-card__body\">\n";
+			$this->m_sOutput .= "<p class=\"pxm-hint\">Click a board name to swap its position with the current board.</p>\n";
 			$this->m_sOutput .= "<table class=\"pxm-table\"><tbody>\n";
 
 			foreach($this->_getBoardListArray() as $arrBoard){

@@ -15,7 +15,8 @@ class cActionAjaxThreadchangefixed extends cActionAjax {
 	 * @return bool true if all permissions granted, false otherwise
 	 */
 	public function validateBasePermissionsAndConditions(): bool {
-		return $this->_requireAuthentication()
+		return $this->_requireValidCsrfToken()
+			&& $this->_requireAuthentication()
 			&& $this->_requireBoard()
 			&& $this->_requireModeratorPermission();
 	}

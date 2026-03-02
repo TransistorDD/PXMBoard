@@ -36,6 +36,7 @@ class cAdminActionUserform extends cAdminAction{
 
 			if($objUser->loadDataById($iUserId)){
 				$this->m_sOutput .= "<form action=\"pxmboard.php\" method=\"post\" onsubmit=\"return confirm('update userdata?')\">".$this->_getHiddenField("mode","admusersave");
+				$this->m_sOutput .= $this->_getHiddenCsrfField();
 
 				$this->m_sOutput .= "<div class=\"pxm-admin-card\"><div class=\"pxm-admin-card__header\">profile</div><div class=\"pxm-admin-card__body\">\n";
 				$this->m_sOutput .= "<div class=\"pxm-form-group\"><label>ID</label><div class=\"pxm-field\">$iUserId".$this->_getHiddenField("usrid",$iUserId)."</div></div>\n";

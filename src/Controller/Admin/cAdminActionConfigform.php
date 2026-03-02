@@ -21,6 +21,7 @@ class cAdminActionConfigform extends cAdminAction{
 		$this->m_sOutput .= $this->_getHead();
 
 		$this->m_sOutput .= "<form action=\"pxmboard.php\" method=\"post\" onsubmit=\"return confirm('update configuration?')\">\n";
+		$this->m_sOutput .= $this->_getHiddenCsrfField();
 		$this->m_sOutput .= "<input type=\"hidden\" name=\"mode\" value=\"admconfigsave\">";
 
 		$this->m_sOutput .= "<div class=\"pxm-admin-card\"><div class=\"pxm-admin-card__header\">general configuration</div><div class=\"pxm-admin-card__body\">\n";
@@ -38,7 +39,7 @@ class cAdminActionConfigform extends cAdminAction{
 		$this->m_sOutput .= $this->_getCheckboxField("signatures","1","enable signatures?",$this->m_objConfig->useSignatures(false));
 		$this->m_sOutput .= $this->_getCheckboxField("directregistration","1","enable direct registration?",$this->m_objConfig->useDirectRegistration());
 		$this->m_sOutput .= $this->_getCheckboxField("uniquemail","1","unique registration mail adr?",$this->m_objConfig->uniqueRegistrationMails());
-		$this->m_sOutput .= "<div class=\"pxm-form-group\"><label>date format (<a href=\"http://www.php.net/manual/en/function.date.php\" target=\"_blank\">php style</a>)</label><div class=\"pxm-field\">";
+		$this->m_sOutput .= "<div class=\"pxm-form-group\"><label>date format (<a href=\"https://www.php.net/manual/en/datetime.format.php\" target=\"_blank\">php style</a>)</label><div class=\"pxm-field\">";
 		$this->m_sOutput .= $this->_getTextField("dateformat",$this->m_objInputHandler->getInputSize("dateformat"),$this->m_objConfig->getDateFormat())."</div></div>\n";
 		$this->m_sOutput .= $this->_getTextField("timeoffset",2,$this->m_objConfig->getTimeOffset(false),"time offset (hours)");
 		$this->m_sOutput .= $this->_getTextField("onlinetime",5,$this->m_objConfig->getOnlineTime(),"time for onlinelist (seconds; 0 = don't log online time)");

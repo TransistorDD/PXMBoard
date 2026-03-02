@@ -36,6 +36,9 @@ require_once(SRCDIR . '/Controller/cAction.php');
 	 * @return bool true if user is admin, false otherwise
 	 */
 	public function validateBasePermissionsAndConditions(): bool {
+		if(!$this->_requireValidCsrfToken()){
+			return false;
+		}
 		if(!$this->m_objActiveUser?->isAdmin()){
 			$this->m_sOutput = $this->_getHead()
 				. $this->_getAlert('Access denied. Admin privileges required.')
@@ -43,6 +46,40 @@ require_once(SRCDIR . '/Controller/cAction.php');
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Validate the CSRF token for admin actions.
+	 * Admin forms always use POST; GET requests (form display) pass without check.
+	 * Overrides parent to use POST field only and return HTML error.
+	 *
+	 * @return bool true if valid (or GET request), false otherwise
+	 */
+	protected function _requireValidCsrfToken(): bool {
+		if(($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST'){
+			return true;
+		}
+		$sPostedToken = $this->m_objInputHandler->getStringFormVar(
+			'csrf_token', 'csrf_token', true, false, 'trim'
+		);
+		if(empty($sPostedToken) || empty($this->m_sCsrfToken)
+			|| !hash_equals($this->m_sCsrfToken, $sPostedToken)
+		){
+			$this->m_sOutput = $this->_getHead()
+				. $this->_getAlert('Invalid or missing security token.')
+				. $this->_getFooter();
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Get a hidden CSRF token form field.
+	 *
+	 * @return string hidden input HTML
+	 */
+	protected function _getHiddenCsrfField(): string {
+		return $this->_getHiddenField('csrf_token', $this->m_sCsrfToken ?? '');
 	}
 
 	/**

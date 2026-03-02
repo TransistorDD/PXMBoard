@@ -21,7 +21,7 @@ class cActionPrivatemessagesave extends cAction{
 	 * @return bool true if all permissions granted
 	 */
 	public function validateBasePermissionsAndConditions(): bool {
-		return $this->_requirePostPermission();
+		return $this->_requireValidCsrfToken() && $this->_requirePostPermission();
 	}
 
 	/**
@@ -73,7 +73,7 @@ class cActionPrivatemessagesave extends cAction{
 						// Create in-app notification
 						$sNotificationTitle = "Neue private Nachricht";
 						$sNotificationMessage = $objActiveUser->getUserName().' hat dir eine PM gesendet: "'.$sSubject.'"';
-						$sNotificationLink = "pxmboard.php?mode=privatemessage&type=outbox&msgid=".$objPrivateMessage->getId();
+						$sNotificationLink = "pxmboard.php?mode=privatemessage&type=inbox&msgid=".$objPrivateMessage->getId();
 
 						cNotification::createNotification(
 							$objDestinationUser->getId(),

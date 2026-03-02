@@ -22,6 +22,7 @@ require_once(SRCDIR . '/Exception/SkinInitializationException.php');
 	protected ?cUserConfig $m_objActiveUser;
 	protected mixed $m_objActiveBoard;
 	protected mixed $m_objActiveSkin;
+	protected ?string $m_sCsrfToken = null;
 
 	/**
 	 * Constructor
@@ -230,6 +231,39 @@ require_once(SRCDIR . '/Exception/SkinInitializationException.php');
 	}
 
 	/**
+	 * Set the CSRF token that was issued for the current session.
+	 * Called by pxmboard.php after instantiating the action.
+	 *
+	 * @param string $sToken token from the session
+	 * @return void
+	 */
+	public function setCsrfToken(string $sToken): void {
+		$this->m_sCsrfToken = $sToken;
+	}
+
+	/**
+	 * Validate the CSRF token submitted with the current request.
+	 * Checks the X-CSRF-Token HTTP header first; falls back to POST field.
+	 *
+	 * @return bool true if the token is valid, false otherwise
+	 */
+	protected function _requireValidCsrfToken(): bool {
+		$sToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+		if(empty($sToken)){
+			$sToken = $this->m_objInputHandler->getStringFormVar(
+				'csrf_token', 'csrf_token', true, false, 'trim'
+			);
+		}
+		if(empty($sToken) || empty($this->m_sCsrfToken)
+			|| !hash_equals($this->m_sCsrfToken, $sToken)
+		){
+			$this->m_objTemplate = $this->_getErrorTemplateObject(eError::CSRF_TOKEN_INVALID);
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * do the pre actions (manipulate GET and POST data etc.)
 	 *
 	 * @return void
@@ -260,11 +294,6 @@ require_once(SRCDIR . '/Exception/SkinInitializationException.php');
 	 */
 	public function getOutput(): string{
 		if(is_object($this->m_objTemplate)){
-			// Add notification count for all templates
-			if($objActiveUser = $this->m_objActiveUser){
-				$iUnreadCount = $objActiveUser->getUnreadNotificationCount();
-				$this->m_objTemplate->addData(array("notification_unread_count" => $iUnreadCount));
-			}
 			return $this->m_objTemplate->getOutput();
 		}
 		else{
@@ -474,6 +503,7 @@ require_once(SRCDIR . '/Exception/SkinInitializationException.php');
 		}
 
 		$arrContext["input_sizes"] = $this->m_objInputHandler->getInputSizes();
+		$arrContext["csrf_token"] = $this->m_sCsrfToken ?? '';
 
 		return array(
 			"config" => array_merge_recursive(

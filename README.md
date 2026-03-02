@@ -5,8 +5,8 @@ messaging, user management, and moderator support — running entirely on PHP an
 no framework required.
 
 This project is the continuation and modernisation of
-[PXMBoard 2.5](https://sourceforge.net/projects/pxmboard/), originally released in 2001
-and last updated in 2007. Development resumed in 2025 with a focus on PHP 8 compatibility,
+[PXMBoard](https://sourceforge.net/projects/pxmboard/), originally released in 2001
+and last updated in 2007. Development resumed in 2026 with a focus on PHP 8 compatibility,
 security hardening, and a modernised UI — while keeping the original architecture intact.
 
 ---
@@ -27,7 +27,7 @@ security hardening, and a modernised UI — while keeping the original architect
 - **DBMS support** — MySQL & PostgreSQL; others possible
 - **Search** — MySQL `FULLTEXT` search or ElasticSearch optional
 - **Skinnable** — Smarty template engine; XSLT support optional
-- **Security** — bcrypt passwords, secure token generation
+- **Security** — bcrypt passwords, CSRF protection, secure token generation
 
 ---
 
@@ -94,6 +94,19 @@ Key settings in `config/pxmboard-config.php`:
 
 Board-level settings (skin, pagination, mail templates, etc.) are managed through
 the **Administration** panel after login.
+
+---
+
+## Security
+
+| Measure | Details |
+|---------|---------|
+| Password hashing | bcrypt via `password_hash()` / `password_verify()` |
+| CSRF protection | Session-scoped token (OWASP Synchronizer Token Pattern); validated on all state-changing actions via `X-CSRF-Token` header (htmx/fetch) or hidden POST field (admin forms); comparison with `hash_equals()` |
+| Secure token generation | Login tickets and recovery tokens use `bin2hex(random_bytes(32))` |
+| SQL escaping | Database-specific `quote()` method; `addslashes()` is banned |
+| Session cookies | `httponly`, `secure`, `SameSite=Lax` |
+| Output escaping | All template output HTML-escaped via Smarty's `escape:'html'` |
 
 ---
 

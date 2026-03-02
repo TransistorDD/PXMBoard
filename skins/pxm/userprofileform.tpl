@@ -66,10 +66,6 @@
 						<input type="text" name="email" value="{$user.email}" size="30" maxlength="{$config.input_sizes.email}" class="rounded px-3 py-1.5 text-sm flex-1 focus:outline-none focus:ring-1" style="border: 1px solid var(--color-border-default); background-color: var(--color-surface-primary); color: var(--color-content-primary); --tw-ring-color: var(--color-accent);"/>
 					</div>
 					<div class="flex items-center gap-3">
-						<label class="w-28 shrink-0 htmx-formlabel">ICQ</label>
-						<input type="text" name="icq" value="{$user.icq}" size="30" maxlength="10" class="rounded px-3 py-1.5 text-sm flex-1 focus:outline-none focus:ring-1" style="border: 1px solid var(--color-border-default); background-color: var(--color-surface-primary); color: var(--color-content-primary); --tw-ring-color: var(--color-accent);"/>
-					</div>
-					<div class="flex items-center gap-3">
 						<label class="w-28 shrink-0 htmx-formlabel">Homepage</label>
 						<input type="text" name="url" value="{$user.url}" size="30" maxlength="50" class="rounded px-3 py-1.5 text-sm flex-1 focus:outline-none focus:ring-1" style="border: 1px solid var(--color-border-default); background-color: var(--color-surface-primary); color: var(--color-content-primary); --tw-ring-color: var(--color-accent);"/>
 					</div>

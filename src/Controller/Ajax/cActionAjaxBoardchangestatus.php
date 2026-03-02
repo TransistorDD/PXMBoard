@@ -16,7 +16,7 @@ class cActionAjaxBoardchangestatus extends cActionAjax {
 	 * @return bool true if admin, false otherwise
 	 */
 	public function validateBasePermissionsAndConditions(): bool {
-		return $this->_requireAdminPermission();
+		return $this->_requireValidCsrfToken() && $this->_requireAdminPermission();
 	}
 
 	/**

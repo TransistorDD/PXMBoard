@@ -28,7 +28,7 @@
 				   hx-get="pxmboard.php?mode=message&brdid={$msg.board.id}&msgid={$msg.id}"
 				   hx-target="#message-container"
 				   hx-swap="innerHTML"
-				   onclick="closeModal()"
+				   hx-on:click="document.getElementById('htmxModal').close()"
 				   class="hover:underline" style="color: var(--color-link);">Zur gespeicherten Nachricht</a>
 {/if}
 			</div>

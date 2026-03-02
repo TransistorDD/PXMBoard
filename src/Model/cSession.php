@@ -89,6 +89,27 @@ class cSession{
 	}
 
 	/**
+	 * Ensure a CSRF token exists in the session, creating one if absent.
+	 *
+	 * @return string the current (or newly generated) CSRF token
+	 */
+	public function ensureCsrfToken(): string {
+		if(empty($_SESSION['csrf_token'])){
+			$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+		}
+		return $_SESSION['csrf_token'];
+	}
+
+	/**
+	 * Get the current CSRF token from the session.
+	 *
+	 * @return string|null the token, or null if no session / no token
+	 */
+	public function getCsrfToken(): ?string {
+		return $_SESSION['csrf_token'] ?? null;
+	}
+
+	/**
 	 * set the value of a session variable
 	 *
 	 * @param string $sVarName name of the variable

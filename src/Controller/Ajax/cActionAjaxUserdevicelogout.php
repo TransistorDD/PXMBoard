@@ -16,7 +16,7 @@ class cActionAjaxUserdevicelogout extends cActionAjax {
 	 * @return bool true if authenticated, false otherwise
 	 */
 	public function validateBasePermissionsAndConditions(): bool {
-		return $this->_requireAuthentication();
+		return $this->_requireValidCsrfToken() && $this->_requireAuthentication();
 	}
 
 	/**

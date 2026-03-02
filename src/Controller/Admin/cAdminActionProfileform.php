@@ -24,6 +24,7 @@ class cAdminActionProfileform extends cAdminAction{
 
 		$this->m_sOutput .= "<div class=\"pxm-admin-card\"><div class=\"pxm-admin-card__header\">delete profile fields</div><div class=\"pxm-admin-card__body\">\n";
 		$this->m_sOutput .= "<form action=\"pxmboard.php\" method=\"post\" onsubmit=\"return confirm('delete profile fields?')\">\n";
+		$this->m_sOutput .= $this->_getHiddenCsrfField();
 		$this->m_sOutput .= "<input type=\"hidden\" name=\"mode\" value=\"admprofiledelete\">";
 		$this->m_sOutput .= "<table class=\"pxm-table\"><thead><tr><th>name</th><th>type</th><th>length</th><th>del</th></tr></thead>\n";
 		$this->m_sOutput .= "<tbody>";
@@ -51,6 +52,7 @@ class cAdminActionProfileform extends cAdminAction{
 
 		$this->m_sOutput .= "<div class=\"pxm-admin-card\"><div class=\"pxm-admin-card__header\">add profile field</div><div class=\"pxm-admin-card__body\">\n";
 		$this->m_sOutput .= "<form action=\"pxmboard.php\" method=\"post\" onsubmit=\"return confirm('add profile field?')\">\n";
+		$this->m_sOutput .= $this->_getHiddenCsrfField();
 		$this->m_sOutput .= "<input type=\"hidden\" name=\"mode\" value=\"admprofileadd\">";
 		$this->m_sOutput .= "<div class=\"pxm-form-group\"><label>name</label><div class=\"pxm-field\"><input type=\"text\" name=\"name\" size=\"10\" maxlength=\"10\"></div></div>\n";
 		$this->m_sOutput .= "<div class=\"pxm-form-group\"><label>type</label><div class=\"pxm-field\"><select name=\"type\" size=\"1\">\n";

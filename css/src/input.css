@@ -642,6 +642,25 @@ button:focus:not(:focus-visible) {
       display: none;
     }
   }
+
+  /* --- Threadlist status spinner (JS-controlled, replaces status icon during load) --- */
+  .thread-status-spinner {
+    flex-shrink: 0;
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid var(--color-border-default);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: htmx-spin 0.6s linear infinite;
+  }
+
+  /* --- Thread container opacity during sort/pagination requests --- */
+  #threadlist-container.htmx-request {
+    opacity: 0.6;
+    pointer-events: none;
+    transition: opacity 0.15s;
+  }
 }
 
 /* ======================================================================
@@ -923,4 +942,3 @@ html.is-mobile .htmx-header img {
 html.is-mobile .htmx-header nav {
   gap: 0.5rem;
 }
-

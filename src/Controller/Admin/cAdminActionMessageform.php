@@ -25,6 +25,7 @@ class cAdminActionMessageform extends cAdminAction{
 
 		$this->m_sOutput .= "<div class=\"pxm-admin-card\">\n<div class=\"pxm-admin-card__header\">delete threads / messages</div>\n<div class=\"pxm-admin-card__body\">\n";
 		$this->m_sOutput .= "<form action=\"pxmboard.php\" method=\"post\" onsubmit=\"return confirm('delete messages?')\">\n";
+		$this->m_sOutput .= $this->_getHiddenCsrfField();
 		$this->m_sOutput .= "<input type=\"hidden\" name=\"mode\" value=\"admmessagesdelete\">\n";
 		$this->m_sOutput .= "<p>delete threads &amp; messages in </p>";
 

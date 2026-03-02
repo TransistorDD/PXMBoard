@@ -6,7 +6,7 @@
 
   Parameters:
   - $user: User data (username, status, fname, lname, city, msgquan, regdate,
-           imgfile, email, icq, url, hobby, lchange, id)
+           imgfile, email, url, hobby, lchange, id)
   - $config.profile_img_dir: Path to profile image directory
   - $config.logedin: Login status (1 = logged in)
   - $config.admin: Admin status (1 = admin)
@@ -70,10 +70,6 @@
 				<div class="flex">
 					<span class="w-36 text-sm font-medium" style="color: var(--color-content-secondary);">Email</span>
 					<a href="mailto:{$user.email}" class="text-sm hover:underline" style="color: var(--color-link);">{$user.email}</a>
-				</div>
-				<div class="flex">
-					<span class="w-36 text-sm font-medium" style="color: var(--color-content-secondary);">ICQ</span>
-					<span class="text-sm" style="color: var(--color-content-primary);">{$user.icq}</span>
 				</div>
 				<div class="flex">
 					<span class="w-36 text-sm font-medium" style="color: var(--color-content-secondary);">Homepage</span>

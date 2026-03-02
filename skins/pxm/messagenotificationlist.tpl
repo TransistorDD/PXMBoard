@@ -15,7 +15,7 @@
 					<tr onmouseover="this.style.backgroundColor='var(--color-hover-bg)'" onmouseout="this.style.backgroundColor='transparent'">
 						<td style="color: var(--color-content-secondary);">{$notif.boardname}</td>
 						<td>
-							<a href="pxmboard.php?mode=board&brdid={$notif.boardid}&thrdid={$notif.threadid}&msgid={$notif.messageid}" hx-get="pxmboard.php?mode=board&brdid={$notif.boardid}&thrdid={$notif.threadid}&msgid={$notif.messageid}" hx-target="#main-content" hx-push-url="true" onclick="closeModal()" class="hover:underline" style="color: var(--color-link);">{$notif.subject}</a>
+							<a href="pxmboard.php?mode=board&brdid={$notif.boardid}&thrdid={$notif.threadid}&msgid={$notif.messageid}" class="hover:underline" style="color: var(--color-link);">{$notif.subject}</a>
 						</td>
 						<td class="text-right whitespace-nowrap" style="color: var(--color-content-secondary);">{$notif.date}</td>
 						<td class="text-center">

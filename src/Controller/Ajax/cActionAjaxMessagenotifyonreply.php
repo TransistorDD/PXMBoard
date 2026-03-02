@@ -16,7 +16,8 @@ class cActionAjaxMessagenotifyonreply extends cActionAjax {
 	 * @return bool true if authenticated and board exists, false otherwise
 	 */
 	public function validateBasePermissionsAndConditions(): bool {
-		return $this->_requireAuthentication()
+		return $this->_requireValidCsrfToken()
+			&& $this->_requireAuthentication()
 			&& $this->_requireBoard();
 	}
 

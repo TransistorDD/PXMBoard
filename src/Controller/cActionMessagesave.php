@@ -22,7 +22,7 @@ class cActionMessagesave extends cAction{
 	 * @return bool true if all permissions granted
 	 */
 	public function validateBasePermissionsAndConditions(): bool {
-		return $this->_requireWritableBoard();
+		return ($this->_requireWritableBoard() && (!$this->_requireAuthentication() || $this->_requireValidCsrfToken()));
 	}
 
 	/**

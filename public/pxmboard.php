@@ -79,9 +79,11 @@ $objSession = new cSession($sSessionName);
 
 // Get UserID from session
 $iUserId = 0;
+$sCsrfToken = '';
 if($objSession->sessionDataAvailable()){
 	$objSession->startSession();
 	$iUserId = intval($objSession->getSessionVar('userid'));
+	$sCsrfToken = $objSession->ensureCsrfToken();
 }
 else{
 	// Try auto-login via ticket cookie
@@ -93,6 +95,7 @@ else{
 			$objSession->startSession();
 			$objSession->setSessionVar('userid', $objUser->getId());
 			$iUserId = $objUser->getId();
+			$sCsrfToken = $objSession->ensureCsrfToken();
 		}
 		else{
 			// Invalid ticket - delete cookie
@@ -132,6 +135,7 @@ try{
 	if(file_exists(SRCDIR . '/Controller/'.$sPath.$sClassName.'.php')){
 		include_once(SRCDIR . '/Controller/'.$sPath.$sClassName.'.php');
 		$objAction = new $sClassName($objConfig, $iUserId, $iBoardId);
+		$objAction->setCsrfToken($sCsrfToken);
 	}
 	else{														// invalid action -> show error
 		include_once(SRCDIR . '/Controller/cActionError.php');

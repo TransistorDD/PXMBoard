@@ -16,7 +16,11 @@
 				<div class="font-semibold">
 				{if $msg.user.id > 0}
 				<a href="pxmboard.php?mode=userprofile&usrid={$msg.user.id}"
-				   onclick="openModal('Profil', 'pxmboard.php?mode=userprofile&usrid={$msg.user.id}'); return false;"
+				   hx-get="pxmboard.php?mode=userprofile&usrid={$msg.user.id}"
+				   hx-target="#htmxModalBody"
+				   hx-swap="innerHTML"
+				   data-modal-title="Profil"
+				   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
 				   class="hover:underline text-content-primary">{$msg.user.username}</a>
 				{else}
 				{$msg.user.username}
@@ -84,7 +88,11 @@
 		<div class="space-x-2">
 {if $config.logedin == 1}
 		<a href="pxmboard.php?mode=privatemessageform&brdid={$config.board.id}&msgid={$msg.id}&toid={$msg.user.id}"
-		   onclick="openModal('Private Nachricht', 'pxmboard.php?mode=privatemessageform&brdid={$config.board.id}&msgid={$msg.id}&toid={$msg.user.id}'); return false;"
+		   hx-get="pxmboard.php?mode=privatemessageform&brdid={$config.board.id}&msgid={$msg.id}&toid={$msg.user.id}"
+		   hx-target="#htmxModalBody"
+		   hx-swap="innerHTML"
+		   data-modal-title="Private Nachricht"
+		   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
 		   class="hover:underline text-link">Private Nachricht</a> |
 {if $msg.user.id == $config.user.id or $config.admin == 1 or $config.moderator == 1}
 		<a href="#" onclick="toggleNotifyOnReply(this, {$msg.id}, {$config.board.id}); return false;" class="hover:underline text-link" data-active="{$msg.notify_on_reply}">Mailbenachrichtigung {if $msg.notify_on_reply == 1}deaktivieren{else}aktivieren{/if}</a> |
@@ -116,3 +124,4 @@
 </div>
 <script>!window._skipPushState&&history.pushState(null,'','pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$msg.thread.id}&msgid={$msg.id}');window._skipPushState=false;</script>
 {/if}
+{if $config.logedin == 1}<span id="badge-data" data-pm="{$config.user.priv_message_unread_count}" data-notif="{$config.user.notification_unread_count}" hidden></span>{/if}

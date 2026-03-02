@@ -169,6 +169,7 @@ class cPrivateMessage extends cMessage{
 																			 cDBFactory::getInstance()->quote($this->m_sIp).")")){
 					if($objResultSet->getAffectedRows()>0){
 						$iErrorId = 0;
+						$this->m_iId = cDBFactory::getInstance()->getInsertID("pxm_priv_message","p_id");
 
 						// Update unread count in pxm_user
 						$objUser = new cUser();

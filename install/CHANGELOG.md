@@ -16,6 +16,7 @@
 - **CRITICAL:** Password hashing migrated from MD5 to bcrypt. Existing passwords are automatically migrated on the next successful login.
 - **CRITICAL:** Admin and moderator permission checks were completely ineffective due to an operator precedence bug — fixed across the codebase.
 - **CRITICAL:** Login tickets and password recovery tokens are now generated using a cryptographically secure random source.
+- **CSRF protection:** All state-changing actions are protected by a session-scoped CSRF token. Token is delivered via `X-CSRF-Token` HTTP header (htmx/fetch) or as a hidden POST field.
 - SQL escaping improved: database-specific escape functions are now used instead of `addslashes()`.
 
 ### ✨ New Features

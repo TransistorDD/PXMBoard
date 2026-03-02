@@ -16,7 +16,7 @@ class cActionPrivatemessagedelete extends cActionPrivatemessagelist{
 	 * @return bool true if all permissions granted
 	 */
 	public function validateBasePermissionsAndConditions(): bool {
-		return $this->_requireAuthentication();
+		return $this->_requireValidCsrfToken() && $this->_requireAuthentication();
 	}
 
 	/**

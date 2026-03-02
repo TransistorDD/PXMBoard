@@ -109,5 +109,4 @@
 			-
 {/if}
 		</div>
-
-
+{if $config.logedin == 1}<span id="badge-data" data-pm="{$config.user.priv_message_unread_count}" data-notif="{$config.user.notification_unread_count}" hidden></span>{/if}

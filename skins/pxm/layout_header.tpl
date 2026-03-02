@@ -7,6 +7,7 @@
 	<link href="css/pxmboard.css" rel="stylesheet">
 	<link rel="manifest" href="manifest.json">
 	<meta name="theme-color" content="#17A2B8">
+	<meta name="csrf-token" content="{$config.csrf_token}">
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -82,7 +83,11 @@
 				<!-- Online-Liste -->
 				{if isset($config.board)}
 				<a href="pxmboard.php?mode=useronline&brdid={$config.board.id}"
-				   onclick="openModal('Online-Liste', 'pxmboard.php?mode=useronline&brdid={$config.board.id}'); return false;"
+				   hx-get="pxmboard.php?mode=useronline&brdid={$config.board.id}"
+				   hx-target="#htmxModalBody"
+				   hx-swap="innerHTML"
+				   data-modal-title="Online-Liste"
+				   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
 				   class="flex items-center justify-center hover:opacity-75 transition-opacity"
 				   title="Online-Liste">
 					<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -90,7 +95,11 @@
 
 				<!-- Benutzersuche -->
 				<a href="pxmboard.php?mode=usersearch&brdid={$config.board.id}"
-				   onclick="openModal('Benutzersuche', 'pxmboard.php?mode=usersearch&brdid={$config.board.id}'); return false;"
+				   hx-get="pxmboard.php?mode=usersearch&brdid={$config.board.id}"
+				   hx-target="#htmxModalBody"
+				   hx-swap="innerHTML"
+				   data-modal-title="Benutzersuche"
+				   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
 				   class="flex items-center justify-center hover:opacity-75 transition-opacity"
 				   title="Benutzersuche">
 					<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><circle cx="11" cy="9" r="2.5"/><path d="M7.5 15a4.5 4.5 0 0 1 7 0"/></svg>
@@ -102,24 +111,28 @@
 
 				<!-- Private Nachrichten -->
 				<a href="pxmboard.php?mode=privatemessagelist"
-				   onclick="openModal('Private Nachrichten', 'pxmboard.php?mode=privatemessagelist'); return false;"
+				   hx-get="pxmboard.php?mode=privatemessagelist"
+				   hx-target="#htmxModalBody"
+				   hx-swap="innerHTML"
+				   data-modal-title="Private Nachrichten"
+				   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
 				   class="relative flex items-center justify-center hover:opacity-75 transition-opacity"
 				   title="Private Nachrichten">
 					<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-					{if $config.user.priv_message_unread_count > 0}
-						<span id="pm-badge" class="absolute -top-2 -right-3 text-xs rounded-full h-4 w-4 flex items-center justify-center bg-accent-danger text-content-inverse">{$config.user.priv_message_unread_count}</span>
-					{/if}
+					<span id="pm-badge" class="absolute -top-2 -right-3 text-xs rounded-full h-4 w-4 flex items-center justify-center bg-accent-danger text-content-inverse{if $config.user.priv_message_unread_count <= 0} hidden{/if}">{$config.user.priv_message_unread_count}</span>
 				</a>
 
 				<!-- Benachrichtigungen -->
 				<a href="pxmboard.php?mode=notificationlist"
-				   onclick="openModal('Benachrichtigungen', 'pxmboard.php?mode=notificationlist'); return false;"
+				   hx-get="pxmboard.php?mode=notificationlist"
+				   hx-target="#htmxModalBody"
+				   hx-swap="innerHTML"
+				   data-modal-title="Benachrichtigungen"
+				   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
 				   class="relative flex items-center justify-center hover:opacity-75 transition-opacity"
 				   title="Benachrichtigungen">
 					<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-					{if $config.user.notification_unread_count > 0}
-						<span id="notification-badge" class="absolute -top-2 -right-3 text-xs rounded-full h-4 w-4 flex items-center justify-center bg-accent-danger text-content-inverse">{$config.user.notification_unread_count}</span>
-					{/if}
+					<span id="notification-badge" class="absolute -top-2 -right-3 text-xs rounded-full h-4 w-4 flex items-center justify-center bg-accent-danger text-content-inverse{if $config.user.notification_unread_count <= 0} hidden{/if}">{$config.user.notification_unread_count}</span>
 				</a>
 
 			{else}
@@ -133,7 +146,11 @@
 
 				<!-- Registrieren Icon (nur auf Boardseite) -->
 				<a href="pxmboard.php?mode=userregistration"
-				   onclick="openModal('Registrieren', 'pxmboard.php?mode=userregistration'); return false;"
+				   hx-get="pxmboard.php?mode=userregistration"
+				   hx-target="#htmxModalBody"
+				   hx-swap="innerHTML"
+				   data-modal-title="Registrieren"
+				   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
 				   class="flex items-center justify-center hover:opacity-75 transition-opacity"
 				   title="Registrieren">
 					<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
@@ -141,10 +158,18 @@
 				{else}
 				<!-- Textlinks (nur auf Boardlistseite) -->
 				<a href="pxmboard.php?mode=usersendpwd"
-				   onclick="openModal('Passwort anfordern', 'pxmboard.php?mode=usersendpwd'); return false;"
+				   hx-get="pxmboard.php?mode=usersendpwd"
+				   hx-target="#htmxModalBody"
+				   hx-swap="innerHTML"
+				   data-modal-title="Passwort anfordern"
+				   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
 				   class="text-sm hover:opacity-75 transition-opacity">Passwort vergessen?</a>
 				<a href="pxmboard.php?mode=userregistration"
-				   onclick="openModal('Registrieren', 'pxmboard.php?mode=userregistration'); return false;"
+				   hx-get="pxmboard.php?mode=userregistration"
+				   hx-target="#htmxModalBody"
+				   hx-swap="innerHTML"
+				   data-modal-title="Registrieren"
+				   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
 				   class="text-sm hover:opacity-75 transition-opacity">Registrieren</a>
 				{/if}
 			{/if}
@@ -270,12 +295,48 @@
 					{/if}
 				</button>
 				<div x-show="open" @click.outside="open = false" @click="open = false" x-transition class="absolute right-0 mt-2 w-48 rounded-lg shadow-xl z-50 py-1 bg-surface-primary text-content-primary">
-					<a href="pxmboard.php?mode=userprofileform" onclick="openModal('Profil', 'pxmboard.php?mode=userprofileform'); return false;" class="block px-4 py-2 text-sm hover:bg-hover-bg text-content-primary">Profil</a>
-					<a href="pxmboard.php?mode=messagedraftlist" onclick="openModal('Entw\u00fcrfe', 'pxmboard.php?mode=messagedraftlist'); return false;" class="block px-4 py-2 text-sm hover:bg-hover-bg text-content-primary">Entw&uuml;rfe</a>
-					<a href="pxmboard.php?mode=messagenotificationlist" onclick="openModal('Beobachten', 'pxmboard.php?mode=messagenotificationlist'); return false;" class="block px-4 py-2 text-sm hover:bg-hover-bg text-content-primary">Beobachten</a>
-					<a href="pxmboard.php?mode=userchangepwd" onclick="openModal('Passwort \u00e4ndern', 'pxmboard.php?mode=userchangepwd'); return false;" class="block px-4 py-2 text-sm hover:bg-hover-bg text-content-primary">Passwort</a>
-					<a href="pxmboard.php?mode=userdevicelist" onclick="openModal('Aktive Ger\u00e4te', 'pxmboard.php?mode=userdevicelist'); return false;" class="block px-4 py-2 text-sm hover:bg-hover-bg text-content-primary">Aktive Ger&auml;te</a>
-					<a href="pxmboard.php?mode=userconfigform" onclick="openModal('Einstellungen', 'pxmboard.php?mode=userconfigform'); return false;" class="block px-4 py-2 text-sm hover:bg-hover-bg text-content-primary">Einstellungen</a>
+					<a href="pxmboard.php?mode=userprofileform"
+					   hx-get="pxmboard.php?mode=userprofileform"
+					   hx-target="#htmxModalBody"
+					   hx-swap="innerHTML"
+					   data-modal-title="Profil"
+					   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
+					   class="block px-4 py-2 text-sm hover:bg-hover-bg text-content-primary">Profil</a>
+					<a href="pxmboard.php?mode=messagedraftlist"
+					   hx-get="pxmboard.php?mode=messagedraftlist"
+					   hx-target="#htmxModalBody"
+					   hx-swap="innerHTML"
+					   data-modal-title="Entw&uuml;rfe"
+					   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
+					   class="block px-4 py-2 text-sm hover:bg-hover-bg text-content-primary">Entw&uuml;rfe</a>
+					<a href="pxmboard.php?mode=messagenotificationlist"
+					   hx-get="pxmboard.php?mode=messagenotificationlist"
+					   hx-target="#htmxModalBody"
+					   hx-swap="innerHTML"
+					   data-modal-title="Beobachten"
+					   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
+					   class="block px-4 py-2 text-sm hover:bg-hover-bg text-content-primary">Beobachten</a>
+					<a href="pxmboard.php?mode=userchangepwd"
+					   hx-get="pxmboard.php?mode=userchangepwd"
+					   hx-target="#htmxModalBody"
+					   hx-swap="innerHTML"
+					   data-modal-title="Passwort &auml;ndern"
+					   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
+					   class="block px-4 py-2 text-sm hover:bg-hover-bg text-content-primary">Passwort</a>
+					<a href="pxmboard.php?mode=userdevicelist"
+					   hx-get="pxmboard.php?mode=userdevicelist"
+					   hx-target="#htmxModalBody"
+					   hx-swap="innerHTML"
+					   data-modal-title="Aktive Ger&auml;te"
+					   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
+					   class="block px-4 py-2 text-sm hover:bg-hover-bg text-content-primary">Aktive Ger&auml;te</a>
+					<a href="pxmboard.php?mode=userconfigform"
+					   hx-get="pxmboard.php?mode=userconfigform"
+					   hx-target="#htmxModalBody"
+					   hx-swap="innerHTML"
+					   data-modal-title="Einstellungen"
+					   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
+					   class="block px-4 py-2 text-sm hover:bg-hover-bg text-content-primary">Einstellungen</a>
 					<div class="my-1 border-t border-border-default"></div>
 					<a href="pxmboard.php?mode=logout" class="block px-4 py-2 text-sm hover:bg-hover-bg text-content-primary">Abmelden</a>
 				</div>

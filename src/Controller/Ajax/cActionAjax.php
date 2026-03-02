@@ -25,6 +25,24 @@ abstract class cActionAjax extends cAction {
 	}
 
 	/**
+	 * Validate the CSRF token for AJAX actions.
+	 * Always reads from the X-CSRF-Token request header (no form field fallback).
+	 * Overrides parent to return a JSON 403 error instead of a template.
+	 *
+	 * @return bool true if valid, false otherwise
+	 */
+	protected function _requireValidCsrfToken(): bool {
+		$sToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+		if(empty($sToken) || empty($this->m_sCsrfToken)
+			|| !hash_equals($this->m_sCsrfToken, $sToken)
+		){
+			$this->_setJsonError(eError::CSRF_TOKEN_INVALID, 403);
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Require user to be authenticated (logged in)
 	 * Overrides parent to set JSON error instead of template
 	 *

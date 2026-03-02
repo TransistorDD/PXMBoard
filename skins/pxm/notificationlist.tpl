@@ -31,7 +31,7 @@
 							{/if}
 						</td>
 						<td>
-							<a href="{$notification.link nofilter}" hx-get="{$notification.link nofilter}" hx-target="#main-content" hx-push-url="true" onclick="closeModal()" class="block hover:underline">
+							<a href="{$notification.link nofilter}" onclick="handleNotificationClick(event, {$notification.id})" class="block hover:underline">
 								<div class="font-semibold" style="color: {if $notification.is_unread}var(--color-content-primary){else}var(--color-content-secondary){/if};">{$notification.title}</div>
 								<div class="text-xs" style="color: var(--color-content-secondary);">{$notification.message}</div>
 							</a>
@@ -65,4 +65,4 @@
 			| -
 {/if}
 		</div>
-
+{if $config.logedin == 1}<span id="badge-data" data-pm="{$config.user.priv_message_unread_count}" data-notif="{$config.user.notification_unread_count}" hidden></span>{/if}

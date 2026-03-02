@@ -39,6 +39,7 @@ class cStringValidations{
 		'skinvalue'        => 255,
 		'error'            => 255,
 		'type'             => 255,
+		'csrf_token'       => 64,
 	];
 
 	/**

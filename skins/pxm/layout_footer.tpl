@@ -1,7 +1,7 @@
 	<!-- Footer -->
 	{if !isset($config.board)}
 	<footer class="text-center py-0.5 text-sm shrink-0 text-content-secondary">
-		powered by <a href="http://www.pxmboard.de" target="_blank" class="hover:underline text-link">pxmboard</a>
+		powered by <a href="https://github.com/TransistorDD/PXMBoard" target="_blank" rel="noopener noreferrer" class="hover:underline text-link">pxmboard</a>
 	</footer>
 	{/if}
 
@@ -10,7 +10,7 @@
 		<div class="p-4">
 			<div class="flex justify-between items-center mb-3">
 				<h2 id="htmxModalTitle" class="text-lg font-bold"></h2>
-				<button onclick="closeModal()" class="htmx-close-btn">&times;</button>
+				<button hx-on:click="document.getElementById('htmxModal').close()" class="htmx-close-btn">&times;</button>
 			</div>
 			<div id="htmxModalBody" class="overflow-y-auto" style="max-height:32rem;"></div>
 		</div>

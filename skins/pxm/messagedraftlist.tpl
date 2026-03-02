@@ -14,7 +14,7 @@
 			<tr onmouseover="this.style.backgroundColor='var(--color-hover-bg)'" onmouseout="this.style.backgroundColor='transparent'">
 				<td style="color: var(--color-content-secondary);">{$draft.boardname}</td>
 				<td>
-					<a href="pxmboard.php?mode=board&brdid={$draft.boardid}&thrdid={$draft.threadid}&msgid={$draft.id}" hx-get="pxmboard.php?mode=board&brdid={$draft.boardid}&thrdid={$draft.threadid}&msgid={$draft.id}" hx-target="#main-content" hx-push-url="true" onclick="closeModal()" class="hover:underline" style="color: var(--color-link);">{$draft.subject}</a>
+					<a href="pxmboard.php?mode=board&brdid={$draft.boardid}&thrdid={$draft.threadid}&msgid={$draft.id}" class="hover:underline" style="color: var(--color-link);">{$draft.subject}</a>
 				</td>
 				<td class="text-right whitespace-nowrap" style="color: var(--color-content-secondary);">{$draft.date}</td>
 			</tr>

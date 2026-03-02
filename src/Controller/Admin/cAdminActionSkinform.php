@@ -25,6 +25,7 @@ class cAdminActionSkinform extends cAdminAction{
 		if($objSkin->loadDataById($this->m_objInputHandler->getIntFormVar("id",true,true,true))){
 
 			$this->m_sOutput .= "<form action=\"pxmboard.php\" method=\"post\">".$this->_getHiddenField("mode","admskinsave").$this->_getHiddenField("id",(string)$objSkin->getId());
+			$this->m_sOutput .= $this->_getHiddenCsrfField();
 
 			$this->m_sOutput .= "<div class=\"pxm-admin-card\"><div class=\"pxm-admin-card__header\">general configuration</div><div class=\"pxm-admin-card__body\">\n";
 

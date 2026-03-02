@@ -22,6 +22,7 @@ class cAdminActionForbiddenmailform extends cAdminAction{
 
 		$this->m_sOutput .= "<div class=\"pxm-admin-card\">\n<div class=\"pxm-admin-card__header\">forbidden mail</div>\n<div class=\"pxm-admin-card__body\">\n";
 		$this->m_sOutput .= "<form action=\"pxmboard.php\" method=\"post\" onsubmit=\"return confirm('update configuration?')\">\n";
+		$this->m_sOutput .= $this->_getHiddenCsrfField();
 		$this->m_sOutput .= "<input type=\"hidden\" name=\"mode\" value=\"admforbiddenmailsave\">\n";
 		$this->m_sOutput .= "<p>mail<br>mail2</p><textarea cols=\"30\" rows=\"30\" name=\"forbmail\">";
 

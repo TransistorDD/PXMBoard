@@ -42,5 +42,6 @@ enum eError: string {
     case CANNOT_MOVE_TO_SUBTREE = 'Nachricht kann nicht in einen ihrer eigenen Unterbäume verschoben werden (Zirkelreferenz).';
     case CANNOT_MOVE_ACROSS_BOARDS = 'Nachrichten können nur innerhalb desselben Boards verschoben werden.';
     case MESSAGE_MOVE_ERROR = 'Fehler beim Verschieben der Nachricht.';
+    case CSRF_TOKEN_INVALID = 'ungültiges oder fehlendes sicherheitstoken';
 }
 ?>

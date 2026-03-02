@@ -3,7 +3,13 @@
 	<main id="main-content" class="flex-1 container mx-auto px-4 py-6 max-w-5xl">
 
 		{if $newestmember}
-		<p class="text-sm mb-4 text-content-secondary">Neuestes Mitglied: <a href="pxmboard.php?mode=userprofile&usrid={$newestmember.user.id}" onclick="openModal('Profil', 'pxmboard.php?mode=userprofile&usrid={$newestmember.user.id}'); return false;" class="font-medium hover:underline text-link">{$newestmember.user.username}</a></p>
+		<p class="text-sm mb-4 text-content-secondary">Neuestes Mitglied: <a href="pxmboard.php?mode=userprofile&usrid={$newestmember.user.id}"
+		   hx-get="pxmboard.php?mode=userprofile&usrid={$newestmember.user.id}"
+		   hx-target="#htmxModalBody"
+		   hx-swap="innerHTML"
+		   data-modal-title="Profil"
+		   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
+		   class="font-medium hover:underline text-link">{$newestmember.user.username}</a></p>
 		{/if}
 
 		<table class="htmx-table w-full shadow rounded-lg overflow-hidden bg-surface-primary">

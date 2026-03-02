@@ -16,6 +16,18 @@
   'use strict';
 
   // ====================================================================
+  // CSRF PROTECTION
+  // ====================================================================
+
+  function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+  }
+
+  document.addEventListener('htmx:configRequest', function(e) {
+    e.detail.headers['X-CSRF-Token'] = getCsrfToken();
+  });
+
+  // ====================================================================
   // THEME MANAGEMENT
   // ====================================================================
 
@@ -533,12 +545,33 @@
   // ====================================================================
 
   /**
+   * Handle notification click: mark as read, then either swap modal content
+   * (for private messages) or navigate via full page load (for board links).
+   */
+  window.handleNotificationClick = function(evt, nid) {
+    evt.preventDefault();
+    var url = evt.currentTarget.href;
+    if (url.indexOf('mode=privatemessage') !== -1) {
+      // PM: wait for mark-read, then swap modal content in place
+      fetch('pxmboard.php?mode=ajaxnotificationmarkread&nid=' + nid, { credentials: 'same-origin', headers: { 'X-CSRF-Token': getCsrfToken() } })
+        .finally(function() {
+          document.getElementById('htmxModalTitle').textContent = 'Private Nachrichten';
+          htmx.ajax('GET', url, { target: '#htmxModalBody', swap: 'innerHTML' });
+        });
+    } else {
+      // Board link: navigate immediately, mark-read fire-and-forget
+      fetch('pxmboard.php?mode=ajaxnotificationmarkread&nid=' + nid, { credentials: 'same-origin', keepalive: true, headers: { 'X-CSRF-Token': getCsrfToken() } });
+      window.location.href = url;
+    }
+  };
+
+  /**
    * Toggle email notification on reply for a message
    */
   window.toggleNotifyOnReply = function(link, msgId, brdId) {
     fetch('pxmboard.php?mode=ajaxMessagenotifyonreply&brdid=' + brdId, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': getCsrfToken() },
       body: 'msgid=' + msgId
     })
     .then(function(r) { return r.json(); })
@@ -557,7 +590,8 @@
    */
   window.toggleMessageNotification = function(msgId, brdId, btn) {
     fetch('pxmboard.php?mode=ajaxMessagenotificationtoggle&msgid=' + msgId + '&brdid=' + brdId, {
-      credentials: 'same-origin'
+      credentials: 'same-origin',
+      headers: { 'X-CSRF-Token': getCsrfToken() }
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
@@ -577,36 +611,6 @@
   // MODAL DIALOG
   // ====================================================================
 
-  /**
-   * Open content in modal dialog using HTML <dialog> API.
-   * Loads the given URL via htmx.ajax() into the modal body div.
-   * @param {string} title - Dialog title text
-   * @param {string} url   - URL to load via HTMX
-   */
-  window.openModal = function(title, url) {
-    var modal = document.getElementById('htmxModal');
-    var modalTitle = document.getElementById('htmxModalTitle');
-    var modalBody = document.getElementById('htmxModalBody');
-    if (modal && modalTitle && modalBody) {
-      modalTitle.textContent = title;
-      modalBody.innerHTML = '';
-      modal.showModal();
-      htmx.ajax('GET', url, {target: '#htmxModalBody', swap: 'innerHTML'});
-    }
-  };
-
-  /**
-   * Close the modal dialog and clear the body content.
-   */
-  window.closeModal = function() {
-    var modal = document.getElementById('htmxModal');
-    if (modal) {
-      modal.close();
-      var body = document.getElementById('htmxModalBody');
-      if (body) body.innerHTML = '';
-    }
-  };
-
   // ====================================================================
   // ADMIN ACTIONS
   // ====================================================================
@@ -618,7 +622,7 @@
    * @param {boolean} clearPanels - clear thread+message panels after success
    */
   function _adminAjax(url, brdid, clearPanels, reloadThreadId) {
-    fetch(url, { credentials: 'same-origin' })
+    fetch(url, { credentials: 'same-origin', headers: { 'X-CSRF-Token': getCsrfToken() } })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (data.success) {
@@ -678,7 +682,7 @@
         break;
 
       case 'movethread':
-        fetch('pxmboard.php?mode=ajaxThreadmove&brdid=' + brdid + '&id=' + id, { credentials: 'same-origin' })
+        fetch('pxmboard.php?mode=ajaxThreadmove&brdid=' + brdid + '&id=' + id, { credentials: 'same-origin', headers: { 'X-CSRF-Token': getCsrfToken() } })
           .then(function(r) { return r.json(); })
           .then(function(data) {
             if (!data.boards) {
@@ -813,7 +817,7 @@
     closeStatusPopup();
     fetch('pxmboard.php?mode=ajaxboardchangestatus', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': getCsrfToken() },
       body: 'boardid=' + boardId + '&status=' + newStatus
     })
     .then(function(r) { return r.json(); })
@@ -902,12 +906,22 @@
     var threadEl = document.querySelector('#thread-container > div[data-thrdid]');
     var loadedThrdId = threadEl ? threadEl.getAttribute('data-thrdid') : null;
     if (loadedThrdId && loadedThrdId == thrdid) {
+      // Thread already loaded: only fetch the message.
+      // The thread tree's hx-indicator spinner handles load feedback.
       currentMsgId = msgid;
       htmx.ajax('GET',
         'pxmboard.php?mode=message&brdid=' + brdid + '&msgid=' + msgid,
         { target: '#message-container', swap: 'innerHTML' }
       );
     } else {
+      // Thread needs loading: show the threadlist status spinner.
+      var row = document.getElementById('thread_' + thrdid);
+      if (row) {
+        var icon = row.querySelector('.thread-status-icon');
+        var spinner = row.querySelector('.thread-status-spinner');
+        if (icon) icon.hidden = true;
+        if (spinner) spinner.hidden = false;
+      }
       loadThreadAndMessage(brdid, msgid, thrdid);
     }
     if (isMobileView()) showMobileDetailPage();
@@ -921,6 +935,13 @@
    * @param {number} thrdid - thread id
    */
   window.loadThreadOnly = function(brdid, thrdid) {
+    var row = document.getElementById('thread_' + thrdid);
+    if (row) {
+      var icon = row.querySelector('.thread-status-icon');
+      var spinner = row.querySelector('.thread-status-spinner');
+      if (icon) icon.hidden = true;
+      if (spinner) spinner.hidden = false;
+    }
     currentMsgId = 0;
     htmx.ajax('GET',
       'pxmboard.php?mode=thread&brdid=' + brdid + '&thrdid=' + thrdid,
@@ -1200,9 +1221,11 @@
     }
   });
 
-  // After thread tree loads: invalidate cached row ref, apply highlight
+  // After thread tree loads: reset all status spinners, invalidate cached row ref, apply highlight
   document.addEventListener('htmx:afterSwap', function(evt) {
     if (evt.detail.target.id === 'thread-container') {
+      document.querySelectorAll('.thread-status-spinner').forEach(function(s) { s.hidden = true; });
+      document.querySelectorAll('.thread-status-icon').forEach(function(i) { i.hidden = false; });
       _highlightedRow = null;
       updateThreadHighlight();
     }
@@ -1219,6 +1242,30 @@
       if (typeof MessageMove !== 'undefined') {
         MessageMove.updateDropdownOptions();
       }
+      // After a form submission (POST) the thread tree is stale — invalidate the
+      // cached thread ID so loadMessageSmart forces a fresh reload on next click.
+      if (evt.detail.requestConfig && evt.detail.requestConfig.verb === 'post') {
+        var threadEl = document.querySelector('#thread-container > div[data-thrdid]');
+        if (threadEl) threadEl.setAttribute('data-thrdid', '0');
+      }
+    }
+  });
+
+  // Update header badge counts after each HTMX swap
+  document.addEventListener('htmx:afterSwap', function() {
+    var d = document.getElementById('badge-data');
+    if (!d) return;
+    var pm = parseInt(d.dataset.pm) || 0;
+    var notif = parseInt(d.dataset.notif) || 0;
+    var pmBadge = document.getElementById('pm-badge');
+    var notifBadge = document.getElementById('notification-badge');
+    if (pmBadge) {
+      pmBadge.textContent = pm;
+      pmBadge.classList.toggle('hidden', pm <= 0);
+    }
+    if (notifBadge) {
+      notifBadge.textContent = notif;
+      notifBadge.classList.toggle('hidden', notif <= 0);
     }
   });
 
@@ -1227,6 +1274,15 @@
   // ====================================================================
 
   document.addEventListener('DOMContentLoaded', function() {
+    // Clear modal body when native dialog closes (ESC key, backdrop click, or close button)
+    var htmxModal = document.getElementById('htmxModal');
+    if (htmxModal) {
+      htmxModal.addEventListener('close', function() {
+        var body = document.getElementById('htmxModalBody');
+        if (body) body.innerHTML = '';
+      });
+    }
+
     // Apply saved layout preference
     var savedLayout = localStorage.getItem('pxmboard-skin-layout') || 'auto';
     applyLayout(savedLayout);

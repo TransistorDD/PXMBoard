@@ -26,6 +26,7 @@ class cAdminActionTemplateform extends cAdminAction{
 
 			$this->m_sOutput .= "<div class=\"pxm-admin-card\">\n<div class=\"pxm-admin-card__header\">template configuration</div>\n<div class=\"pxm-admin-card__body\">\n";
 			$this->m_sOutput .= "<form action=\"pxmboard.php\" method=\"post\" onsubmit=\"return confirm('update configuration?')\">\n";
+			$this->m_sOutput .= $this->_getHiddenCsrfField();
 			$this->m_sOutput .= $this->_getHiddenField("mode","admtemplatesave").$this->_getHiddenField("id",(string)$objTemplate->getId());
 			$this->m_sOutput .= "<h2>".htmlspecialchars($objTemplate->getName())."</h2>\n";
 			$this->m_sOutput .= "<p>".nl2br(htmlspecialchars($objTemplate->getDescription()))."</p>\n";

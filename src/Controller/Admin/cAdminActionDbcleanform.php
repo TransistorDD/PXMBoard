@@ -21,6 +21,7 @@ class cAdminActionDbcleanform extends cAdminAction{
 
 		$this->m_sOutput .= "<div class=\"pxm-admin-card\">\n<div class=\"pxm-admin-card__header\">delete / restore invalid database entries</div>\n<div class=\"pxm-admin-card__body\">\n";
 		$this->m_sOutput .= "<form action=\"pxmboard.php\" method=\"post\" onsubmit=\"return confirm('clean database?')\">\n";
+		$this->m_sOutput .= $this->_getHiddenCsrfField();
 		$this->m_sOutput .= "<input type=\"hidden\" name=\"mode\" value=\"admdbclean\">\n";
 		$this->m_sOutput .= $this->_getCheckboxField("nobrd","1","delete lost threads (invalid board id)?");
 		$this->m_sOutput .= $this->_getCheckboxField("nousr","1","delete lost messages (invalid user id)?");

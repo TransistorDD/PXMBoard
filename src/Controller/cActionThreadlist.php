@@ -29,6 +29,7 @@ require_once(SRCDIR . '/Parser/cParser.php');
 	 */
 	public function performAction(): void{
 		$objActiveBoard = $this->getActiveBoard();
+		$objActiveUser = $this->getActiveUser();
 
 		$this->m_objTemplate = $this->_getTemplateObject("threadlist");
 
@@ -41,30 +42,17 @@ require_once(SRCDIR . '/Parser/cParser.php');
 			$objActiveBoard->setThreadListTimeSpan($iTimeSpan);
 		}
 
-		// Get user ID for read tracking (0 for guests)
-		$iUserId = 0;
-		if($objActiveUser = $this->getActiveUser()){
-			$iUserId = $objActiveUser->getId();
-		}
+		$iUserId = $objActiveUser ? $objActiveUser->getId() : 0;
+		$iLastOnline = $objActiveUser ? $objActiveUser->getLastOnlineTimestamp() : 0;
 
 		$objThreadList = new cThreadList($objActiveBoard->getId(),$this->_getThreadListSortMode(),$this->m_objConfig->getAccessTimestamp() - $objActiveBoard->getThreadListTimeSpan()*86400 + $this->m_objConfig->getTimeOffset()*3600,$iUserId);
 		$objThreadList->loadData($this->m_objInputHandler->getIntFormVar("page",true,true,true),$this->m_objConfig->getThreadsPerPage());
 
-		$iLastOnline = 0;
-		$arrUser = array();
-		if($objActiveUser = $this->getActiveUser()){
-			$iLastOnline = $objActiveUser->getLastOnlineTimestamp();
-			// message drafts (public only)
-			require_once(SRCDIR . '/Model/cMessageDraftList.php');
-			$objMessageDraftList = new cMessageDraftList($objActiveUser->getId());
-			$arrUser = array("user"=>array("draftcount"=>strval($objMessageDraftList->countDrafts())));
-		}
-		$this->m_objTemplate->addData($this->getContextDataArray(array_merge($arrUser,
-																					array("previd"=>$objThreadList->getPrevPageId(),
-																							"nextid"=>$objThreadList->getNextPageId()))));
+		$this->m_objTemplate->addData($this->getContextDataArray(array("previd"=>$objThreadList->getPrevPageId(),
+																				"nextid"=>$objThreadList->getNextPageId())));
 		$this->m_objTemplate->addData(array("thread"=>$objThreadList->getDataArray($this->m_objConfig->getTimeOffset()*3600,
-																							$this->m_objConfig->getDateFormat(),
-																							$iLastOnline)));
+																						$this->m_objConfig->getDateFormat(),
+																						$iLastOnline)));
 	}
 
 	/**
