@@ -118,7 +118,7 @@ class cActionMessagesave extends cAction{
 				$objBoardMessage->setSubject($sSubject);
 				$objBoardMessage->setBody($sBody);
 				$objBoardMessage->setMessageTimestamp($this->m_objConfig->getAccessTimestamp());
-				$objBoardMessage->setIp($this->m_objConfig->getRemoteAddr());
+				$objBoardMessage->setIp($this->m_objServerHandler->getRemoteAddr());
 				$objBoardMessage->setNotifyOnReply($this->m_objInputHandler->getIntFormVar("notify_on_reply",true,true,true));
 
 				$objBoardMessage->setStatus($eMessageStatus);

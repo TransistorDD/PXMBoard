@@ -3,6 +3,7 @@ require_once(SRCDIR . '/Model/cSkin.php');
 require_once(SRCDIR . '/Model/cUserConfig.php');
 require_once(SRCDIR . '/Enum/eUser.php');
 require_once(SRCDIR . '/Validation/cInputHandler.php');
+require_once(SRCDIR . '/Validation/cServerHandler.php');
 require_once(SRCDIR . '/Parser/cPxmParser.php');
 require_once(SRCDIR . '/Skin/cSkinTemplateFactory.php');
 require_once(SRCDIR . '/Exception/SkinInitializationException.php');
@@ -19,6 +20,7 @@ require_once(SRCDIR . '/Exception/SkinInitializationException.php');
 	protected mixed $m_objConfig;
 	protected mixed $m_objTemplate;
 	protected mixed $m_objInputHandler;
+	protected cServerHandler $m_objServerHandler;
 	protected ?cUserConfig $m_objActiveUser;
 	protected mixed $m_objActiveBoard;
 	protected mixed $m_objActiveSkin;
@@ -37,6 +39,7 @@ require_once(SRCDIR . '/Exception/SkinInitializationException.php');
 		$this->m_objConfig = $objConfig;
 		$this->m_objTemplate = null;
 		$this->m_objInputHandler = new cInputHandler();
+		$this->m_objServerHandler = new cServerHandler();
 
 		$this->m_objActiveUser = null;
 		$this->m_objActiveBoard = null;
@@ -248,7 +251,7 @@ require_once(SRCDIR . '/Exception/SkinInitializationException.php');
 	 * @return bool true if the token is valid, false otherwise
 	 */
 	protected function _requireValidCsrfToken(): bool {
-		$sToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+		$sToken = $this->m_objServerHandler->getHttpCsrfToken();
 		if(empty($sToken)){
 			$sToken = $this->m_objInputHandler->getStringFormVar(
 				'csrf_token', 'csrf_token', true, false, 'trim'
@@ -548,6 +551,7 @@ require_once(SRCDIR . '/Exception/SkinInitializationException.php');
 		$objPxmParser->setQuoteTag($this->m_objConfig->getQuoteTag());
 		$objPxmParser->setEmbedExternal($this->embedExternal());
 		$objPxmParser->setDoQuote($bDoQuote);
+		$objPxmParser->setHttpHost($this->m_objServerHandler->getHttpHost());
 		if($bDoTextReplacements){
 			require_once(SRCDIR . '/Model/cTextreplacementList.php');
 			$objTextreplacementList = new cTextreplacementList();

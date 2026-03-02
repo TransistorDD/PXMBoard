@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown on search engine errors (configuration issues, unavailable engine)
  *

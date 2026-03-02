@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when skin initialization fails
  *
@@ -17,7 +18,7 @@ class SkinInitializationException extends RuntimeException
      * @param Throwable|null $previous Previous exception
      */
     public function __construct(
-        string $message = "Could not initialize skin. Check configuration.",
+        string $message = 'Could not initialize skin. Check configuration.',
         int $code = 0,
         ?Throwable $previous = null
     ) {

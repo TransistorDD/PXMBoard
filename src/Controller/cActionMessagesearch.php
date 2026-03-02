@@ -67,7 +67,7 @@ class cActionMessagesearch extends cAction{
 		}
 		else{
 			// Check rate limiting (applies to all searches, including saved profiles)
-			$sIpAddress = $this->m_objConfig->getRemoteAddr();
+			$sIpAddress = $this->m_objServerHandler->getRemoteAddr();
 			$iCurrentTime = $this->m_objConfig->getAccessTimestamp();
 
 			if(cSearchProfile::isRateLimitExceeded($sIpAddress, $iCurrentTime)){

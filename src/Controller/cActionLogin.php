@@ -44,7 +44,7 @@ class cActionLogin extends cActionBoardlist{
 
 					// Handle "stay logged in" checkbox
 					if($this->m_objInputHandler->getIntFormVar("staylogedin",true,true)>0){
-						$sTicket = $objUser->createNewTicket($this->m_objConfig->getUserAgent(), $this->m_objConfig->getRemoteAddr());
+						$sTicket = $objUser->createNewTicket($this->m_objServerHandler->getUserAgent(), $this->m_objServerHandler->getRemoteAddr());
 						cSession::setCookieVar("ticket", $sTicket, $this->m_objConfig->getAccessTimestamp()+15552000); // 180 days / 6 months
 					}
 

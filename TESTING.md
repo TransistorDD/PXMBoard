@@ -197,13 +197,16 @@ vendor/bin/phpunit
 ### Before Committing
 
 ```bash
-# 1. Full test suite
+# 1. Format changed PHP files with Pint (PSR-12, configured in pint.json)
+vendor/bin/pint src/path/to/ChangedClass.php
+
+# 2. Full test suite
 vendor/bin/phpunit
 
-# 2. Static analysis (minimum level 5, see phpstan.neon)
+# 3. Static analysis (minimum level 5, see phpstan.neon)
 vendor/bin/phpstan analyse
 
-# 3. Write report to file
+# 4. Write report to file
 vendor/bin/phpstan analyse --output-file reports/phpstan.txt
 ```
 

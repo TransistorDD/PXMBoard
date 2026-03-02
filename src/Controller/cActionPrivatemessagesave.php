@@ -65,7 +65,7 @@ class cActionPrivatemessagesave extends cAction{
 					$objPrivateMessage->setSubject($sSubject);
 					$objPrivateMessage->setBody($sBody);
 					$objPrivateMessage->setMessageTimestamp($this->m_objConfig->getAccessTimestamp());
-					$objPrivateMessage->setIp($this->m_objConfig->getRemoteAddr());
+					$objPrivateMessage->setIp($this->m_objServerHandler->getRemoteAddr());
 
 					$iErrorId = $objPrivateMessage->insertData();
 					if($iErrorId==0){

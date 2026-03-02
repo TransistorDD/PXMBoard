@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base exception for message move operations
  *
@@ -7,7 +8,8 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-class cMessageMoveException extends Exception {
+class cMessageMoveException extends Exception
+{
 }
 
 /**
@@ -16,7 +18,8 @@ class cMessageMoveException extends Exception {
  * @author Torsten Rentsch <forum@torsten-rentsch.de>
  * @copyright Torsten Rentsch 2001 - 2026
  */
-class cCircularReferenceException extends cMessageMoveException {
+class cCircularReferenceException extends cMessageMoveException
+{
 }
 
 /**
@@ -25,7 +28,8 @@ class cCircularReferenceException extends cMessageMoveException {
  * @author Torsten Rentsch <forum@torsten-rentsch.de>
  * @copyright Torsten Rentsch 2001 - 2026
  */
-class cSelfReferenceException extends cMessageMoveException {
+class cSelfReferenceException extends cMessageMoveException
+{
 }
 
 /**
@@ -34,7 +38,8 @@ class cSelfReferenceException extends cMessageMoveException {
  * @author Torsten Rentsch <forum@torsten-rentsch.de>
  * @copyright Torsten Rentsch 2001 - 2026
  */
-class cInvalidBoardException extends cMessageMoveException {
+class cInvalidBoardException extends cMessageMoveException
+{
 }
 
 /**
@@ -43,6 +48,6 @@ class cInvalidBoardException extends cMessageMoveException {
  * @author Torsten Rentsch <forum@torsten-rentsch.de>
  * @copyright Torsten Rentsch 2001 - 2026
  */
-class cInvalidParentException extends cMessageMoveException {
+class cInvalidParentException extends cMessageMoveException
+{
 }
-?>

@@ -15,7 +15,8 @@
     "require-dev": {
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^13.0",
-        "elasticsearch/elasticsearch": "^9.3"
+        "elasticsearch/elasticsearch": "^9.3",
+        "laravel/pint": "^1.27"
     },
     "suggest": {
         "elasticsearch/elasticsearch": "^9.3 (Wird für die erweiterte Volltextsuche benötigt. Ohne dieses Paket steht nur die Basissuche zur Verfügung.)"

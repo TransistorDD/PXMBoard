@@ -56,7 +56,7 @@ require_once(SRCDIR . '/Controller/cAction.php');
 	 * @return bool true if valid (or GET request), false otherwise
 	 */
 	protected function _requireValidCsrfToken(): bool {
-		if(($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST'){
+		if($this->m_objServerHandler->getRequestMethod() !== 'POST'){
 			return true;
 		}
 		$sPostedToken = $this->m_objInputHandler->getStringFormVar(
