@@ -15,6 +15,7 @@ class cMessageHeader
     protected mixed $m_objAuthor;			// author (user)
     protected string $m_sSubject;			// message subject
     protected int $m_iMessageTimestamp;		// date of the message
+    protected ?bool $m_bIsRead = null;		// DB-based read status (null = use timestamp fallback)
 
     /**
      * Constructor
@@ -263,6 +264,17 @@ class cMessageHeader
     }
 
     /**
+     * set DB-based read status
+     *
+     * @param ?bool $bIsRead true = read, false = unread, null = use timestamp fallback
+     * @return void
+     */
+    public function setIsRead(?bool $bIsRead): void
+    {
+        $this->m_bIsRead = $bIsRead;
+    }
+
+    /**
      * get membervariables as array
      *
      * @param int $iTimeOffset time offset in seconds
@@ -278,7 +290,9 @@ class cMessageHeader
         return ['id'		=>	$this->m_iId,
                      'subject'	=>	$this->getSubject($sSubjectQuotePrefix),
                      'date'		=>	(($this->m_iMessageTimestamp > 0) ? date($sDateFormat, ($this->m_iMessageTimestamp + $iTimeOffset)) : 0),
-                     'new'		=>	(($iLastOnlineTimestamp > $this->m_iMessageTimestamp) ? 0 : 1),
+                     'new'		=>	$this->m_bIsRead !== null
+                                        ? ($this->m_bIsRead ? 0 : 1)
+                                        : (($iLastOnlineTimestamp > $this->m_iMessageTimestamp) ? 0 : 1),
                      'user'		=>	$this->m_objAuthor->getDataArray($iTimeOffset, $sDateFormat, $objParser)];
     }
 }

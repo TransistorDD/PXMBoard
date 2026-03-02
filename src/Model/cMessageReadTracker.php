@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Message read tracking
  *
@@ -25,11 +26,37 @@ class cMessageReadTracker
         $iTimestamp = time();
 
         // Single INSERT with ON DUPLICATE KEY UPDATE
-        $sQuery = "INSERT INTO pxm_message_read (mr_userid, mr_messageid, mr_timestamp) VALUES (" .
-                  (int)$iUserId . "," .
-                  (int)$iMessageId . "," .
+        $sQuery = 'INSERT INTO pxm_message_read (mr_userid, mr_messageid, mr_timestamp) VALUES (' .
+                  (int)$iUserId . ',' .
+                  (int)$iMessageId . ',' .
                   (int)$iTimestamp .
-                  ") ON DUPLICATE KEY UPDATE mr_timestamp=VALUES(mr_timestamp)";
+                  ') ON DUPLICATE KEY UPDATE mr_timestamp=VALUES(mr_timestamp)';
+
+        return $objDb->executeQuery($sQuery) != false;
+    }
+
+    /**
+     * Mark all messages in a thread as read
+     *
+     * @param int $iUserId User ID
+     * @param int $iThreadId Thread ID
+     * @return bool Success
+     */
+    public static function markThreadAsRead(int $iUserId, int $iThreadId): bool
+    {
+        $objDb = cDBFactory::getInstance();
+
+        if ($iUserId <= 0 || $iThreadId <= 0) {
+            return false;
+        }
+
+        $iTimestamp = time();
+
+        $sQuery = 'INSERT INTO pxm_message_read (mr_userid, mr_messageid, mr_timestamp) ' .
+                  'SELECT ' . (int)$iUserId . ', m_id, ' . (int)$iTimestamp . ' ' .
+                  'FROM pxm_message ' .
+                  'WHERE m_threadid = ' . (int)$iThreadId . ' ' .
+                  'ON DUPLICATE KEY UPDATE mr_timestamp = VALUES(mr_timestamp)';
 
         return $objDb->executeQuery($sQuery) != false;
     }
@@ -48,7 +75,7 @@ class cMessageReadTracker
             return 0;
         }
 
-        $sQuery = "SELECT COUNT(*) as readcount FROM pxm_message_read WHERE mr_messageid=" . (int)$iMessageId;
+        $sQuery = 'SELECT COUNT(*) as readcount FROM pxm_message_read WHERE mr_messageid=' . (int)$iMessageId;
 
         if ($objResultSet = $objDb->executeQuery($sQuery)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
@@ -70,9 +97,9 @@ class cMessageReadTracker
         $objDb = cDBFactory::getInstance();
         $iCutoff = time() - ($iDaysOld * 86400);
 
-        $sQuery = "DELETE FROM pxm_message_read " .
-                  "WHERE mr_timestamp < " . (int)$iCutoff . " " .
-                  "LIMIT 10000"; // Prevent lock escalation
+        $sQuery = 'DELETE FROM pxm_message_read ' .
+                  'WHERE mr_timestamp < ' . (int)$iCutoff . ' ' .
+                  'LIMIT 10000'; // Prevent lock escalation
 
         $objResultSet = $objDb->executeQuery($sQuery);
         return $objResultSet ? $objResultSet->getAffectedRows() : 0;

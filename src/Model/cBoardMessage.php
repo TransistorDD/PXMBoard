@@ -24,7 +24,7 @@ class cBoardMessage extends cMessage
 
     protected bool $m_bNotifyOnReply;		// notify author on reply
 
-    protected bool $m_bIsRead;				// is message read (for logged-in users)?
+    protected ?bool $m_bIsRead = null;		// is message read (for logged-in users)?
 
     protected MessageStatus $m_eStatus;		// message status (draft, published, etc.)
 
@@ -496,11 +496,11 @@ class cBoardMessage extends cMessage
     /**
      * set message read status
      *
-     * @param  bool  $bIsRead  is message read
+     * @param  ?bool  $bIsRead  is message read
      */
-    public function setIsRead(bool $bIsRead): void
+    public function setIsRead(?bool $bIsRead): void
     {
-        $this->m_bIsRead = $bIsRead ? true : false;
+        $this->m_bIsRead = (bool)$bIsRead;
     }
 
     /**
