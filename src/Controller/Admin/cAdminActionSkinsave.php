@@ -28,9 +28,6 @@ class cAdminActionSkinsave extends cAdminAction{
 
 			$objSkin->setName($this->m_objInputHandler->getStringFormVar("name","skinvalue",true,true,"trim"));
 			$objSkin->setDirectory($this->m_objInputHandler->getStringFormVar("dir","skinvalue",true,true,"trim"));
-
-			$objSkin->setThreadGraphics($this->m_objInputHandler->getArrFormVar("threadgraphic",true,true,false,"trim","skinvalue"));
-
 			$objSkin->setAdditionalSkinValues($this->m_objInputHandler->getArrFormVar("additionalvalues",true,true,false,"trim","skinvalue"));
 
 			if($objSkin->updateData()){

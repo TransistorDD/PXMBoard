@@ -1,8 +1,5 @@
 {function name="threadnode"}
 <li><div class="htmx-thread-msg-row" data-msgid="{$msg.id}">
-	{if $msg.user.imgfile}
-		<img class="h-5 w-5 rounded-full object-cover shrink-0" src="{$config.profile_img_dir}{$msg.user.imgfile}" alt="{$msg.user.username}">
-	{/if}
 	<span class="{if $config.logedin == 1 && $msg.new == 1}font-semibold{/if}">
 		<a href="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$msg.id}"
 		   hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$msg.id}"
@@ -31,9 +28,6 @@
 <div data-thrdid="{$thread.id}">
 	<!-- Thread-Kopf: Wurzelnachricht als Header-Zeile -->
 	<div class="htmx-thread-root-header" data-msgid="{$root.id}">
-		{if $root.user.imgfile}
-			<img class="h-4 w-4 rounded-full object-cover shrink-0" src="{$config.profile_img_dir}{$root.user.imgfile}" alt="{$root.user.username}">
-		{/if}
 		<span class="font-semibold">
 			<a href="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$root.id}"
 			   hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$root.id}"

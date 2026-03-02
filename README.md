@@ -97,19 +97,6 @@ the **Administration** panel after login.
 
 ---
 
-## Security
-
-| Measure | Details |
-|---------|---------|
-| Password hashing | bcrypt via `password_hash()` / `password_verify()` |
-| CSRF protection | Session-scoped token (OWASP Synchronizer Token Pattern); validated on all state-changing actions via `X-CSRF-Token` header (htmx/fetch) or hidden POST field (admin forms); comparison with `hash_equals()` |
-| Secure token generation | Login tickets and recovery tokens use `bin2hex(random_bytes(32))` |
-| SQL escaping | Database-specific `quote()` method; `addslashes()` is banned |
-| Session cookies | `httponly`, `secure`, `SameSite=Lax` |
-| Output escaping | All template output HTML-escaped via Smarty's `escape:'html'` |
-
----
-
 ## Development
 
 **Prerequisites:** PHP ≥ 8.4, Composer ≥ 2.0, Node.js / npm

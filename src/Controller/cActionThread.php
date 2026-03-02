@@ -32,10 +32,6 @@ class cActionThread extends cAction{
 		$objThread = new cThread();
 		if($objThread->loadDataById($this->m_objInputHandler->getIntFormVar("thrdid",true,true,true),$this->getActiveBoard()->getId())){
 
-			$objActiveSkin = $this->getActiveSkin();
-
-			$objThread->setThreadGraphics($objActiveSkin->getThreadGraphics());
-
 			// Get current user id for draft visibility
 			$iCurrentUserId = 0;
 			$iLastOnline = 0;

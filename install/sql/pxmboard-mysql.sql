@@ -187,11 +187,7 @@ CREATE TABLE `pxm_skin` (
 INSERT INTO `pxm_skin` (`s_id`, `s_fieldname`, `s_fieldvalue`) VALUES
 (1, 'name', 'PXM Skin'),
 (1, 'dir', 'pxm'),
-(1, 'type', 'Smarty'),
-(1, 'tgfx_lastc', '<img src="images/lc.gif" width="8" height="22" border="0"/>'),
-(1, 'tgfx_midc', '<img src="images/mc.gif" width="8" height="22" border="0"/>'),
-(1, 'tgfx_noc', '<img src="images/nc.gif" width="8" height="22" border="0"/>'),
-(1, 'tgfx_empty', '<img src="images/empty.gif" width="8" height="22" border="0"/>');
+(1, 'type', 'Smarty');
 # --------------------------------------------------------
 
 CREATE TABLE `pxm_textreplacement` (

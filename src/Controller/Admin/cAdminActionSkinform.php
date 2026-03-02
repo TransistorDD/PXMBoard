@@ -32,9 +32,6 @@ class cAdminActionSkinform extends cAdminAction{
 			$this->m_sOutput .= "<div class=\"pxm-form-group\"><label>supported template engines</label><div class=\"pxm-field\">".htmlspecialchars(implode(",",$objSkin->getSupportedTemplateEngines()))."</div></div>\n";
 			$this->m_sOutput .= $this->_getTextField("name",255,$objSkin->getName(),"name");
 			$this->m_sOutput .= $this->_getTextField("dir",255,$objSkin->getDirectory(),"directory");
-			foreach($objSkin->getThreadGraphics() as $sKey=>$sValue){
-				$this->m_sOutput .= $this->_getTextField("threadgraphic[$sKey]",255,$sValue,"threadgraphic ".$sKey);
-			}
 			$this->m_sOutput .= "</div></div>\n";
 
 			$this->m_sOutput .= "<div class=\"pxm-admin-card\"><div class=\"pxm-admin-card__header\">additional configuration</div><div class=\"pxm-admin-card__body\">\n";

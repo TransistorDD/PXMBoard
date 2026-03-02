@@ -19,7 +19,6 @@ class cThread{
 	protected int $m_iMessageQuantity;			// quantity of messages in this thread
 	protected int $m_iViews;					// views for this thread
 	protected array $m_arrThreadMessages;		// message headers of the thread
-	protected array $m_arrThreadGraphics;		// graphics for threads
 
 	/**
 	 * Constructor
@@ -36,7 +35,6 @@ class cThread{
 		$this->m_iLastMessageTimestamp = 0;
 		$this->m_iMessageQuantity = 0;
 		$this->m_iViews = 0;
-		$this->m_arrThreadGraphics = array("lastc"=>"","empty"=>"","noc"=>"","midc"=>"");
 	}
 
 	/**
@@ -99,7 +97,7 @@ class cThread{
 	 *
 	 * @return boolean is the thread active?
 	 */
-	public function isActive(){
+	public function isActive():bool {
 		return $this->m_bIsActive;
 	}
 
@@ -118,7 +116,7 @@ class cThread{
 	 * @param boolean $bIsActive should the thread be activated?
 	 * @return boolean success / failure
 	 */
-	public function updateIsActive($bIsActive){
+	public function updateIsActive($bIsActive):bool {
 
 
 		if(!cDBFactory::getInstance()->executeQuery("UPDATE pxm_thread SET t_active=".intval($bIsActive)." WHERE t_id=$this->m_iId")){
@@ -133,7 +131,7 @@ class cThread{
 	 *
 	 * @return boolean is the thread fixed on top of the threadlist?
 	 */
-	public function isFixed(){
+	public function isFixed():bool {
 		return $this->m_bIsFixed;
 	}
 
@@ -143,7 +141,7 @@ class cThread{
 	 * @param boolean $bIsFixed is the thread fixed on top of the threadlist?
 	 * @return boolean success / failure
 	 */
-	public function updateIsFixed($bIsFixed){
+	public function updateIsFixed($bIsFixed):bool {
 
 
 		if(!cDBFactory::getInstance()->executeQuery("UPDATE pxm_thread SET t_fixed=".intval($bIsFixed)." WHERE t_id=$this->m_iId")){
@@ -158,7 +156,7 @@ class cThread{
 	 *
 	 * @return boolean success / failure
 	 */
-	public function deleteData(){
+	public function deleteData():bool {
 
 
 		if(cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_threadid=$this->m_iId")
@@ -175,7 +173,7 @@ class cThread{
 	 * @param integer $iMessageId id of the start message
 	 * @return boolean success / failure
 	 */
-	public function deleteSubThread($iMessageId){
+	public function deleteSubThread(int $iMessageId):bool {
 
 		$iMessageId = intval($iMessageId);
 
@@ -192,11 +190,11 @@ class cThread{
 		if(isset($this->m_arrThreadMessages[0]) && !in_array($iMessageId,$this->m_arrThreadMessages[0])){// root message not allowed
 
 
-			$this->_deleteSubThreadRecursive($iMessageId);
+			$this->deleteSubThreadRecursive($iMessageId);
 
 			cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_id=".$iMessageId);
 
-			$this->_updateThreadInformation($this->m_iId);
+			$this->updateThreadInformation($this->m_iId);
 			$bReturn = true;
 		}
 		if($bClosed){
@@ -215,7 +213,7 @@ class cThread{
 	 * @param integer $iMessageId id of the message to delete (with all children)
 	 * @return boolean success / failure
 	 */
-	public function deleteMessageTree(int $iMessageId): bool {
+	public function deleteMessageTree(int $iMessageId):bool {
 		$iMessageId = intval($iMessageId);
 		if($iMessageId <= 0){
 			return false;
@@ -237,7 +235,7 @@ class cThread{
 	 * @param integer $iMessageId id of the start message
 	 * @return boolean success / failure
 	 */
-	public function extractSubThread($iMessageId){
+	public function extractSubThread(int $iMessageId):bool {
 
 		$iMessageId = intval($iMessageId);
 
@@ -261,10 +259,10 @@ class cThread{
 
 					cDBFactory::getInstance()->executeQuery("UPDATE pxm_message SET m_threadid=".intval($iNewThreadId).",m_parentid=0 WHERE m_id=".$iMessageId);
 
-					$this->_moveSubThreadRecursive($iMessageId,$iNewThreadId);
+					$this->moveSubThreadRecursive($iMessageId,$iNewThreadId);
 
-					$this->_updateThreadInformation($iNewThreadId);
-					$this->_updateThreadInformation($this->m_iId);
+					$this->updateThreadInformation($iNewThreadId);
+					$this->updateThreadInformation($this->m_iId);
 					$bReturn = true;
 				}
 			}
@@ -280,7 +278,7 @@ class cThread{
 	 *
 	 * @return array ids of the messages in this thread
 	 */
-	public function getThreadMessageIdArray(){
+	public function getThreadMessageIdArray():array {
 
 		$arrThreadMessageIds = array();
 		if($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT m_id,m_parentid FROM pxm_message WHERE m_threadid=$this->m_iId")){
@@ -297,10 +295,10 @@ class cThread{
 	 * @param integer $iMessageId id of the start message
 	 * @return boolean success / failure
 	 */
-	private function _deleteSubThreadRecursive(int $iMessageId): bool{
+	private function deleteSubThreadRecursive(int $iMessageId):bool {
 		if(isset($this->m_arrThreadMessages[$iMessageId])){
 			foreach($this->m_arrThreadMessages[$iMessageId] as $iSubMessageId){
-				$this->_deleteSubThreadRecursive($iSubMessageId);
+				$this->deleteSubThreadRecursive($iSubMessageId);
 			}
 			cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_threadid=$this->m_iId AND m_parentid=".$iMessageId);
 		}
@@ -314,13 +312,14 @@ class cThread{
 	 * @param integer $iNewThreadId id of the new thread
 	 * @return boolean success / failure
 	 */
-	private function _moveSubThreadRecursive($iMessageId,$iNewThreadId){
+	private function moveSubThreadRecursive(int $iMessageId,int $iNewThreadId):bool {
 		if(isset($this->m_arrThreadMessages[$iMessageId])){
 			foreach($this->m_arrThreadMessages[$iMessageId] as $iSubMessageId){
-				$this->_moveSubThreadRecursive($iSubMessageId,$iNewThreadId);
+				$this->moveSubThreadRecursive($iSubMessageId,$iNewThreadId);
 			}
 			cDBFactory::getInstance()->executeQuery("UPDATE pxm_message SET m_threadid=$iNewThreadId WHERE m_threadid=$this->m_iId AND m_parentid=".$iMessageId);
 		}
+		return true;
 	}
 
 	/**
@@ -329,7 +328,7 @@ class cThread{
 	 * @param integer $iThreadId id of the thread
 	 * @return boolean success / failure
 	 */
-	private function _updateThreadInformation($iThreadId){
+	private function updateThreadInformation(int $iThreadId):bool {
 		if($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS count,MAX(m_tstmp) AS maxd,MAX(m_id) AS maxid FROM pxm_message WHERE m_threadid=$iThreadId")){
 			if($objResultRow = $objResultSet->getNextResultRowObject()){
 				cDBFactory::getInstance()->executeQuery("UPDATE pxm_thread SET t_msgquantity=$objResultRow->count-1,t_lastmsgid=$objResultRow->maxid,t_lastmsgtstmp=$objResultRow->maxd WHERE t_id=$iThreadId");
@@ -345,7 +344,7 @@ class cThread{
 	 * @param integer $iDestinationBoardId destination board id
 	 * @return boolean success / failure
 	 */
-	public function moveThread($iDestinationBoardId){
+	public function moveThread(int $iDestinationBoardId):bool {
 
 		$bReturn = false;
 
@@ -359,16 +358,6 @@ class cThread{
 	}
 
 	/**
-	 * set thread graphics
-	 *
-	 * @param array $arrThreadGraphics thread graphics
-	 * @return void
-	 */
-	public function setThreadGraphics($arrThreadGraphics){
-		$this->m_arrThreadGraphics = $arrThreadGraphics;
-	}
-
-	/**
 	 * get membervariables as array
 	 *
 	 * @param integer $iTimeOffset time offset in seconds
@@ -377,7 +366,7 @@ class cThread{
 	 * @param integer $iCurrentUserId current user id for draft visibility (0 = guest)
 	 * @return array member variables
 	 */
-	public function getDataArray($iTimeOffset,$sDateFormat,$iLastOnlineTimestamp,$iCurrentUserId = 0){
+	public function getDataArray(int $iTimeOffset,string $sDateFormat,int $iLastOnlineTimestamp,int $iCurrentUserId = 0):array {
 
 		require_once(SRCDIR . '/Enum/eMessage.php');
 		$iCurrentUserId = intval($iCurrentUserId);
@@ -417,7 +406,7 @@ class cThread{
 								 "active"	=>	$this->m_bIsActive,
 								 "fixed"	=>	$this->m_bIsFixed,
 								 "views"	=>	$this->m_iViews,
-								 "msg"		=>	$this->_getMessageTreeArray(0));
+								 "msg"		=>	$this->getMessageTreeArray(0));
 				}
 			}
 		}
@@ -434,22 +423,22 @@ class cThread{
 	 * @param string $sImages image tags
 	 * @return array message header tree
 	 */
-	private function _getMessageTreeArray($iParentId,$sImages = ""){
+	private function getMessageTreeArray(int $iParentId,string $sTreeLines = ''):array {
 		$arrReturn = array();
 		if(isset($this->m_arrThreadMessages[$iParentId]) && is_array($this->m_arrThreadMessages[$iParentId]) && ($iLevelArraySize = sizeof($this->m_arrThreadMessages[$iParentId]))>0){		//if there is at least one answer to parent message
 			for($iMessagePointer = 0;$iMessagePointer<$iLevelArraySize;$iMessagePointer++){//recursive call to getMsgTreeArray for every answer
 				if($iMessagePointer<$iLevelArraySize-1){	//if it is not the last answer...
-					$this->m_arrThreadMessages[$iParentId][$iMessagePointer] = array_merge($this->m_arrThreadMessages[$iParentId][$iMessagePointer],array("_img" => $sImages.$this->m_arrThreadGraphics["midc"]));
+					$this->m_arrThreadMessages[$iParentId][$iMessagePointer] = array_merge($this->m_arrThreadMessages[$iParentId][$iMessagePointer],array("tree_lines" => $sTreeLines.'├'));
 
-					if($arrChildren = $this->_getMessageTreeArray($this->m_arrThreadMessages[$iParentId][$iMessagePointer]["id"],$sImages.$this->m_arrThreadGraphics["noc"])){
+					if($arrChildren = $this->getMessageTreeArray($this->m_arrThreadMessages[$iParentId][$iMessagePointer]["id"],$sTreeLines.'│')){
 						$this->m_arrThreadMessages[$iParentId][$iMessagePointer] = array_merge($this->m_arrThreadMessages[$iParentId][$iMessagePointer],array("msg" => $arrChildren));
 					}
 				}
 				else{										//...else draw gif for endpart
 					if($iParentId>0){
-						$this->m_arrThreadMessages[$iParentId][$iMessagePointer] = array_merge($this->m_arrThreadMessages[$iParentId][$iMessagePointer],array("_img" => $sImages.$this->m_arrThreadGraphics["lastc"]));
+						$this->m_arrThreadMessages[$iParentId][$iMessagePointer] = array_merge($this->m_arrThreadMessages[$iParentId][$iMessagePointer],array("tree_lines" => $sTreeLines.'└'));
 					}
-					if($arrChildren = $this->_getMessageTreeArray($this->m_arrThreadMessages[$iParentId][$iMessagePointer]["id"],$sImages.$this->m_arrThreadGraphics["empty"])){
+					if($arrChildren = $this->getMessageTreeArray($this->m_arrThreadMessages[$iParentId][$iMessagePointer]["id"],$sTreeLines.' ')){
 						$this->m_arrThreadMessages[$iParentId][$iMessagePointer] = array_merge($this->m_arrThreadMessages[$iParentId][$iMessagePointer],array("msg" => $arrChildren));
 					}
 				}

@@ -13,7 +13,6 @@ class cSkin{
 	protected string $m_sName;						// name
 	protected string $m_sDirectory;					// subdirectory of the templates
 	protected array $m_arrSupportedTemplateEngines; // supported template engines
-	protected array $m_arrThreadGraphics;			// graphics for thread visualisation
 	protected array $m_arrAdditionalSkinValues;		// additional values
 
 	/**
@@ -27,7 +26,6 @@ class cSkin{
 		$this->m_sName = "";
 		$this->m_sDirectory = "";
 		$this->m_arrSupportedTemplateEngines = array();
-		$this->m_arrThreadGraphics = array("empty" => "","midc" => "","lastc" => "","noc" => "");
 		$this->m_arrAdditionalSkinValues = array();
 	}
 
@@ -37,7 +35,7 @@ class cSkin{
 	 * @param integer $iSkinId skin id
 	 * @return boolean success / failure
 	 */
-	public function loadDataById($iSkinId){
+	public function loadDataById(int $iSkinId):bool {
 
 		$bReturn = false;
 		$iSkinId = intval($iSkinId);
@@ -55,14 +53,9 @@ class cSkin{
 												 	break;
 							case "dir"			:	$this->m_sDirectory = $objResultRow->s_fieldvalue;
 													break;
-							case "type"			:	$this->m_arrSupportedTemplateEngines = explode(",",$objResultRow->s_fieldvalue);
+							case "type"			:	$this->m_arrSupportedTemplateEngines = explode(',',$objResultRow->s_fieldvalue);
 													break;
-							default				:	if(strncmp($objResultRow->s_fieldname,"tgfx_",5)==0){
-														$this->m_arrThreadGraphics[substr($objResultRow->s_fieldname,5)] = $objResultRow->s_fieldvalue;
-													}
-													else{
-												  		$this->m_arrAdditionalSkinValues[$objResultRow->s_fieldname] = $objResultRow->s_fieldvalue;
-													}
+							default				:	$this->m_arrAdditionalSkinValues[$objResultRow->s_fieldname] = $objResultRow->s_fieldvalue;
 						}
 					}
 				}
@@ -78,7 +71,7 @@ class cSkin{
 	 *
 	 * @return boolean success / failure
 	 */
-	public function updateData(){
+	public function updateData():bool {
 
 		$bReturn = false;
 
@@ -86,9 +79,6 @@ class cSkin{
 			   cDBFactory::getInstance()->executeQuery("UPDATE pxm_skin SET s_fieldvalue=".cDBFactory::getInstance()->quote($this->m_sName)." WHERE s_id=".$this->m_iId." AND s_fieldname='name'");
 			   cDBFactory::getInstance()->executeQuery("UPDATE pxm_skin SET s_fieldvalue=".cDBFactory::getInstance()->quote($this->m_sDirectory)." WHERE s_id=".$this->m_iId." AND s_fieldname='dir'");
 
-			   foreach($this->m_arrThreadGraphics as $sKey=>$sValue){
-				   cDBFactory::getInstance()->executeQuery("UPDATE pxm_skin SET s_fieldvalue=".cDBFactory::getInstance()->quote($sValue)." WHERE s_id=".$this->m_iId." AND s_fieldname=".cDBFactory::getInstance()->quote("tgfx_".$sKey));
-			   }
 			   foreach($this->m_arrAdditionalSkinValues as $sKey=>$sValue){
 				   cDBFactory::getInstance()->executeQuery("UPDATE pxm_skin SET s_fieldvalue=".cDBFactory::getInstance()->quote($sValue)." WHERE s_id=".$this->m_iId." AND s_fieldname=".cDBFactory::getInstance()->quote($sKey));
 			   }
@@ -102,7 +92,7 @@ class cSkin{
 	 *
 	 * @return integer id
 	 */
-	public function getId(){
+	public function getId():int {
 		return $this->m_iId;
 	}
 
@@ -112,7 +102,7 @@ class cSkin{
 	 * @param integer $iId id
 	 * @return void
 	 */
-	public function setId($iId){
+	public function setId(int $iId){
 		$this->m_iId = intval($iId);
 	}
 
@@ -121,7 +111,7 @@ class cSkin{
 	 *
 	 * @return string name
 	 */
-	public function getName(){
+	public function getName():string {
 		return $this->m_sName;
 	}
 
@@ -131,15 +121,10 @@ class cSkin{
 	 * @param string $sName name
 	 * @return void
 	 */
-	public function setName($sName){
+	public function setName(string $sName){
 		if(!empty($sName)){
 			$this->m_sName = $sName;
 		}
-	}
-
-
-
-	/**
 	}
 
 	/**
@@ -147,7 +132,7 @@ class cSkin{
 	 *
 	 * @return string directory
 	 */
-	public function getDirectory(){
+	public function getDirectory():string {
 		return $this->m_sDirectory;
 	}
 
@@ -157,29 +142,10 @@ class cSkin{
 	 * @param string $sDirectory directory
 	 * @return void
 	 */
-	public function setDirectory($sDirectory){
+	public function setDirectory(string $sDirectory){
 		if(!empty($sDirectory)){
 			$this->m_sDirectory = $sDirectory;
 		}
-	}
-
-	/**
-	 * get thread graphics
-	 *
-	 * @return array thread graphics
-	 */
-	public function getThreadGraphics(){
-		return $this->m_arrThreadGraphics;
-	}
-
-	/**
-	 * set thread graphics
-	 *
-	 * @param array $arrThreadGraphics thread graphics
-	 * @return void
-	 */
-	public function setThreadGraphics($arrThreadGraphics){
-		$this->m_arrThreadGraphics = $arrThreadGraphics;
 	}
 
 	/**
@@ -187,7 +153,7 @@ class cSkin{
 	 *
 	 * @return array supported template engines
 	 */
-	public function getSupportedTemplateEngines(){
+	public function getSupportedTemplateEngines():array {
 		return $this->m_arrSupportedTemplateEngines;
 	}
 
@@ -197,7 +163,7 @@ class cSkin{
 	 * @param array $arrSupportedTemplateEngines supported template engines
 	 * @return void
 	 */
-	public function setSupportedTemplateEngines($arrSupportedTemplateEngines){
+	public function setSupportedTemplateEngines(array $arrSupportedTemplateEngines){
 		$this->m_arrSupportedTemplateEngines = $arrSupportedTemplateEngines;
 	}
 
@@ -206,7 +172,7 @@ class cSkin{
 	 *
 	 * @return array additional skin values
 	 */
-	public function getAdditionalSkinValues(){
+	public function getAdditionalSkinValues():array {
 		return $this->m_arrAdditionalSkinValues;
 	}
 
@@ -216,7 +182,7 @@ class cSkin{
 	 * @param array $arrAdditionalSkinValues additional skin values
 	 * @return void
 	 */
-	public function setAdditionalSkinValues($arrAdditionalSkinValues){
+	public function setAdditionalSkinValues(array $arrAdditionalSkinValues){
 		$this->m_arrAdditionalSkinValues = $arrAdditionalSkinValues;
 	}
 
@@ -226,7 +192,7 @@ class cSkin{
 	 * @param array  $arrAdditionalConfig additional configuration
 	 * @return array member variables
 	 */
-	public function getDataArray($arrAdditionalConfig = array()){
+	public function getDataArray($arrAdditionalConfig = array()):array {
 		return array_merge(array("id"			=>	$this->m_iId,
 								 "name"		 	=>	$this->m_sName),
 						   $this->m_arrAdditionalSkinValues);

@@ -1252,8 +1252,8 @@
   });
 
   // Update header badge counts after each HTMX swap
-  document.addEventListener('htmx:afterSwap', function() {
-    var d = document.getElementById('badge-data');
+  document.addEventListener('htmx:afterSwap', function(event) {
+    var d = event.detail.target.querySelector('#badge-data');
     if (!d) return;
     var pm = parseInt(d.dataset.pm) || 0;
     var notif = parseInt(d.dataset.notif) || 0;
