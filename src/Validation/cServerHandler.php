@@ -70,4 +70,14 @@ class cServerHandler
     {
         return $_SERVER['SCRIPT_NAME'] ?? '';
     }
+
+    /**
+     * Check whether the current request was made by HTMX (HX-Request: true header present)
+     *
+     * @return bool true if the request originates from HTMX
+     */
+    public function isHtmxRequest(): bool
+    {
+        return ($_SERVER['HTTP_HX_REQUEST'] ?? '') === 'true';
+    }
 }

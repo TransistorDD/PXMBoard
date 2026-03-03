@@ -1,5 +1,5 @@
 <!-- Thread-Header -->
-<div class="htmx-thread-list-header" hx-target="#threadlist-container" hx-swap="innerHTML" hx-sync="#threadlist-container:replace" hx-indicator="#threadlist-container">
+<div class="htmx-thread-list-header" hx-target="#threadlist-container" hx-swap="innerHTML" hx-sync="#threadlist-container:replace">
 	<span class="htmx-col-status"></span>
 	<span class="htmx-col-subject"><a href="pxmboard.php?mode=threadlist&brdid={$config.board.id}&date={$config.timespan}&sort=subject" hx-get="pxmboard.php?mode=threadlist&brdid={$config.board.id}&date={$config.timespan}&sort=subject" class="hover:opacity-80">Thema</a></span>
 	<span class="htmx-col-author"><a href="pxmboard.php?mode=threadlist&brdid={$config.board.id}&date={$config.timespan}&sort=username" hx-get="pxmboard.php?mode=threadlist&brdid={$config.board.id}&date={$config.timespan}&sort=username" class="hover:opacity-80">Autor</a></span>
@@ -51,7 +51,7 @@
 {/foreach}
 
 <!-- Pagination -->
-<div class="text-center py-2 text-xs text-content-secondary" hx-target="#threadlist-container" hx-swap="innerHTML" hx-sync="#threadlist-container:replace" hx-indicator="#threadlist-container">
+<div class="text-center py-2 text-xs text-content-secondary" hx-target="#threadlist-container" hx-swap="innerHTML" hx-sync="#threadlist-container:replace">
 {if isset($config.previd) && $config.previd != ''}
 	<a href="pxmboard.php?mode=threadlist&brdid={$config.board.id}&date={$config.timespan}&sort={$config.sort}&page={$config.previd}" hx-get="pxmboard.php?mode=threadlist&brdid={$config.board.id}&date={$config.timespan}&sort={$config.sort}&page={$config.previd}" class="hover:underline text-link">&laquo; Zur&uuml;ck</a> |
 {else}

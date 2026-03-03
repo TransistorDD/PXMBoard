@@ -126,6 +126,23 @@ if (preg_match('/^(adm|ajax)?([a-zA-Z]+)$/', $sBoardMode, $arrBoardMode)) {
     $sClassName = 'cActionLogin';							// default mode
 }
 
+// For non-HTMX direct browser requests to partial actions: substitute with the fullpage Board action.
+// HTMX automatically sets the HX-Request header on all partial loads; its absence means full-page browser access.
+// Admin and Ajax actions are excluded from substitution via $sPath check.
+if ($sPath === '' && !$objServerHandler->isHtmxRequest()) {
+    $arrPartialRoutes = [
+        'message'         => 'Board',
+        'thread'          => 'Board',
+        'threadlist'      => 'Board',
+        'messageform'     => 'Board',
+        'messageeditform' => 'Board',
+    ];
+    $sResolvedMode = strtolower($arrBoardMode[2] ?? '');
+    if (isset($arrPartialRoutes[$sResolvedMode])) {
+        $sClassName = 'cAction' . $arrPartialRoutes[$sResolvedMode];
+    }
+}
+
 // include action class and instantiate object
 try {
     if (file_exists(SRCDIR . '/Controller/'.$sPath.$sClassName.'.php')) {
