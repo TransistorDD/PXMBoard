@@ -122,6 +122,6 @@
 {/if}
 	</div>
 </div>
-<script>!window._skipPushState&&history.pushState(null,'','pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$msg.thread.id}&msgid={$msg.id}');window._skipPushState=false;</script>
+<script>if(!document.getElementById('threadlist-container')){ldelim}window.location.replace('pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$msg.thread.id}&msgid={$msg.id}'){rdelim}else{ldelim}!window._skipPushState&&history.pushState(null,'','pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$msg.thread.id}&msgid={$msg.id}');window._skipPushState=false{rdelim}</script>
 {/if}
 {if $config.logedin == 1}<span id="badge-data" data-pm="{$config.user.priv_message_unread_count}" data-notif="{$config.user.notification_unread_count}" hidden></span>{/if}

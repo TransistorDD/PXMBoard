@@ -64,5 +64,6 @@
 		{/if}
 	</div>
 </div>
+<script>if(!document.getElementById('threadlist-container')){ldelim}window.location.replace('pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}'){rdelim}</script>
 {/if}
 {if $config.logedin == 1}<span id="badge-data" data-pm="{$config.user.priv_message_unread_count}" data-notif="{$config.user.notification_unread_count}" hidden></span>{/if}
