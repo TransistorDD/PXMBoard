@@ -77,9 +77,9 @@
 
 	<!-- Nachrichteninhalt -->
 	<div class="px-4 py-3 bg-surface-primary text-content-primary">
-		<div class="prose max-w-none">{$msg._body}</div>
+		<div class="prose max-w-none">{$msg._body nofilter}</div>
 		{if $config.usesignatures>0}
-		<div class="mt-4 pt-2 text-xs text-content-secondary">{$msg.user._signature}</div>
+		<div class="mt-4 pt-2 text-xs text-content-secondary">{$msg.user._signature nofilter}</div>
 		{/if}
 	</div>
 

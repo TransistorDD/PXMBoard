@@ -21,7 +21,7 @@ class cPlainTextParser extends cParser
     {
         $sReturnText = htmlspecialchars($sText);
         if (!empty($this->m_sQuoteTag)) {
-            $sReturnText = '<'.$this->m_sQuoteTag.'>'.$sText.'</'.$this->m_sQuoteTag.'>';
+            $sReturnText = '<'.$this->m_sQuoteTag.'>'.$sReturnText.'</'.$this->m_sQuoteTag.'>';
         }
         return $sReturnText;
     }

@@ -156,11 +156,11 @@ class cPxmParser extends cParser
                             } elseif (preg_match('/^\[((https?|ftps?|www|mailto:)([^\] ]+))/iu', $sMessagePart, $arrLinkMatch)) {
                                 if (!$bMemberSkip) {
                                     if (strcasecmp($arrLinkMatch[2], 'www') === 0) {
-                                        $sReturnText .= '[<a href="https://' . htmlspecialchars($arrLinkMatch[1]) . '" target="_blank">' . htmlspecialchars($arrLinkMatch[1]) . '</a>]';
+                                        $sReturnText .= '[<a href="https://' . htmlspecialchars($arrLinkMatch[1]) . '" class="pxm-link" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($arrLinkMatch[1]) . '</a>]';
                                     } elseif (strcasecmp($arrLinkMatch[2], 'mailto:') === 0) {
-                                        $sReturnText .= '[<a href="' . htmlspecialchars($arrLinkMatch[1]) . '">' . htmlspecialchars($arrLinkMatch[3]) . '</a>]';
+                                        $sReturnText .= '[<a href="' . htmlspecialchars($arrLinkMatch[1]) . '" class="pxm-link">' . htmlspecialchars($arrLinkMatch[3]) . '</a>]';
                                     } else {
-                                        $sReturnText .= '[<a href="' . htmlspecialchars($arrLinkMatch[1]) . '" target="_blank">' . htmlspecialchars($arrLinkMatch[1]) . '</a>]';
+                                        $sReturnText .= '[<a href="' . htmlspecialchars($arrLinkMatch[1]) . '" class="pxm-link" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($arrLinkMatch[1]) . '</a>]';
                                     }
                                 }
                                 $iCharPointer += strlen($arrLinkMatch[1]) + 1;
@@ -168,9 +168,9 @@ class cPxmParser extends cParser
                             } elseif (preg_match('/^\[img:((https?[^\] ]+)\.(?:jpg|gif|png|jpeg))/iu', $sMessagePart, $arrImgMatch)) {
                                 if (!$bMemberSkip) {
                                     if ($this->m_bEmbedExternal /* && !$bIsInQuote*/) {
-                                        $sReturnText .= '<img src="' . htmlspecialchars($arrImgMatch[1]) . '" onload="checkImgWidth(this)"/>';
+                                        $sReturnText .= '<img src="' . htmlspecialchars($arrImgMatch[1]) . '" class="pxm-img"/>';
                                     } else {
-                                        $sReturnText .= '[<a href="' . htmlspecialchars($arrImgMatch[1]) . '" target="_blank">' . htmlspecialchars($arrImgMatch[1]) . '</a>]';
+                                        $sReturnText .= '[<a href="' . htmlspecialchars($arrImgMatch[1]) . '" class="pxm-link" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($arrImgMatch[1]) . '</a>]';
                                     }
                                 }
                                 $iCharPointer += strlen($arrImgMatch[1]) + 5;
@@ -181,7 +181,7 @@ class cPxmParser extends cParser
                                     if (isset($this->m_arrMentionCache[$iUserId])) {
                                         $sUsername = htmlspecialchars($this->m_arrMentionCache[$iUserId]);
                                         $sProfileUrl = 'pxmboard.php?mode=userprofile&usrid='.$iUserId;
-                                        $sReturnText .= '<a href="'.htmlspecialchars($sProfileUrl).'" class="mention" data-user-id="'.$iUserId.'" onclick="openProfile(this);return false;">@'.$sUsername.'</a>';
+                                        $sReturnText .= '<a href="'.htmlspecialchars($sProfileUrl).'" class="mention" data-user-id="'.$iUserId.'">@'.$sUsername.'</a>';
                                     } else {
                                         $sReturnText .= '<span class="mention mention-deleted">[Gel&ouml;schter Nutzer]</span>';
                                     }
@@ -196,7 +196,7 @@ class cPxmParser extends cParser
                                             $sReturnText .= '<div class="youtube-embed"><iframe width="640" height="480" src="https://www.youtube.com/embed/'.htmlspecialchars($sVideoId).'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
                                         } else {
                                             $sYtUrl = 'https://www.youtube.com/watch?v='.htmlspecialchars($sVideoId);
-                                            $sReturnText .= '[<a href="'.$sYtUrl.'" target="_blank">&#9654; YouTube</a>]';
+                                            $sReturnText .= '<a href="'.$sYtUrl.'" class="video-link video-link--yt" target="_blank" rel="noopener noreferrer">YouTube</a>';
                                         }
                                     }
                                 }
@@ -210,7 +210,7 @@ class cPxmParser extends cParser
                                             $sReturnText .= $this->_getTwitchIframe($arrTwitchData);
                                         } else {
                                             $sTtvUrl = htmlspecialchars($arrTtvMatch[1]);
-                                            $sReturnText .= '[<a href="'.$sTtvUrl.'" target="_blank">&#127918; Twitch</a>]';
+                                            $sReturnText .= '<a href="'.$sTtvUrl.'" class="video-link video-link--twitch" target="_blank" rel="noopener noreferrer">Twitch</a>';
                                         }
                                     }
                                 }

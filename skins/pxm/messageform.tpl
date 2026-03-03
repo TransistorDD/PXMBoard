@@ -2,11 +2,10 @@
   Message Form Template (Fragment) - HTMX Skin
 
   Loads into #message-container via hx-target.
-  Handles: new thread, reply, guest quickpost, preview, drafts.
+  Handles: new thread, reply, guest quickpost, drafts.
 
   Parameters:
   - $msg: Message being replied to (optional, id=0 for new thread)
-  - $pmsg: Preview message (optional, set after preview submit)
   - $config.board.id: Current board ID
   - $config.logedin: Login status
   - $config.quickpost: Guest quickpost allowed
@@ -49,27 +48,7 @@
 	{/if}
 {/if}
 
-{if $pmsg}
-			<!-- Preview Mode -->
-			<div class="rounded p-3" style="background-color: var(--color-surface-secondary);">
-				<div class="mb-2">Thema: <span class="font-semibold">{$pmsg.subject}</span></div>
-				<input name="subject" type="hidden" value="{$msg.subject}"/>
-				<div class="prose max-w-none">{$pmsg._body}</div>
-				<input name="body" type="hidden" value="{$msg._body}"/>
-			</div>
-			<div class="flex items-center justify-center gap-3">
-				<label class="flex items-center gap-2 cursor-pointer text-sm">
-					<span class="toggle-switch">
-						<input type="checkbox" name="notify_on_reply" value="1" tabindex="30006"/>
-						<span class="toggle-switch-track"></span>
-					</span>
-					<span style="color: var(--color-content-primary);">Mailbenachrichtigung?</span>
-				</label>
-				<button type="submit" class="htmx-btn-primary text-sm px-4 py-1" tabindex="30004">Abschicken</button>
-				<button type="submit" name="btn_edit" value="editieren" class="htmx-btn text-sm px-4 py-1" tabindex="30005">Editieren</button>
-			</div>
-{else}
-			<!-- Subject -->
+		<!-- Subject -->
 			<div class="flex items-center gap-2">
 				<label class="w-24 shrink-0 htmx-formlabel">Titel</label>
 				<input name="subject" type="text" size="61" maxlength="{$config.input_sizes.subject}" value="{if $msg}{$msg.subject}{/if}" tabindex="30004" class="rounded px-2 py-1 text-sm flex-1 focus:outline-none focus:ring-1" style="border: 1px solid var(--color-border-default); background-color: var(--color-surface-primary); color: var(--color-content-primary); --tw-ring-color: var(--color-accent);"/>
@@ -110,7 +89,6 @@
 {/if}
 				</div>
 			</div>
-{/if}
 		</div>
 	</form>
 </div>

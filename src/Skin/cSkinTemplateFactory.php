@@ -1,4 +1,5 @@
 <?php
+
 /**
  * factory class for template abstraction
  *
@@ -7,30 +8,32 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-class cSkinTemplateFactory{
-	/**
+class cSkinTemplateFactory
+{
+    /**
      * Constructor
-	 *
-	 * @return void
+     *
+     * @return void
      */
-	public function __construct(){
-	}
+    public function __construct()
+    {
+    }
 
-	/**
+    /**
      * instanciates and returns the selected template object
-	 *
-	 * @param  string $sTemplateType type of the templates
-	 * @param string $sSkinDir skin directory
-	 * @return cSkinTemplate|null template object
+     *
+     * @param  string $sTemplateType type of the templates
+     * @param string $sSkinDir skin directory
+     * @return cSkinTemplate|null template object
      */
-	public static function getTemplateObject(string $sTemplateType, string $sSkinDir): ?cSkinTemplate{
-		$objTemplate = null;
-		if(preg_match('/^[a-zA-Z]+$/',$sTemplateType)){
-			$sTemplateType = 'cSkinTemplate'.$sTemplateType;
-			require_once(SRCDIR.'/Skin/'.$sTemplateType.'.php');
-			$objTemplate = new $sTemplateType($sSkinDir);
-		}
-		return $objTemplate;
-	}
+    public static function getTemplateObject(string $sTemplateType, string $sSkinDir): ?cSkinTemplate
+    {
+        $objTemplate = null;
+        if (preg_match('/^[a-zA-Z]+$/', $sTemplateType)) {
+            $sTemplateType = 'cSkinTemplate'.$sTemplateType;
+            require_once(SRCDIR.'/Skin/'.$sTemplateType.'.php');
+            $objTemplate = new $sTemplateType($sSkinDir);
+        }
+        return $objTemplate;
+    }
 }
-?>

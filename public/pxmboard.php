@@ -66,7 +66,7 @@ $objInputHandler = new cInputHandler();
 $sBaseDir = dirname($objServerHandler->getScriptName());
 $sEncodedPath = rtrim(implode('/', array_map('rawurlencode', explode('/', $sBaseDir))), '/') . '/'; // encode special chars
 
-$arrSessionCookieParams = ['lifetime' => 90 * (24 * 60 * 60),	// 90 Tage
+$arrSessionCookieParams = ['lifetime' => 90 * (24 * 60 * 60),	// 90 days
                             'path' => $sEncodedPath,
                             'domain' => '',	// browser deaulft: Host-only
                             'secure' => true,
