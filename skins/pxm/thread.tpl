@@ -46,7 +46,7 @@
 		</span>
 		{if $config.admin == 1 or $config.moderator == 1}
 		<div class="ml-auto">
-			<select onchange="adminaction(this.value,{$config.board.id},{$thread.id})" class="text-xs rounded px-2 py-0 bg-surface-secondary text-content-primary border border-border-default">
+			<select id="admin-dropdown-{$thread.id}" onchange="adminaction(this.value,{$config.board.id},{$thread.id},0,this)" class="text-xs rounded px-2 py-0 bg-surface-secondary text-content-primary border border-border-default">
 				<option value="">Aktion...</option>
 				<option value="threadstatus">{if $thread.active == 1}Schliessen{else}&Ouml;ffnen{/if}</option>
 				<option value="fixthread">{if $thread.fixed == 1}L&ouml;sen{else}Fixieren{/if}</option>

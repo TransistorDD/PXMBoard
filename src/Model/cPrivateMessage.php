@@ -1,8 +1,8 @@
 <?php
 
 require_once(SRCDIR . '/Model/cMessage.php');
-require_once(SRCDIR . '/Model/cMessageStates.php');
 require_once(SRCDIR . '/Model/cUser.php');
+require_once(SRCDIR . '/Enum/ePrivateMessage.php');
 /**
  * private message handling
  *
@@ -14,8 +14,8 @@ require_once(SRCDIR . '/Model/cUser.php');
 class cPrivateMessage extends cMessage
 {
     protected int $m_iToUserId;					// destination user id
-    protected int $m_iToState;					// state for the recipient
-    protected int $m_iFromState;					// state for the sender
+    protected PrivateMessageStatus $m_eToState;		// state for the recipient
+    protected PrivateMessageStatus $m_eFromState;	// state for the sender
 
     /**
      * Constructor
@@ -28,9 +28,9 @@ class cPrivateMessage extends cMessage
         parent::__construct();
 
         $this->m_iToUserId = 0;
-        $this->m_iToState = cMessageStates::messageNew();
+        $this->m_eToState = PrivateMessageStatus::UNREAD;
 
-        $this->m_iFromState = cMessageStates::messageRead();
+        $this->m_eFromState = PrivateMessageStatus::READ;
     }
 
     /**
@@ -73,9 +73,9 @@ class cPrivateMessage extends cMessage
                                                             $this->_getDbTables().
                                                             ' WHERE p_fromuserid=u_id'.
                                                             ' AND ('.
-                                                            '(p_touserid='.$this->m_iToUserId.' AND p_tostate!='.cMessageStates::messageDeleted().')'.
+                                                            '(p_touserid='.$this->m_iToUserId.' AND p_tostate!='.PrivateMessageStatus::DELETED->value.')'.
                                                             ' OR '.
-                                                            '(p_fromuserid='.$this->m_objAuthor->getId().' AND p_fromstate!='.cMessageStates::messageDeleted().')'.
+                                                            '(p_fromuserid='.$this->m_objAuthor->getId().' AND p_fromstate!='.PrivateMessageStatus::DELETED->value.')'.
                                                             ') AND p_id='.$iMessageId.
                                                             $this->_getDbJoin())) {
                 if ($objResultRow = $objResultSet->getNextResultRowObject()) {
@@ -104,7 +104,7 @@ class cPrivateMessage extends cMessage
         $this->m_sIp = $objResultRow->p_ip;
 
         // recipient data
-        $this->m_iToState = intval($objResultRow->p_tostate);
+        $this->m_eToState = PrivateMessageStatus::from(intval($objResultRow->p_tostate));
         $this->m_iToUserId = intval($objResultRow->p_touserid);
 
         // author data
@@ -121,7 +121,7 @@ class cPrivateMessage extends cMessage
         $this->m_objAuthor->setMessageQuantity($objResultRow->u_msgquantity);
         $this->m_objAuthor->setSignature($objResultRow->u_signature);
 
-        $this->m_iFromState = intval($objResultRow->p_fromstate);
+        $this->m_eFromState = PrivateMessageStatus::from(intval($objResultRow->p_fromstate));
 
         return true;
     }
@@ -208,13 +208,13 @@ class cPrivateMessage extends cMessage
         $bReturn = false;
 
         // set the message to deleted if we are the recipient
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_tostate='.cMessageStates::messageDeleted().
+        if ($objResultSet = cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_tostate='.PrivateMessageStatus::DELETED->value.
                                                            " WHERE p_touserid=$this->m_iToUserId AND p_id=$this->m_iId")) {
             if ($objResultSet->getAffectedRows() > 0) {
                 $bReturn = true;
 
                 // Decrement unread count if message was unread
-                if ($this->m_iToState == cMessageStates::messageNew()) {
+                if ($this->m_eToState->isUnread()) {
                     $objUser = new cUser();
                     if ($objUser->loadDataById($this->m_iToUserId)) {
                         $objUser->decrementPrivMessageCount();
@@ -224,7 +224,7 @@ class cPrivateMessage extends cMessage
         }
 
         // set the message to deleted if we are the author
-        if (!$bReturn && ($objResultSet = cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_fromstate='.cMessageStates::messageDeleted().
+        if (!$bReturn && ($objResultSet = cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_fromstate='.PrivateMessageStatus::DELETED->value.
                                                                 ' WHERE p_fromuserid='.$this->m_objAuthor->getId()." AND p_id=$this->m_iId"))) {
             if ($objResultSet->getAffectedRows() > 0) {
                 $bReturn = true;
@@ -232,7 +232,7 @@ class cPrivateMessage extends cMessage
         }
 
         // remove all deleted messages from db
-        cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_priv_message WHERE p_tostate='.cMessageStates::messageDeleted().' AND p_fromstate='.cMessageStates::messageDeleted());
+        cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_priv_message WHERE p_tostate='.PrivateMessageStatus::DELETED->value.' AND p_fromstate='.PrivateMessageStatus::DELETED->value);
 
         return $bReturn;
     }
@@ -261,22 +261,22 @@ class cPrivateMessage extends cMessage
     /**
      * get the message state for the destination user
      *
-     * @return int message state for the destination user
+     * @return PrivateMessageStatus message state for the destination user
      */
-    public function getDestinationState(): int
+    public function getDestinationState(): PrivateMessageStatus
     {
-        return $this->m_iToState;
+        return $this->m_eToState;
     }
 
     /**
      * set the message state for the destination user
      *
-     * @param int $iToState message state for the destination user
+     * @param PrivateMessageStatus $eToState message state for the destination user
      * @return void
      */
-    public function setDestinationState(int $iToState): void
+    public function setDestinationState(PrivateMessageStatus $eToState): void
     {
-        $this->m_iToState = intval($iToState);
+        $this->m_eToState = $eToState;
     }
 
     /**
@@ -286,10 +286,10 @@ class cPrivateMessage extends cMessage
      */
     public function setMessageRead(): void
     {
-        if ($this->m_iToState == cMessageStates::messageNew()) {
+        if ($this->m_eToState->isUnread()) {
 
 
-            cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_tostate='.cMessageStates::messageRead()." WHERE p_id=$this->m_iId");
+            cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_tostate='.PrivateMessageStatus::READ->value." WHERE p_id=$this->m_iId");
 
             // Update unread count in pxm_user
             $objUser = new cUser();
@@ -302,22 +302,22 @@ class cPrivateMessage extends cMessage
     /**
      * get the message state for the author
      *
-     * @return int message state for the author
+     * @return PrivateMessageStatus message state for the author
      */
-    public function getAuthorState(): int
+    public function getAuthorState(): PrivateMessageStatus
     {
-        return $this->m_iFromState;
+        return $this->m_eFromState;
     }
 
     /**
      * set the message state for the author
      *
-     * @param int $iFromState message state for the author
+     * @param PrivateMessageStatus $eFromState message state for the author
      * @return void
      */
-    public function setAuthorState(int $iFromState): void
+    public function setAuthorState(PrivateMessageStatus $eFromState): void
     {
-        $this->m_iFromState = intval($iFromState);
+        $this->m_eFromState = $eFromState;
     }
 
     /**
@@ -334,7 +334,7 @@ class cPrivateMessage extends cMessage
     {
         return array_merge(
             cMessage::getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp, $sSubjectQuotePrefix, $objParser),
-            ['read' => ($this->m_iToState == cMessageStates::messageRead() ? '1' : '0')]
+            ['read' => ($this->m_eToState->isRead() ? '1' : '0')]
         );
     }
 }

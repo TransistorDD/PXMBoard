@@ -2,6 +2,7 @@
 
 require_once SRCDIR.'/Model/cMessage.php';
 require_once SRCDIR.'/Enum/eMessage.php';
+require_once SRCDIR.'/Enum/eError.php';
 require_once SRCDIR.'/Exception/cMessageMoveException.php';
 /**
  * boardmessage handling
@@ -68,7 +69,6 @@ class cBoardMessage extends cMessage
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         cMessage::_setDataFromDb($objResultRow);
 
         $this->m_iBoardId = intval($objResultRow->t_boardid);
@@ -132,12 +132,11 @@ class cBoardMessage extends cMessage
      *
      * @param  int  $iParentId  parent id
      * @param  int  $iAutoClose  message limit per thread (thread will be closed when reached)
-     * @return int error id
+     * @return ?eError null on success, eError enum on failure
      */
-    public function insertData(int $iParentId, int $iAutoClose): int
+    public function insertData(int $iParentId, int $iAutoClose): ?eError
     {
-
-        $iErrorId = 8;												// could not insert data
+        $eError = eError::COULD_NOT_INSERT_DATA;
         $iParentId = intval($iParentId);
         $iAutoClose = intval($iAutoClose);
 
@@ -189,21 +188,17 @@ class cBoardMessage extends cMessage
                                             $this->m_eStatus->value
                                         );
 
-                                        // no error occured
-                                        $iErrorId = 0;
+                                        // success
+                                        $eError = null;
                                     } else {
                                         cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_id=$this->m_iThreadId");
                                     }
                                 } else {
                                     cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_id=$this->m_iThreadId");
                                 }
-                            } else {
-                                $iErrorId = 8;
-                            }						// could not insert data
-                        } else {
-                            $iErrorId = 8;
-                        }							// could not insert data
-                    } else {											// reply
+                            }
+                        }
+                    } else {						// reply
                         if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT m_threadid,t_active FROM pxm_thread,pxm_message WHERE t_id=m_threadid AND t_boardid=$this->m_iBoardId AND m_id=$iParentId")) {
                             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                                 $objResultSet->freeResult();
@@ -254,46 +249,37 @@ class cBoardMessage extends cMessage
                                                 $this->m_eStatus->value
                                             );
 
-                                            // no error occured
-                                            $iErrorId = 0;
-                                        } else {
-                                            $iErrorId = 8;
-                                        }			// could not insert data
-                                    } else {
-                                        $iErrorId = 8;
-                                    }				// could not insert data
+                                            // success
+                                            $eError = null;
+                                        }
+                                    }
                                 } else {
-                                    $iErrorId = 9;
-                                }					// thread closed
+                                    $eError = eError::THREAD_CLOSED;
+                                }
                             } else {
-                                $iErrorId = 6;
-                            }						// invalid msg id
-                        } else {
-                            $iErrorId = 8;
-                        }							// could not insert data
+                                $eError = eError::INVALID_MESSAGE_ID;
+                            }
+                        }
                     }
                 } else {
-                    $iErrorId = 14;
-                }								// message already exists
-            } else {
-                $iErrorId = 8;
-            }										// could not insert data
+                    $eError = eError::MESSAGE_ALREADY_EXISTS;
+                }
+            }
         } else {
-            $iErrorId = 7;
-        }											// missing subject
+            $eError = eError::SUBJECT_MISSING;
+        }
 
-        return $iErrorId;
+        return $eError;
     }
 
     /**
      * update data in database
      *
-     * @return int error id
+     * @return ?eError null on success, eError enum on failure
      */
-    public function updateData(): int
+    public function updateData(): ?eError
     {
-
-        $iErrorId = 8;												// could not insert data
+        $eError = eError::COULD_NOT_UPDATE_DATA;
 
         if (! empty($this->m_sSubject)) {
             if ($this->m_iId > 0) {
@@ -319,21 +305,17 @@ class cBoardMessage extends cMessage
                             $this->m_eStatus->value
                         );
 
-                        $iErrorId = 0;
-                    } else {
-                        $iErrorId = 8;
-                    }								// could not insert data
-                } else {
-                    $iErrorId = 8;
-                }									// could not insert data
+                        $eError = null;
+                    }
+                }
             } else {
-                $iErrorId = 6;
-            }										// invalid msg id
+                $eError = eError::INVALID_MESSAGE_ID;
+            }
         } else {
-            $iErrorId = 7;
-        }											// missing subject
+            $eError = eError::SUBJECT_MISSING;
+        }
 
-        return $iErrorId;
+        return $eError;
     }
 
     /**
@@ -343,16 +325,17 @@ class cBoardMessage extends cMessage
      */
     public function deleteData(): bool
     {
-
         $iParentId = $this->m_objReplyMsg->getId();
         if ($this->m_iId > 0 && $iParentId > 0) {
+            // remove message
             cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_id=$this->m_iId");
+
+            // change parent message for replys to this message
+            cDBFactory::getInstance()->executeQuery("UPDATE pxm_message SET m_parentid=$iParentId WHERE m_parentid=$this->m_iId");
 
             // Remove message from search engine index
             require_once SRCDIR.'/Search/cSearchEngineFactory.php';
             cSearchEngineFactory::getInstance()->removeMessage($this->m_iId);
-
-            cDBFactory::getInstance()->executeQuery("UPDATE pxm_message SET m_parentid=$iParentId WHERE m_parentid=$this->m_iId");
 
             if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS count,MAX(m_tstmp) AS maxd,MAX(m_id) AS maxid FROM pxm_message WHERE m_threadid=$this->m_iThreadId")) {
                 if ($objResultRow = $objResultSet->getNextResultRowObject()) {
@@ -599,9 +582,6 @@ class cBoardMessage extends cMessage
 
     /**
      * Get all message IDs in subtree (including this message)
-     * Uses MySQL 8+ recursive CTE for optimal performance
-     *
-     * @copyright Torsten Rentsch 2001 - 2026
      *
      * @return array Message IDs
      */
@@ -609,7 +589,6 @@ class cBoardMessage extends cMessage
     {
         $arrIds = [];
 
-        // Use MySQL 8+ recursive CTE
         $sQuery = 'WITH RECURSIVE subtree AS (
 					  SELECT m_id
 					  FROM pxm_message
@@ -634,8 +613,6 @@ class cBoardMessage extends cMessage
     /**
      * Move this message (including subtree) to new parent
      * Validates all constraints and throws exceptions on error
-     *
-     * @copyright Torsten Rentsch 2001 - 2026
      *
      * @param  int  $iNewParentId  New parent message ID
      * @return bool Success

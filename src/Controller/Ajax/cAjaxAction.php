@@ -1,7 +1,6 @@
 <?php
 
-require_once(SRCDIR . '/Controller/cAction.php');
-require_once(SRCDIR . '/Enum/eError.php');
+require_once(SRCDIR . '/Controller/cBaseAction.php');
 require_once(SRCDIR . '/Enum/eSuccessMessage.php');
 /**
  * Base class for AJAX actions with JSON response
@@ -12,210 +11,47 @@ require_once(SRCDIR . '/Enum/eSuccessMessage.php');
  * @author Torsten Rentsch <forum@torsten-rentsch.de>
  * @copyright Torsten Rentsch 2001 - 2026
  */
-abstract class cAjaxAction extends cAction
+abstract class cAjaxAction extends cBaseAction
 {
     protected array $m_arrJsonData = [];
     protected int $m_iHttpStatusCode = 200;
 
     /**
-     * Initialize skin - AJAX actions don't use template engine
+     * Handle permission error by setting a JSON error response.
      *
-     * @return bool always true (no template needed)
+     * @param eError $error the error that caused the permission failure
+     * @return void
      */
-    public function initSkin(): bool
+    protected function _handlePermissionError(eError $error): void
     {
-        return true;
+        $this->_setJsonError($error, $this->_mapErrorToHttpStatus($error));
     }
 
     /**
-     * Validate the CSRF token for AJAX actions.
-     * Always reads from the X-CSRF-Token request header (no form field fallback).
-     * Overrides parent to return a JSON 403 error instead of a template.
+     * Map an eError value to the appropriate HTTP status code for AJAX responses.
      *
-     * @return bool true if valid, false otherwise
+     * @param eError $error error enum
+     * @return int HTTP status code
      */
-    protected function _requireValidCsrfToken(): bool
+    protected function _mapErrorToHttpStatus(eError $error): int
     {
-        $sToken = $this->m_objServerHandler->getHttpCsrfToken();
-        if (empty($sToken) || empty($this->m_sCsrfToken)
-            || !hash_equals($this->m_sCsrfToken, $sToken)
-        ) {
-            $this->_setJsonError(eError::CSRF_TOKEN_INVALID, 403);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Require user to be authenticated (logged in)
-     * Overrides parent to set JSON error instead of template
-     *
-     * @return bool true if user is authenticated, false otherwise
-     */
-    protected function _requireAuthentication(): bool
-    {
-        if (!is_object($this->m_objActiveUser)) {
-            $this->_setJsonError(eError::NOT_LOGGED_IN, 401);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Require user to NOT be authenticated (for registration, password reset)
-     * Overrides parent to set JSON error instead of template
-     *
-     * @return bool true if user is not authenticated, false otherwise
-     */
-    protected function _requireNotAuthenticated(): bool
-    {
-        if (is_object($this->m_objActiveUser)) {
-            $this->_setJsonError(eError::ALREADY_LOGGED_IN, 400);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Require board to be readable (checks authentication if needed)
-     * Overrides parent to set JSON error instead of template
-     *
-     * @return bool true if board is readable, false otherwise
-     */
-    protected function _requireReadableBoard(): bool
-    {
-        if (!is_object($this->m_objActiveBoard)) {
-            $this->_setJsonError(eError::BOARD_ID_MISSING, 400);
-            return false;
-        }
-
-        $eStatus = $this->m_objActiveBoard->getStatus();
-
-        // Closed boards: only mods/admins
-        if ($eStatus === BoardStatus::CLOSED) {
-            if (!$this->m_objActiveUser?->isAdmin() && !$this->m_objActiveUser?->isModerator($this->m_objActiveBoard->getId())) {
-                $this->_setJsonError(eError::BOARD_CLOSED, 403);
-                return false;
-            }
-        }
-
-        // Members-only boards: require authentication
-        if ($eStatus->requiresAuthentication()) {
-            if (!$this->_requireAuthentication()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Require board to be writable (for posting messages)
-     * Overrides parent to set JSON error instead of template
-     *
-     * @return bool true if board is writable, false otherwise
-     */
-    protected function _requireWritableBoard(): bool
-    {
-        if (!$this->_requireReadableBoard()) {
-            return false; // Must be readable first
-        }
-
-        $eStatus = $this->m_objActiveBoard->getStatus();
-
-        // Read-only or closed: only mods/admins
-        if (!$eStatus->isWritable()) {
-            if (!$this->m_objActiveUser?->isAdmin() && !$this->m_objActiveUser?->isModerator($this->m_objActiveBoard->getId())) {
-                $this->_setJsonError(eError::BOARD_READONLY, 403);
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Require an active board to be set (exists and is active)
-     * Overrides parent to set JSON error instead of template
-     * @deprecated Use _requireReadableBoard() instead
-     *
-     * @return bool true if board is set and active, false otherwise
-     */
-    protected function _requireActiveBoard(): bool
-    {
-        return $this->_requireReadableBoard();
-    }
-
-    /**
-     * Require board to be set (regardless of active status)
-     * Overrides parent to set JSON error instead of template
-     *
-     * @return bool true if board is set, false otherwise
-     */
-    protected function _requireBoard(): bool
-    {
-        if (!is_object($this->m_objActiveBoard)) {
-            $this->_setJsonError(eError::BOARD_ID_MISSING, 400);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Require user to have posting permission
-     * Automatically checks authentication first
-     * Overrides parent to set JSON error instead of template
-     *
-     * @return bool true if user can post, false otherwise
-     */
-    protected function _requirePostPermission(): bool
-    {
-        if (!$this->_requireAuthentication()) {
-            return false;
-        }
-        if (!$this->m_objActiveUser?->isPostAllowed()) {
-            $this->_setJsonError(eError::NOT_AUTHORIZED, 403);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Require user to be moderator of current board or admin
-     * Automatically checks authentication and board first
-     * Overrides parent to set JSON error instead of template
-     *
-     * @return bool true if user is moderator or admin, false otherwise
-     */
-    protected function _requireModeratorPermission(): bool
-    {
-        if (!$this->_requireAuthentication() || !$this->_requireBoard()) {
-            return false;
-        }
-        if (!$this->m_objActiveUser?->isAdmin() && !$this->m_objActiveUser?->isModerator($this->m_objActiveBoard->getId())) {
-            $this->_setJsonError(eError::NOT_AUTHORIZED, 403);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Require user to be admin
-     * Automatically checks authentication first
-     * Overrides parent to set JSON error instead of template
-     *
-     * @return bool true if user is admin, false otherwise
-     */
-    protected function _requireAdminPermission(): bool
-    {
-        if (!$this->_requireAuthentication()) {
-            return false;
-        }
-        if (!$this->m_objActiveUser?->isAdmin()) {
-            $this->_setJsonError(eError::NOT_AUTHORIZED, 403);
-            return false;
-        }
-        return true;
+        return match ($error) {
+            eError::NOT_LOGGED_IN                => 401,
+            eError::NOT_AUTHORIZED,
+            eError::BOARD_CLOSED,
+            eError::BOARD_READONLY,
+            eError::CSRF_TOKEN_INVALID           => 403,
+            eError::INVALID_BOARD_ID,
+            eError::BOARD_ID_MISSING,
+            eError::INVALID_MESSAGE_ID,
+            eError::INVALID_THREAD_ID,
+            eError::INVALID_USER_ID,
+            eError::ALREADY_LOGGED_IN            => 400,
+            eError::COULD_NOT_INSERT_DATA,
+            eError::COULD_NOT_UPDATE_DATA,
+            eError::COULD_NOT_DELETE_DATA        => 500,
+            default                              => 400,
+        };
     }
 
     /**

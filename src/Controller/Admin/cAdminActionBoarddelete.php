@@ -1,4 +1,5 @@
 <?php
+
 require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
 require_once(SRCDIR . '/Model/cBoard.php');
 /**
@@ -9,31 +10,41 @@ require_once(SRCDIR . '/Model/cBoard.php');
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-class cAdminActionBoarddelete extends cAdminAction{
+class cAdminActionBoarddelete extends cAdminAction
+{
+    /**
+     * Validate permissions - requires admin rights and valid CSRF token.
+     *
+     * @return bool true if admin and CSRF valid, false otherwise
+     */
+    public function validateBasePermissionsAndConditions(): bool
+    {
+        return $this->_requireValidCsrfToken() && $this->_requireAdminPermission();
+    }
 
-	/**
-	 * perform the action
-	 *
-	 * @return void
-	 */
-	public function performAction(): void{
+    /**
+     * perform the action
+     *
+     * @return void
+     */
+    public function performAction(): void
+    {
 
-		$this->m_sOutput .= $this->_getHead();
+        $this->m_sOutput .= $this->_getHead();
 
-		$iBoardId = $this->m_objInputHandler->getIntFormVar("id",true,true,true);
+        $iBoardId = $this->m_objInputHandler->getIntFormVar('id', true, true, true);
 
-		$objBoard = new cBoard();
-		if($objBoard->loadDataById($iBoardId)){
-			if($objBoard->deleteData()){
-				$this->m_sOutput .= $this->_getAlert('board deleted', 'success');
-			}
-			else{
-				$this->m_sOutput .= $this->_getAlert('could not delete data');
-			}
-		}
-		else $this->m_sOutput .= $this->_getAlert('invalid boardid');
+        $objBoard = new cBoard();
+        if ($objBoard->loadDataById($iBoardId)) {
+            if ($objBoard->deleteData()) {
+                $this->m_sOutput .= $this->_getAlert('board deleted', 'success');
+            } else {
+                $this->m_sOutput .= $this->_getAlert('could not delete data');
+            }
+        } else {
+            $this->m_sOutput .= $this->_getAlert('invalid boardid');
+        }
 
-		$this->m_sOutput .= $this->_getFooter();
-	}
+        $this->m_sOutput .= $this->_getFooter();
+    }
 }
-?>

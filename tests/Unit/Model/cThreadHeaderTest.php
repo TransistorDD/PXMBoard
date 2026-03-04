@@ -68,20 +68,6 @@ class cThreadHeaderTest extends TestCase
     }
 
     /**
-     * Test setThreadActive converts truthy values to boolean
-     *
-     * @return void
-     */
-    public function test_setThreadActive_withTruthyValue_convertsToTrue(): void
-    {
-        $this->threadHeader->setThreadActive(1);
-        $this->assertTrue($this->threadHeader->isThreadActive());
-
-        $this->threadHeader->setThreadActive("yes");
-        $this->assertTrue($this->threadHeader->isThreadActive());
-    }
-
-    /**
      * Test setIsThreadFixed and isThreadFixed
      *
      * @return void
@@ -209,22 +195,5 @@ class cThreadHeaderTest extends TestCase
         $this->assertSame(0, $this->threadHeader->getViews());
         $this->assertFalse($this->threadHeader->isThreadMsgRead());
         $this->assertFalse($this->threadHeader->isLastMsgRead());
-    }
-
-    /**
-     * Test integer setters convert string to int
-     *
-     * @return void
-     */
-    public function test_setters_convertStringToInt(): void
-    {
-        $this->threadHeader->setBoardId("42");
-        $this->assertSame(42, $this->threadHeader->getBoardId());
-
-        $this->threadHeader->setThreadId("123");
-        $this->assertSame(123, $this->threadHeader->getThreadId());
-
-        $this->threadHeader->setViews("999");
-        $this->assertSame(999, $this->threadHeader->getViews());
     }
 }

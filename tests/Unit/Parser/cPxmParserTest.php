@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Unit tests for cPxmParser
  * Tests PXM markup to HTML conversion
@@ -99,7 +100,7 @@ class cPxmParserTest extends TestCase
     {
         $sInput = '[https://example.com]';
         $sOutput = $this->parser->parse($sInput);
-        $this->assertStringContainsString('<a href="https://example.com" target="_blank">https://example.com</a>', $sOutput);
+        $this->assertStringContainsString('<a href="https://example.com" class="pxm-link" target="_blank" rel="noopener noreferrer">https://example.com</a>', $sOutput);
     }
 
     /**
@@ -211,8 +212,9 @@ class cPxmParserTest extends TestCase
         $property->setAccessible(true);
 
         // Create a subclass that overrides _preloadMentions to prevent DB access
-        $parser = new class extends \cPxmParser {
-            protected function _preloadMentions($sText): void {
+        $parser = new class () extends \cPxmParser {
+            protected function _preloadMentions($sText): void
+            {
                 // Override to prevent database access
                 // Manually set cache for testing
                 $this->m_arrMentionCache = [123 => 'TestUser'];
@@ -226,7 +228,6 @@ class cPxmParserTest extends TestCase
         $this->assertStringContainsString('<a href="pxmboard.php?mode=userprofile&amp;usrid=123"', $sOutput);
         $this->assertStringContainsString('class="mention"', $sOutput);
         $this->assertStringContainsString('data-user-id="123"', $sOutput);
-        $this->assertStringContainsString('onclick="openProfile(this);return false;"', $sOutput);
         $this->assertStringContainsString('@TestUser', $sOutput);
     }
 
@@ -238,8 +239,9 @@ class cPxmParserTest extends TestCase
     public function test_parse_withDeletedUserMention_returnsDeletedMessage(): void
     {
         // Create a subclass that overrides _preloadMentions to prevent DB access
-        $parser = new class extends \cPxmParser {
-            protected function _preloadMentions($sText): void {
+        $parser = new class () extends \cPxmParser {
+            protected function _preloadMentions($sText): void
+            {
                 // Override to prevent database access
                 // Empty cache simulates deleted user
                 $this->m_arrMentionCache = [];

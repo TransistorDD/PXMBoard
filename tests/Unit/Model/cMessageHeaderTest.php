@@ -184,26 +184,4 @@ class cMessageHeaderTest extends TestCase
         $this->assertSame(0, $this->messageHeader->getMessageTimestamp());
         $this->assertSame(0, $this->messageHeader->getAuthorId());
     }
-
-    /**
-     * Test setId converts string to int
-     *
-     * @return void
-     */
-    public function test_setId_convertsStringToInt(): void
-    {
-        $this->messageHeader->setId("42");
-        $this->assertSame(42, $this->messageHeader->getId());
-    }
-
-    /**
-     * Test setMessageTimestamp converts string to int
-     *
-     * @return void
-     */
-    public function test_setMessageTimestamp_convertsStringToInt(): void
-    {
-        $this->messageHeader->setMessageTimestamp("1640000000");
-        $this->assertSame(1640000000, $this->messageHeader->getMessageTimestamp());
-    }
 }
