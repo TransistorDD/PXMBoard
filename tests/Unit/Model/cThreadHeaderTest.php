@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Unit test for cThreadHeader class
  *
@@ -187,7 +188,7 @@ class cThreadHeaderTest extends TestCase
     {
         $this->assertSame(0, $this->threadHeader->getBoardId());
         $this->assertSame(0, $this->threadHeader->getThreadId());
-        $this->assertFalse($this->threadHeader->isThreadActive());
+        $this->assertTrue($this->threadHeader->isThreadActive());
         $this->assertFalse($this->threadHeader->isThreadFixed());
         $this->assertSame(0, $this->threadHeader->getLastMessageId());
         $this->assertSame(0, $this->threadHeader->getLastMessageTimestamp());

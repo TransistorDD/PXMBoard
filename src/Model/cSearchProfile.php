@@ -10,31 +10,15 @@
  */
 class cSearchProfile
 {
-    protected int $m_iId;							// search id
-    protected int $m_iIdUser;						// who started the search?
-    protected string $m_sSearchMessage;				// message search string
-    protected string $m_sSearchUser;				// user search string
-    protected array $m_arrBoardIds;					// search in this boards
-    protected int $m_iSearchDays;					// timespan of the search (last x days)
-    protected int $m_iSearchTimestamp;				// date of the search
-    protected string $m_sIpAddress;					// IP address of the searcher
-
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->m_iId = 0;
-        $this->m_iIdUser = 0;
-        $this->m_sSearchMessage = '';
-        $this->m_sSearchUser = '';
-        $this->m_arrBoardIds = [];
-        $this->m_iSearchDays = 0;
-        $this->m_iSearchTimestamp = 0;
-        $this->m_sIpAddress = '';
-    }
+    protected int $m_iId = 0;							// search id
+    protected int $m_iIdUser = 0;						// who started the search?
+    protected string $m_sSearchMessage = '';			// message search string
+    protected string $m_sSearchUser = '';				// user search string
+    /** @var array<string> */
+    protected array $m_arrBoardIds = [];				// search in this boards
+    protected int $m_iSearchDays = 0;					// timespan of the search (last x days)
+    protected int $m_iSearchTimestamp = 0;				// date of the search
+    protected string $m_sIpAddress = '';				// IP address of the searcher
 
     /**
      * get data from database by search id
@@ -44,13 +28,10 @@ class cSearchProfile
      */
     public function loadDataById(int $iSearchId): bool
     {
-
         $bReturn = false;
         $iSearchId = intval($iSearchId);
 
         if ($iSearchId > 0) {
-
-
             if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT se_id,se_userid,se_message,se_username,se_boardids,se_days,se_tstmp,se_ipaddress FROM pxm_search WHERE se_id='.$iSearchId)) {
                 if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                     $bReturn = $this->_setDataFromDb($objResultRow);
@@ -70,7 +51,6 @@ class cSearchProfile
      */
     private function _setDataFromDb(object $objResultRow): bool
     {
-
         $this->m_iId = intval($objResultRow->se_id);
         $this->m_iIdUser = intval($objResultRow->se_userid);
         $this->m_sSearchMessage = $objResultRow->se_message;
@@ -90,8 +70,6 @@ class cSearchProfile
      */
     public function insertData(): bool
     {
-
-
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_search (se_userid,se_message,se_username,se_boardids,se_days,se_tstmp,se_ipaddress)'.
                                                       " VALUES ($this->m_iIdUser,".
                                                                 cDBFactory::getInstance()->quote($this->m_sSearchMessage).','.
@@ -119,7 +97,6 @@ class cSearchProfile
      */
     public function deleteData(): bool
     {
-
         $bReturn = false;
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_search WHERE se_id='.$this->m_iId)) {
@@ -217,7 +194,7 @@ class cSearchProfile
     /**
      * get the boards to be searched
      *
-     * @return array the boards to be searched
+     * @return array<string> the boards to be searched
      */
     public function getBoardIds(): array
     {
@@ -227,7 +204,7 @@ class cSearchProfile
     /**
      * set the boards to be searched
      *
-     * @param array $arrBoardIds the boards to be searched
+     * @param array<string> $arrBoardIds the boards to be searched
      * @return void
      */
     public function setBoardIds(array $arrBoardIds): void
@@ -327,15 +304,15 @@ class cSearchProfile
      *
      * @param int $iTimeOffset time offset in seconds
      * @param string $sDateFormat php date format
-     * @return array member variables
+     * @return array<string, mixed> member variables
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat): array
     {
         return ['id'			=>	$this->m_iId,
-                     'userid'		=>	$this->m_iIdUser,
-                     'searchstring'	=>	$this->m_sSearchMessage,
-                     'username'		=>	$this->m_sSearchUser,
-                     'days'			=>	$this->m_iSearchDays,
-                     'date'			=>	(($this->m_iSearchTimestamp > 0) ? date($sDateFormat, ($this->m_iSearchTimestamp + $iTimeOffset)) : 0)];
+                'userid'		=>	$this->m_iIdUser,
+                'searchstring'	=>	$this->m_sSearchMessage,
+                'username'		=>	$this->m_sSearchUser,
+                'days'			=>	$this->m_iSearchDays,
+                'date'			=>	(($this->m_iSearchTimestamp > 0) ? date($sDateFormat, ($this->m_iSearchTimestamp + $iTimeOffset)) : 0)];
     }
 }

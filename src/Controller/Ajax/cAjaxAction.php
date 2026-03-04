@@ -13,6 +13,7 @@ require_once(SRCDIR . '/Enum/eSuccessMessage.php');
  */
 abstract class cAjaxAction extends cBaseAction
 {
+    /** @var array<string, mixed> */
     protected array $m_arrJsonData = [];
     protected int $m_iHttpStatusCode = 200;
 
@@ -57,7 +58,7 @@ abstract class cAjaxAction extends cBaseAction
     /**
      * Set JSON response data (instead of template)
      *
-     * @param array $arrData data for JSON response
+     * @param array<string, mixed> $arrData data for JSON response
      * @param int $iHttpCode HTTP status code (200, 400, 404, 500)
      */
     protected function _setJsonResponse(array $arrData, int $iHttpCode = 200): void
@@ -81,7 +82,7 @@ abstract class cAjaxAction extends cBaseAction
      * Set success response using success message enum
      *
      * @param eSuccessMessage $eSuccessMessage success message enum constant
-     * @param array $arrAdditionalData optional additional data (e.g. count, isActive, etc.)
+     * @param array<string, mixed> $arrAdditionalData optional additional data (e.g. count, isActive, etc.)
      * @param int $iHttpCode HTTP status code (default 200)
      */
     protected function _setJsonSuccess(eSuccessMessage $eSuccessMessage, array $arrAdditionalData = [], int $iHttpCode = 200): void

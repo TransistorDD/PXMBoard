@@ -15,7 +15,7 @@ class cUserLoginTicketList
      * Get all tickets for a user
      *
      * @param int $iUserId User ID
-     * @return array Array of cUserLoginTicket objects
+     * @return array<cUserLoginTicket> Array of cUserLoginTicket objects
      */
     public static function getTicketsForUser(int $iUserId): array
     {

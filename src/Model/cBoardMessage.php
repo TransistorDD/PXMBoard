@@ -8,26 +8,20 @@ require_once SRCDIR.'/Exception/cMessageMoveException.php';
  * boardmessage handling
  *
  * @link      https://github.com/TransistorDD/PXMBoard
- *
  * @author    Torsten Rentsch <forum@torsten-rentsch.de>
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
 class cBoardMessage extends cMessage
 {
-    protected int $m_iBoardId;				// board id
+    protected int $m_iBoardId = 0;				    // board id
+    protected int $m_iThreadId = 0;				    // thread id
+    protected bool $m_bThreadIsActive = true;		// thread status
+    protected bool $m_bNotifyOnReply = false;		// notify author on reply
+    protected bool $m_bIsRead = false;				// is message read (for logged-in users)?
+    protected MessageStatus $m_eStatus = MessageStatus::PUBLISHED;		    // message status (draft, published, etc.)
 
-    protected int $m_iThreadId;				// thread id
-
-    protected bool $m_bThreadIsActive;		// thread status
-
-    protected mixed $m_objReplyMsg;			// reply to message
-
-    protected bool $m_bNotifyOnReply;		// notify author on reply
-
-    protected bool $m_bIsRead;				// is message read (for logged-in users)?
-
-    protected MessageStatus $m_eStatus;		// message status (draft, published, etc.)
+    protected cMessageHeader $m_objReplyMsg;		// reply to message
 
     /**
      * Constructor
@@ -36,16 +30,9 @@ class cBoardMessage extends cMessage
      */
     public function __construct()
     {
-
         parent::__construct();
 
-        $this->m_iBoardId = 0;
-        $this->m_iThreadId = 0;
-        $this->m_bThreadIsActive = false;
         $this->m_objReplyMsg = new cMessageHeader();
-        $this->m_bNotifyOnReply = false;
-        $this->m_bIsRead = false;
-        $this->m_eStatus = MessageStatus::PUBLISHED;
     }
 
     /**
@@ -561,7 +548,7 @@ class cBoardMessage extends cMessage
      * @param  int  $iLastOnlineTimestamp  last online timestamp for user
      * @param  string  $sSubjectQuotePrefix  prefix for quoted subject
      * @param  ?cParser  $objParser  message parser
-     * @return array member variables
+     * @return array<string, mixed> member variables
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, string $sSubjectQuotePrefix = '', ?cParser $objParser = null): array
     {
@@ -583,7 +570,7 @@ class cBoardMessage extends cMessage
     /**
      * Get all message IDs in subtree (including this message)
      *
-     * @return array Message IDs
+     * @return array<int> Message IDs
      */
     public function getSubtreeMessageIds(): array
     {
@@ -678,10 +665,6 @@ class cBoardMessage extends cMessage
             // 2. Update thread ID for entire subtree (if moving to different thread)
             if ($iOldThreadId != $iNewThreadId) {
                 $sIds = implode(',', array_map('intval', $arrSubtreeIds));
-                // Safety check: ensure $sIds is not empty
-                if (empty($sIds)) {
-                    throw new Exception('Empty subtree IDs');
-                }
                 $sQuery = 'UPDATE pxm_message SET m_threadid='.intval($iNewThreadId).
                           ' WHERE m_id IN ('.$sIds.')';
                 if (! $objDb->executeQuery($sQuery)) {
@@ -772,7 +755,7 @@ class cBoardMessage extends cMessage
     /**
      * Get all user IDs with active notification for this message
      *
-     * @return array Array of user IDs
+     * @return array<int> Array of user IDs
      */
     public function getNotificationUserIds(): array
     {

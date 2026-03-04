@@ -32,7 +32,6 @@ class cPrivateInboxList extends cPrivateMessageList
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         $this->m_arrResultList[] = ['id'		=> $objResultRow->p_id,
                                          'subject'	=> $objResultRow->p_subject,
                                          'date'		=> date($this->m_sDateFormat, ($objResultRow->p_tstmp + $this->m_iTimeOffset)),
@@ -50,8 +49,6 @@ class cPrivateInboxList extends cPrivateMessageList
      */
     public function deleteData(): bool
     {
-
-
         // set the message to deleted if we are the recipient
         cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_tostate='.PrivateMessageStatus::DELETED->value." WHERE p_touserid=$this->m_iUserId");
 
@@ -68,7 +65,6 @@ class cPrivateInboxList extends cPrivateMessageList
      */
     public function countUnread(): int
     {
-
         if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS msgcount FROM pxm_priv_message WHERE p_touserid=$this->m_iUserId AND p_tostate=".PrivateMessageStatus::UNREAD->value)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 return intval($objResultRow->msgcount);

@@ -21,10 +21,9 @@ class cUserSearchList extends cScrollList
      */
     public function __construct(string $sUserName)
     {
+        parent::__construct();
 
         $this->m_sUserName = $sUserName;
-
-        parent::__construct();
     }
 
     /**
@@ -45,11 +44,10 @@ class cUserSearchList extends cScrollList
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         $this->m_arrResultList[] = ['id'		=> $objResultRow->u_id,
-                                         'username'	=> $objResultRow->u_username,
-                                         'highlight' => $objResultRow->u_highlight,
-                                         'status'	=> $objResultRow->u_status];
+                                    'username'	=> $objResultRow->u_username,
+                                    'highlight' => $objResultRow->u_highlight,
+                                    'status'	=> $objResultRow->u_status];
         return true;
     }
 }

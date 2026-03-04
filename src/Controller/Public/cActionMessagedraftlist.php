@@ -33,7 +33,7 @@ class cActionMessagedraftlist extends cPublicAction
         $this->m_objTemplate = $this->_getTemplateObject('messagedraftlist');
 
         $objDraftList = new cMessageDraftList($this->getActiveUser()->getId(), $this->m_objConfig->getTimeOffset() * 3600, $this->m_objConfig->getDateFormat());
-        $objDraftList->loadData($this->m_objInputHandler->getIntFormVar('page', true, true, true), $this->m_objConfig->getMessagesPerPage());
+        $objDraftList->loadData($this->m_objInputHandler->getIntFormVar('page', true, true, true), $this->m_objConfig->getMessageHeaderPerPage());
 
         $this->m_objTemplate->addData($this->getContextDataArray(['previd'	=> $objDraftList->getPrevPageId(),
                                                                                 'nextid'	=> $objDraftList->getNextPageId()]));

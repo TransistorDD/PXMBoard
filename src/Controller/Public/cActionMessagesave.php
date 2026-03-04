@@ -191,11 +191,11 @@ class cActionMessagesave extends cPublicAction
                                                             '%threadid%'],
                                             [$objActiveUser->getUserName(),
                                                             $objReplyMessage->getSubject(),
-                                                            $objReplyMessage->getId(),
+                                                            (string)$objReplyMessage->getId(),
                                                             $sSubject,
-                                                            $objBoardMessage->getId(),
-                                                            $iBoardId,
-                                                            $objReplyMessage->getThreadId()],
+                                                            (string)$objBoardMessage->getId(),
+                                                            (string)$iBoardId,
+                                                            (string)$objReplyMessage->getThreadId()],
                                             $objReplyNotificationMailBody->getMessage()
                                         ),
                                         'From: '.$this->m_objConfig->getMailWebmaster()."\nReply-To: ".$this->m_objConfig->getMailWebmaster()

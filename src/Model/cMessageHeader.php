@@ -11,10 +11,10 @@ require_once(SRCDIR . '/Model/cUser.php');
  */
 class cMessageHeader
 {
-    protected int $m_iId;					// message id
-    protected mixed $m_objAuthor;			// author (user)
-    protected string $m_sSubject;			// message subject
-    protected int $m_iMessageTimestamp;		// date of the message
+    protected int $m_iId = 0;					// message id
+    protected mixed $m_objAuthor;			    // author (user)
+    protected string $m_sSubject = '';			// message subject
+    protected int $m_iMessageTimestamp = 0;		// date of the message
 
     /**
      * Constructor
@@ -23,11 +23,7 @@ class cMessageHeader
      */
     public function __construct()
     {
-
-        $this->m_iId = 0;
         $this->m_objAuthor = new cUser();
-        $this->m_sSubject = '';
-        $this->m_iMessageTimestamp = 0;
     }
 
     /**
@@ -38,13 +34,8 @@ class cMessageHeader
      */
     public function loadDataById(int $iMessageId): bool
     {
-
         $bReturn = false;
-        $iMessageId = intval($iMessageId);
-
         if ($iMessageId > 0) {
-
-
             if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT m_id,'.
                                                              'm_subject,'.
                                                              'm_tstmp,'.
@@ -75,7 +66,6 @@ class cMessageHeader
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         $this->m_iId = intval($objResultRow->m_id);
         $this->m_sSubject = $objResultRow->m_subject;
         $this->m_iMessageTimestamp = intval($objResultRow->m_tstmp);
@@ -136,7 +126,7 @@ class cMessageHeader
      */
     public function setId(int $iId): void
     {
-        $this->m_iId = intval($iId);
+        $this->m_iId = $iId;
     }
 
     /**
@@ -270,15 +260,15 @@ class cMessageHeader
      * @param int $iLastOnlineTimestamp last online timestamp for user
      * @param string $sSubjectQuotePrefix prefix for quoted subject
      * @param ?cParser $objParser message parser
-     * @return array member variables
+     * @return array<string, mixed> member variables
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, string $sSubjectQuotePrefix = '', ?cParser $objParser = null): array
     {
         // TODO: Vererbung mit unterschiedlicher Methodensignatur optimieren
         return ['id'		=>	$this->m_iId,
-                     'subject'	=>	$this->getSubject($sSubjectQuotePrefix),
-                     'date'		=>	(($this->m_iMessageTimestamp > 0) ? date($sDateFormat, ($this->m_iMessageTimestamp + $iTimeOffset)) : 0),
-                     'new'		=>	(($iLastOnlineTimestamp > $this->m_iMessageTimestamp) ? 0 : 1),
-                     'user'		=>	$this->m_objAuthor->getDataArray($iTimeOffset, $sDateFormat, $objParser)];
+                'subject'	=>	$this->getSubject($sSubjectQuotePrefix),
+                'date'		=>	(($this->m_iMessageTimestamp > 0) ? date($sDateFormat, ($this->m_iMessageTimestamp + $iTimeOffset)) : 0),
+                'new'		=>	(($iLastOnlineTimestamp > $this->m_iMessageTimestamp) ? 0 : 1),
+                'user'		=>	$this->m_objAuthor->getDataArray($iTimeOffset, $sDateFormat, $objParser)];
     }
 }

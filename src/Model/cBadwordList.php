@@ -11,23 +11,12 @@
 class cBadwordList
 {
     /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * get all badwords
      *
-     * @return array badwords and replacements
+     * @return array{search: array<string>, replace: array<string>} badwords and replacements
      */
     public function getList(): array
     {
-
-
         $arrBadwords = ['search' => [],'replace' => []];
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT bw_name,bw_replacement FROM pxm_badword')) {
@@ -45,12 +34,11 @@ class cBadwordList
     /**
      * update all badwords
      *
-     * @param array $arrBadwords badwords and replacements
+     * @param array{search?: array<string>, replace?: array<string>} $arrBadwords badwords and replacements
      * @return bool success / failure
      */
     public function updateList(array $arrBadwords): bool
     {
-
         if (isset($arrBadwords['search']) && isset($arrBadwords['replace'])) {
             if (cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_badword')) {
                 foreach ($arrBadwords['search'] as $iKey => $sBadwordSearch) {

@@ -11,23 +11,12 @@
 class cProfileConfig
 {
     /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * get the installed addional profile slots
      *
-     * @return array installed additional profile slots
+     * @return array<string, mixed> installed additional profile slots
      */
     public function getSlotList(): array
     {
-
-
         $arrProfileSlots = [];
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT pa_name,pa_type,pa_length FROM pxm_profile_accept')) {
@@ -44,13 +33,11 @@ class cProfileConfig
     /**
      * delete profile slots
      *
-     * @param array $arrProfileSlots installed additional profile slots
+     * @param array<string> $arrProfileSlots installed additional profile slots
      * @return bool success / failure
      */
     public function deleteSlots(array $arrProfileSlots): bool
     {
-
-
         $arrExistingProfileSlots = $this->getSlotList();
         foreach ($arrProfileSlots as $sSlotName) {
             if (preg_match('/^[a-zA-Z]+$/', $sSlotName) && isset($arrExistingProfileSlots[$sSlotName])) {
@@ -72,7 +59,6 @@ class cProfileConfig
      */
     public function addSlot(string $sSlotName, string $sSlotType, int $iSlotSize = -1): bool
     {
-
         $bReturn = false;
         $arrProfileSlots = $this->getSlotList();
         if (preg_match('/^[a-zA-Z]+$/', $sSlotName) && !isset($arrProfileSlots[$sSlotName])) {

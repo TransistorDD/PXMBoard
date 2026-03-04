@@ -47,9 +47,6 @@ try {
 $objConfig = new cConfig($arrTemplateTypes);
 
 // Initialize search engine singleton from configuration
-if (!isset($arrSearchEngine)) {
-    $arrSearchEngine = ['type' => 'MySql'];
-}
 try {
     cSearchEngineFactory::getInstance($arrSearchEngine);
 } catch (cSearchEngineException $e) {

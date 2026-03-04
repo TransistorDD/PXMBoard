@@ -432,6 +432,16 @@ ALTER TABLE `pxm_user`
 
 
 -- ============================================================================
+-- SCHEMA CLEANUP: Remove flat-mode messages-per-page configuration
+-- ============================================================================
+-- c_msgperpage was used for flat-mode message display which is no longer
+-- supported. The setting is replaced by c_msgheaderperpage for all list views.
+
+ALTER TABLE `pxm_configuration`
+  DROP COLUMN IF EXISTS `c_msgperpage`;
+
+
+-- ============================================================================
 -- All changes for Release 3.0.0 have been applied successfully.
 --
 -- Summary of changes:
@@ -442,7 +452,7 @@ ALTER TABLE `pxm_user`
 -- - pxm_notification: new table for in-app user notifications
 -- - pxm_message_notification: new table for per-message notification subscriptions
 -- - pxm_message_read: new table for server-side read tracking with idx_messageid for read count queries
--- - pxm_configuration: c_banner, c_guestpost, c_countviews, c_quotechar, c_parseurl, c_parsestyle columns dropped
+-- - pxm_configuration: c_banner, c_guestpost, c_countviews, c_quotechar, c_parseurl, c_parsestyle, c_msgperpage columns dropped
 -- - pxm_error: table dropped (replaced by eError PHP enum)
 -- - pxm_skin: names updated, quoteprefix/quotesuffix removed (CSS-based quote styling), frame_top/frame_bottom removed
 -- - pxm_search: se_ipaddress added with idx_ratelimit index for search rate limiting

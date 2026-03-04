@@ -12,43 +12,18 @@ require_once(SRCDIR . '/Model/cBoard.php');
  */
 class cUserAdmin extends cUserProfile
 {
-    protected bool $m_bPost;						// post allowed ?
-    protected bool $m_bEdit;						// edit allowed ?
-    protected bool $m_bIsAdmin;					// is administrator ?
-    protected array $m_arrModeratedBoards;			// boards moderated by current user
+    protected bool $m_bPost = false;						// post allowed ?
+    protected bool $m_bEdit = false;						// edit allowed ?
+    protected bool $m_bIsAdmin = false;					    // is administrator ?
+    /** @var array<cBoard> */
+    protected array $m_arrModeratedBoards = [];			    // boards moderated by current user
 
-    protected bool $m_bIsVisible;					// user visible? (online list)
-    protected int $m_iSkinId;						// skin id
-    protected string $m_sThreadListSortMode;			// sort mode for threadlist
-    protected int $m_iTimeOffset;					// timeoffset
-    protected bool $m_bEmbedExternal;				// externe Inhalte einbetten (Bilder, YouTube, Twitch)
-    protected bool $m_bPrivateMessageNotification;	// send private message notification
-
-    /**
-     * Constructor
-     *
-     * @param array $arrAddFields additional profile fields
-     * @return void
-     */
-    public function __construct(array $arrAddFields = [])
-    {
-
-        parent::__construct($arrAddFields);
-
-        $this->m_bPost = false;
-        $this->m_bEdit = false;
-
-        $this->m_bIsAdmin = false;
-
-        $this->m_arrModeratedBoards = [];
-
-        $this->m_bIsVisible	= true;
-        $this->m_iSkinId = 0;
-        $this->m_sThreadListSortMode = '';
-        $this->m_iTimeOffset = 0;
-        $this->m_bEmbedExternal = false;
-        $this->m_bPrivateMessageNotification = false;
-    }
+    protected bool $m_bIsVisible = true;					// user visible? (online list)
+    protected int $m_iSkinId = 0;						    // skin id
+    protected string $m_sThreadListSortMode = '';		    // sort mode for threadlist
+    protected int $m_iTimeOffset = 0;					    // timeoffset
+    protected bool $m_bEmbedExternal = false;				// externe Inhalte einbetten (Bilder, YouTube, Twitch)
+    protected bool $m_bPrivateMessageNotification = false;	// send private message notification
 
     /**
      * initalize the member variables with the resultset from the db
@@ -58,7 +33,6 @@ class cUserAdmin extends cUserProfile
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         cUserProfile::_setDataFromDb($objResultRow);
 
         $this->m_bPost = $objResultRow->u_post ? true : false;
@@ -94,7 +68,6 @@ class cUserAdmin extends cUserProfile
      */
     public function updateData(): bool
     {
-
         $bReturn = false;
         $sAddUpdateQuery = '';
 
@@ -137,8 +110,6 @@ class cUserAdmin extends cUserProfile
      */
     public function loadModData(): bool
     {
-
-
         $this->m_arrModeratedBoards = [];
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT b_id,b_name FROM pxm_moderator,pxm_board WHERE mod_boardid=b_id AND mod_userid=$this->m_iId")) {
@@ -154,7 +125,6 @@ class cUserAdmin extends cUserProfile
         } else {
             return false;
         }
-
         return true;
     }
 
@@ -165,8 +135,6 @@ class cUserAdmin extends cUserProfile
      */
     public function updateModData(): bool
     {
-
-
         if (cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_moderator WHERE mod_userid=$this->m_iId")) {
             foreach ($this->m_arrModeratedBoards as $objBoard) {
                 cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_moderator (mod_boardid,mod_userid) VALUES ('.$objBoard->getId().",$this->m_iId)");
@@ -196,7 +164,7 @@ class cUserAdmin extends cUserProfile
      */
     public function setPostAllowed(bool $bPost): void
     {
-        $this->m_bPost = $bPost ? true : false;
+        $this->m_bPost = $bPost;
     }
 
     /**
@@ -217,7 +185,7 @@ class cUserAdmin extends cUserProfile
      */
     public function setEditAllowed(bool $bEdit): void
     {
-        $this->m_bEdit = $bEdit ? true : false;
+        $this->m_bEdit = $bEdit;
     }
 
     /**
@@ -238,7 +206,7 @@ class cUserAdmin extends cUserProfile
      */
     public function setAdmin(bool $bIsAdmin): void
     {
-        $this->m_bIsAdmin = $bIsAdmin ? true : false;
+        $this->m_bIsAdmin = $bIsAdmin;
     }
 
     /**
@@ -259,7 +227,7 @@ class cUserAdmin extends cUserProfile
      */
     public function setIsVisible(bool $bIsVisible): void
     {
-        $this->m_bIsVisible = $bIsVisible ? true : false;
+        $this->m_bIsVisible = $bIsVisible;
     }
 
     /**
@@ -280,7 +248,6 @@ class cUserAdmin extends cUserProfile
      */
     public function setSkinId(int $iSkinId): void
     {
-        $iSkinId = intval($iSkinId);
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT s_id FROM pxm_skin WHERE s_id='.$iSkinId." AND s_fieldname='name'")) {
             if ($objResultSet->getNumRows() > 0) {
                 $this->m_iSkinId = $iSkinId;
@@ -327,7 +294,6 @@ class cUserAdmin extends cUserProfile
      */
     public function setTimeOffset(int $iTimeOffset): void
     {
-        $iTimeOffset = intval($iTimeOffset);
         if (($iTimeOffset < 13) && ($iTimeOffset > -13)) {
             $this->m_iTimeOffset = $iTimeOffset;
         }
@@ -351,7 +317,7 @@ class cUserAdmin extends cUserProfile
      */
     public function setEmbedExternal(bool $bEmbedExternal): void
     {
-        $this->m_bEmbedExternal = $bEmbedExternal ? true : false;
+        $this->m_bEmbedExternal = $bEmbedExternal;
     }
 
     /**
@@ -372,13 +338,13 @@ class cUserAdmin extends cUserProfile
      */
     public function setSendPrivateMessageNotification(bool $bPrivateMessageNotification): void
     {
-        $this->m_bPrivateMessageNotification = $bPrivateMessageNotification ? true : false;
+        $this->m_bPrivateMessageNotification = $bPrivateMessageNotification;
     }
 
     /**
      * get moderated boards
      *
-     * @return array moderated boards
+     * @return array<cBoard> moderated boards
      */
     public function getModeratedBoards(): array
     {
@@ -388,15 +354,14 @@ class cUserAdmin extends cUserProfile
     /**
      * set moderated boards
      *
-     * @param array $arrModeratedBoards moderated boards
+     * @param array<int> $arrModeratedBoardIds moderated board ids
      * @return void
      */
-    public function setModeratedBoardsById(array $arrModeratedBoards): void
+    public function setModeratedBoardsById(array $arrModeratedBoardIds): void
     {
-
         $this->m_arrModeratedBoards = [];
 
-        foreach ($arrModeratedBoards as $iBoardId) {
+        foreach ($arrModeratedBoardIds as $iBoardId) {
             $objBoard = new cBoard();
             if ($objBoard->loadDataById($iBoardId)) {
                 $this->m_arrModeratedBoards[] = $objBoard;

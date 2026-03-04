@@ -33,7 +33,7 @@ class cActionMessagenotificationlist extends cPublicAction
         $this->m_objTemplate = $this->_getTemplateObject('messagenotificationlist');
 
         $objNotificationList = new cMessageNotificationList($this->getActiveUser()->getId(), $this->m_objConfig->getTimeOffset() * 3600, $this->m_objConfig->getDateFormat());
-        $objNotificationList->loadData($this->m_objInputHandler->getIntFormVar('page', true, true, true), $this->m_objConfig->getMessagesPerPage());
+        $objNotificationList->loadData($this->m_objInputHandler->getIntFormVar('page', true, true, true), $this->m_objConfig->getMessageHeaderPerPage());
 
         $this->m_objTemplate->addData($this->getContextDataArray(['previd'	=> $objNotificationList->getPrevPageId(),
                                                                                 'nextid'	=> $objNotificationList->getNextPageId()]));

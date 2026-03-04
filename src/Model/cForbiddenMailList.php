@@ -11,23 +11,12 @@
 class cForbiddenMailList
 {
     /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * get all forbidden mails
      *
-     * @return array forbidden mails
+     * @return array<string> forbidden mails
      */
     public function getList(): array
     {
-
-
         $arrForbiddenMails = [];
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT fm_adress FROM pxm_forbiddenmail')) {
@@ -44,12 +33,11 @@ class cForbiddenMailList
     /**
      * update all forbidden mails
      *
-     * @param array $arrForbiddenMails forbidden mails
+     * @param array<string> $arrForbiddenMails forbidden mails
      * @return bool success / failure
      */
     public function updateList(array $arrForbiddenMails): bool
     {
-
         if (cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_forbiddenmail')) {
             foreach ($arrForbiddenMails as $sForbiddenMail) {
                 if (strlen($sForbiddenMail) > 0) {

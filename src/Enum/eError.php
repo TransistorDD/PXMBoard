@@ -1,11 +1,15 @@
 <?php
+
 /**
  * Error message enumeration
  *
- * @author Torsten Rentsch <forum@torsten-rentsch.de>
- * @copyright Torsten Rentsch 2001 - 2026
+ * @link      https://github.com/TransistorDD/PXMBoard
+ * @author    Torsten Rentsch <forum@torsten-rentsch.de>
+ * @copyright 2001-2026 Torsten Rentsch
+ * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-enum eError: string {
+enum eError: string
+{
     case INVALID_MODE = 'ungültiger modus';
     case USERNAME_UNKNOWN = 'nutzername unbekannt';
     case INVALID_PASSWORD = 'passwort ungültig';
@@ -44,4 +48,3 @@ enum eError: string {
     case MESSAGE_MOVE_ERROR = 'Fehler beim Verschieben der Nachricht.';
     case CSRF_TOKEN_INVALID = 'ungültiges oder fehlendes sicherheitstoken';
 }
-?>

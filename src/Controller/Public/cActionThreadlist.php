@@ -96,12 +96,12 @@ class cActionThreadlist extends cPublicAction
     /**
      * Get context data array for templates
      *
-     * @param array $arrAdditionalData additional data
-     * @return array context data
+     * @param array<string, mixed> $arrAdditionalData additional data
+     * @return array<string, mixed> context data
      */
     protected function getContextDataArray(array $arrAdditionalData = []): array
     {
         $arrContext = ['sort' => $this->_getThreadListSortMode()];
-        return parent::getContextDataArray(array_merge_recursive($arrContext,$arrAdditionalData));
+        return parent::getContextDataArray(array_merge_recursive($arrContext, $arrAdditionalData));
     }
 }

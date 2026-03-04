@@ -13,7 +13,7 @@ require_once(SRCDIR . '/Enum/ePrivateMessage.php');
 class cPrivateMessageList extends cScrollList
 {
     protected int $m_iUserId;				// user id
-    protected string $m_sDateFormat;			// date format
+    protected string $m_sDateFormat;		// date format
     protected int $m_iTimeOffset;			// time offset
 
     /**
@@ -26,11 +26,10 @@ class cPrivateMessageList extends cScrollList
      */
     public function __construct(int $iUserId, int $iTimeOffset = 0, string $sDateFormat = '')
     {
-
-        $this->m_iUserId = intval($iUserId);
-        $this->m_iTimeOffset = intval($iTimeOffset);
-        $this->m_sDateFormat = $sDateFormat;
-
         parent::__construct();
+
+        $this->m_iUserId = $iUserId;
+        $this->m_iTimeOffset = $iTimeOffset;
+        $this->m_sDateFormat = $sDateFormat;
     }
 }

@@ -322,7 +322,7 @@ abstract class cBaseAction
     /**
      * Get board list array for templates.
      *
-     * @return array board list data array
+     * @return list<array<string, mixed>> board list data array
      */
     protected function _getBoardListArray(): array
     {

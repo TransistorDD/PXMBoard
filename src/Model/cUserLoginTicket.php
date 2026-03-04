@@ -11,24 +11,13 @@ require_once(SRCDIR . '/Database/cDBFactory.php');
  */
 class cUserLoginTicket
 {
-    protected int $m_iId;
-    protected int $m_iUserId;
-    protected string $m_sToken;
-    protected string $m_sUserAgent;
-    protected string $m_sIpAddress;
-    protected int $m_iCreatedTimestamp;
-    protected int $m_iLastUsedTimestamp;
-
-    public function __construct()
-    {
-        $this->m_iId = 0;
-        $this->m_iUserId = 0;
-        $this->m_sToken = '';
-        $this->m_sUserAgent = '';
-        $this->m_sIpAddress = '';
-        $this->m_iCreatedTimestamp = 0;
-        $this->m_iLastUsedTimestamp = 0;
-    }
+    protected int $m_iId = 0;
+    protected int $m_iUserId = 0;
+    protected string $m_sToken = '';
+    protected string $m_sUserAgent = '';
+    protected string $m_sIpAddress = '';
+    protected int $m_iCreatedTimestamp = 0;
+    protected int $m_iLastUsedTimestamp = 0;
 
     /**
      * Create a new login ticket for user
@@ -302,19 +291,19 @@ class cUserLoginTicket
      *
      * @param int $iTimeOffset Time offset in seconds
      * @param string $sDateFormat PHP date format
-     * @return array Member variables as array
+     * @return array<string, mixed> Member variables as array
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat): array
     {
         return [
-            'id' => $this->m_iId,
-            'userid' => $this->m_iUserId,
-            'token' => $this->m_sToken,
+            'id'        => $this->m_iId,
+            'userid'    => $this->m_iUserId,
+            'token'     => $this->m_sToken,
             'useragent' => $this->m_sUserAgent,
             'ipaddress' => $this->m_sIpAddress,
             'deviceinfo' => $this->getDeviceInfo(),
-            'created' => date($sDateFormat, $this->m_iCreatedTimestamp + $iTimeOffset),
-            'lastused' => date($sDateFormat, $this->m_iLastUsedTimestamp + $iTimeOffset)
+            'created'   => date($sDateFormat, $this->m_iCreatedTimestamp + $iTimeOffset),
+            'lastused'  => date($sDateFormat, $this->m_iLastUsedTimestamp + $iTimeOffset)
         ];
     }
 }

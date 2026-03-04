@@ -44,7 +44,6 @@ class cAdminActionConfigsave extends cAdminAction
         $this->m_objConfig->setUserPerPage($this->m_objInputHandler->getIntFormVar('userperpage', true, true, true));
         $this->m_objConfig->setThreadsPerPage($this->m_objInputHandler->getIntFormVar('threadsperpage', true, true, true));
         $this->m_objConfig->setMessageHeaderPerPage($this->m_objInputHandler->getIntFormVar('messageheaderperpage', true, true, true));
-        $this->m_objConfig->setMessagesPerPage($this->m_objInputHandler->getIntFormVar('messagesperpage', true, true, true));
         $this->m_objConfig->setPrivateMessagesPerPage($this->m_objInputHandler->getIntFormVar('privatemessagesperpage', true, true, true));
 
         $this->m_objConfig->setMailWebmaster($this->m_objInputHandler->getStringFormVar('mailwebmaster', 'email', true, true, 'trim'));

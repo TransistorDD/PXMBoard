@@ -83,7 +83,7 @@ class cInputHandler
      * @param bool $bForceUnique make the array elements unique
      * @param string $sAddFunction name of an additional function that should be called (e.g. trim)
      * @param string $sValidName name of the validation that should be used
-     * @return array value of the variable
+     * @return array<string, mixed> value of the variable
      */
     public function getArrFormVar(string $sVarName, bool $bSearchPost, bool $bSearchGet, bool $bForceUnique = false, string $sAddFunction = '', string $sValidName = ''): array
     {

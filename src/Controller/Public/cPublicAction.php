@@ -146,8 +146,8 @@ abstract class cPublicAction extends cBaseAction
     /**
      * Get context data array for templates.
      *
-     * @param array $arrAdditionalData additional data to merge
-     * @return array context data
+     * @param array<string, mixed> $arrAdditionalData additional data to merge
+     * @return array<string, mixed> context data
      */
     protected function getContextDataArray(array $arrAdditionalData = []): array
     {

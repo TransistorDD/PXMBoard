@@ -207,7 +207,7 @@ vendor/bin/phpunit
 vendor/bin/phpstan analyse
 
 # 4. Write report to file
-vendor/bin/phpstan analyse --output-file reports/phpstan.txt
+vendor/bin/phpstan analyse > reports/phpstan.txt
 ```
 
 ## Static Analysis

@@ -12,24 +12,13 @@ require_once(SRCDIR . '/Model/cSkin.php');
 class cSkinList
 {
     /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * get all skin ids and names
      *
-     * @return array skins
+     * @return array<mixed> skins
      */
     public function getList(): array
     {
-
         $arrSkins = [];
-
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT s1.s_id,s1.s_fieldvalue AS s_name,s2.s_fieldvalue AS s_type FROM pxm_skin s1,pxm_skin s2 WHERE s1.s_id=s2.s_id AND s1.s_fieldname='name' AND s2.s_fieldname='type' ORDER BY s1.s_id")) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {

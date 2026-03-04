@@ -11,28 +11,12 @@ require_once(SRCDIR . '/Model/cUser.php');
  */
 class cUserPermissions extends cUser
 {
-    public $m_bPost;					// post allowed ?
-    public $m_bEdit;					// edit allowed ?
+    public bool $m_bPost = false;					// post allowed ?
+    public bool $m_bEdit = false ;					// edit allowed ?
 
-    public $m_bIsAdmin;				// is administrator ?
-    public $m_arrModBoards;			// is moderator for
-
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-
-        parent::__construct();
-
-        $this->m_bPost = false;
-        $this->m_bEdit = false;
-
-        $this->m_bIsAdmin = false;
-        $this->m_arrModBoards = null;
-    }
+    public bool $m_bIsAdmin = false;				// is administrator ?
+    /** @var array<int> */
+    public ?array $m_arrModBoards = null;			// is moderator for
 
     /**
      * initalize the member variables with the resultset from the db
@@ -42,7 +26,6 @@ class cUserPermissions extends cUser
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         cUser::_setDataFromDb($objResultRow);
 
         $this->m_bPost = $objResultRow->u_post ? true : false;
@@ -59,7 +42,6 @@ class cUserPermissions extends cUser
      */
     private function _loadModBoards(): bool
     {
-
         $this->m_arrModBoards = [];
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT mod_boardid FROM pxm_moderator WHERE mod_userid='.$this->m_iId)) {
@@ -90,8 +72,6 @@ class cUserPermissions extends cUser
      */
     public function refreshRights(): void
     {
-
-
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT u_status,u_post,u_edit,u_admin FROM pxm_user WHERE u_id='.$this->m_iId)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $this->m_eStatus = UserStatus::tryFrom($objResultRow->u_status) ?? UserStatus::NOT_ACTIVATED;
@@ -121,7 +101,7 @@ class cUserPermissions extends cUser
      */
     public function setPostAllowed(bool $bPost): void
     {
-        $this->m_bPost = $bPost ? true : false;
+        $this->m_bPost = $bPost;
     }
 
     /**
@@ -142,7 +122,7 @@ class cUserPermissions extends cUser
      */
     public function setEditAllowed(bool $bEdit): void
     {
-        $this->m_bEdit = $bEdit ? true : false;
+        $this->m_bEdit = $bEdit;
     }
 
     /**
@@ -163,7 +143,7 @@ class cUserPermissions extends cUser
      */
     public function setAdmin(bool $bIsAdmin): void
     {
-        $this->m_bIsAdmin = $bIsAdmin ? true : false;
+        $this->m_bIsAdmin = $bIsAdmin;
     }
 
     /**
@@ -183,7 +163,7 @@ class cUserPermissions extends cUser
     /**
      * get the board ids of where this user is moderator
      *
-     * @return array board ids
+     * @return array<int> board ids
      */
     public function getModeratorBoardIds(): array
     {
@@ -200,8 +180,6 @@ class cUserPermissions extends cUser
      */
     public function updateData(): bool
     {
-
-
         if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_status='.$this->m_eStatus->value.
                                                              ',u_post='.intval($this->m_bPost).
                                                              ',u_edit='.intval($this->m_bEdit).

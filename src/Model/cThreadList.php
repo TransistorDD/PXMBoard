@@ -29,6 +29,7 @@ class cThreadList extends cScrollList
      */
     public function __construct(int $iBoardId, string $sSortMode, int $iTimeSpan, int $iUserId = 0)
     {
+        parent::__construct();
 
         $this->m_sSortDirection = 'DESC';
 
@@ -50,11 +51,9 @@ class cThreadList extends cScrollList
             default: 		$this->m_sSortMode = 'm_tstmp';
                 break;
         }
-        $this->m_iBoardId = intval($iBoardId);
-        $this->m_iTimeSpan = intval($iTimeSpan);
-        $this->m_iUserId = intval($iUserId);
-
-        parent::__construct();
+        $this->m_iBoardId = $iBoardId;
+        $this->m_iTimeSpan = $iTimeSpan;
+        $this->m_iUserId = $iUserId;
     }
 
     /**
@@ -126,7 +125,6 @@ class cThreadList extends cScrollList
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         $objThreadHeader = new cThreadHeader();
         $objThreadHeader->setId($objResultRow->m_id);
         $objThreadHeader->setSubject($objResultRow->m_subject);
@@ -159,7 +157,7 @@ class cThreadList extends cScrollList
      * @param int $iTimeOffset time offset in seconds
      * @param string $sDateFormat php date format
      * @param int $iLastOnlineTimestamp last online timestamp for user
-     * @return array member variables
+     * @return list<array<string, mixed>> member variables
      */
     public function getDataArray(int $iTimeOffset = 0, string $sDateFormat = '', int $iLastOnlineTimestamp = 0): array
     {

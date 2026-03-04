@@ -12,43 +12,20 @@ require_once(SRCDIR . '/Enum/eBoardStatus.php');
  */
 class cBoard
 {
-    protected int $m_iId;						// board id
-    protected string $m_sName;					// board name
-    protected string $m_sDescription;			// board description
-    protected int $m_iPosition;					// position in boardlist
-    protected BoardStatus $m_eStatus;			// board status (PUBLIC, MEMBERS_ONLY, READONLY_PUBLIC, READONLY_MEMBERS, CLOSED)
-    protected int $m_iLastMessageTimestamp;		// timestamp of last message
-    protected int $m_iThreadListTimeSpan;		// timespan for threadlist
-    protected string $m_sThreadListSortMode;	// sortmode for threadlist
-    protected bool $m_bEmbedExternal;			// externe Inhalte einbetten (Bilder, YouTube, Twitch)
-    protected bool $m_bDoTextReplacements;		// do textreplacements
-    protected int $m_iThreadsPerPage;			// threads per page
+    protected int $m_iId = 0;						    // board id
+    protected string $m_sName = '';					    // board name
+    protected string $m_sDescription = '';			    // board description
+    protected int $m_iPosition = 0;					    // position in boardlist
+    protected BoardStatus $m_eStatus = BoardStatus::PUBLIC;			// board status (PUBLIC, MEMBERS_ONLY, READONLY_PUBLIC, READONLY_MEMBERS, CLOSED)
+    protected int $m_iLastMessageTimestamp = 0;		    // timestamp of last message
+    protected int $m_iThreadListTimeSpan = 365;		    // timespan for threadlist in days
+    protected string $m_sThreadListSortMode = 'last';	// sortmode for threadlist
+    protected bool $m_bEmbedExternal = false;			// externe Inhalte einbetten (Bilder, YouTube, Twitch)
+    protected bool $m_bDoTextReplacements = false;		// do textreplacements
+    protected int $m_iThreadsPerPage = 50;			    // threads per page
 
-    protected array $m_arrModerators;			// array of moderatores (id and name)
-
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-
-        $this->m_iId = 0;
-        $this->m_sName = '';
-        $this->m_sDescription = '';
-        $this->m_iPosition = 0;
-        $this->m_eStatus = BoardStatus::PUBLIC;
-        $this->m_iLastMessageTimestamp = 0;
-
-        $this->m_iThreadListTimeSpan = 100;
-        $this->m_sThreadListSortMode = 'last';
-        $this->m_bEmbedExternal = false;
-        $this->m_bDoTextReplacements = false;
-        $this->m_iThreadsPerPage = 0;
-
-        $this->m_arrModerators = [];
-    }
+    /** @var array<cUser> */
+    protected array $m_arrModerators = [];			    // array of moderatores (id and name)
 
     /**
      * get data from database by board id
@@ -58,13 +35,8 @@ class cBoard
      */
     public function loadDataById(int $iBoardId): bool
     {
-
         $bReturn = false;
-        $iBoardId = intval($iBoardId);
-
         if ($iBoardId > 0) {
-
-
             if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT b_id,'.
                                                                       'b_name,'.
                                                                       'b_description,'.
@@ -94,7 +66,6 @@ class cBoard
      */
     private function _setDataFromDb(object $objResultRow): bool
     {
-
         $this->m_iId = intval($objResultRow->b_id);
         $this->m_sName = $objResultRow->b_name;
         $this->m_sDescription = $objResultRow->b_description;
@@ -116,8 +87,6 @@ class cBoard
      */
     public function loadModData(): bool
     {
-
-
         $this->m_arrModerators = [];
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT u_id,u_username,u_publicmail,u_highlight FROM pxm_moderator,pxm_user WHERE mod_userid=u_id AND mod_boardid=$this->m_iId")) {
@@ -135,7 +104,6 @@ class cBoard
         } else {
             return false;
         }
-
         return true;
     }
 
@@ -146,8 +114,6 @@ class cBoard
      */
     public function updateModData(): bool
     {
-
-
         if (cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_moderator WHERE mod_boardid=$this->m_iId")) {
             foreach ($this->m_arrModerators as $objUser) {
                 cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_moderator (mod_userid,mod_boardid) VALUES (' . $objUser->getId() . ",$this->m_iId)");
@@ -155,7 +121,6 @@ class cBoard
         } else {
             return false;
         }
-
         return true;
     }
 
@@ -166,10 +131,8 @@ class cBoard
      */
     public function insertData(): bool
     {
-
-
         if (cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_board (b_name,b_description,b_status,b_timespan,b_threadlistsort,b_embed_external,b_replacetext) '
-                                         .'VALUES ('.cDBFactory::getInstance()->quote($this->m_sName).','.cDBFactory::getInstance()->quote($this->m_sDescription).','.cDBFactory::getInstance()->quote($this->m_eStatus->value).",$this->m_iThreadListTimeSpan,"
+                                         .'VALUES ('.cDBFactory::getInstance()->quote($this->m_sName).','.cDBFactory::getInstance()->quote($this->m_sDescription).','.intval($this->m_eStatus->value).",$this->m_iThreadListTimeSpan,"
                                                  .cDBFactory::getInstance()->quote($this->m_sThreadListSortMode).','.intval($this->m_bEmbedExternal).','.intval($this->m_bDoTextReplacements).')')) {
             $this->m_iId = cDBFactory::getInstance()->getInsertId('pxm_board', 'b_id');
             cDBFactory::getInstance()->executeQuery('UPDATE pxm_board SET b_position=b_id WHERE b_id='.$this->m_iId);
@@ -186,18 +149,17 @@ class cBoard
      */
     public function updateData(): bool
     {
-
         $bReturn = false;
 
         if ($this->m_iId > 0) {
             if (cDBFactory::getInstance()->executeQuery('UPDATE pxm_board SET b_name='.cDBFactory::getInstance()->quote($this->m_sName).','
                                                         .'b_description='.cDBFactory::getInstance()->quote($this->m_sDescription).','
                                                         ."b_position=$this->m_iPosition,"
-                                                        .'b_status='.cDBFactory::getInstance()->quote($this->m_eStatus->value).','
+                                                        .'b_status='.intval($this->m_eStatus->value).','
                                                         ."b_timespan=$this->m_iThreadListTimeSpan,"
                                                         .'b_threadlistsort='.cDBFactory::getInstance()->quote($this->m_sThreadListSortMode).','
-                                                                    .'b_embed_external='.intval($this->m_bEmbedExternal).','
-                                                                    .'b_replacetext='.intval($this->m_bDoTextReplacements)." WHERE b_id=$this->m_iId")) {
+                                                        .'b_embed_external='.intval($this->m_bEmbedExternal).','
+                                                        .'b_replacetext='.intval($this->m_bDoTextReplacements)." WHERE b_id=$this->m_iId")) {
                 $bReturn = true;
             }
         }
@@ -211,8 +173,6 @@ class cBoard
      */
     public function deleteData(): bool
     {
-
-
         if ($this->m_iId > 0) {
             if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT t_id FROM pxm_thread WHERE t_boardid=$this->m_iId")) {
                 while ($objResultRow = $objResultSet->getNextResultRowObject()) {
@@ -225,7 +185,6 @@ class cBoard
         } else {
             return false;
         }
-
         return true;
     }
 
@@ -247,7 +206,7 @@ class cBoard
      */
     public function setId(int $iId): void
     {
-        $this->m_iId = intval($iId);
+        $this->m_iId = $iId;
     }
 
     /**
@@ -310,7 +269,7 @@ class cBoard
      */
     public function setPosition(int $iPosition): void
     {
-        $this->m_iPosition = intval($iPosition);
+        $this->m_iPosition = $iPosition;
     }
 
     /**
@@ -321,10 +280,6 @@ class cBoard
      */
     public function updatePosition(int $iPosition): void
     {
-
-
-        $iPosition = intval($iPosition);
-
         if ($iPosition > 0 && $this->m_iPosition != $iPosition) {
             if ($this->m_iPosition > $iPosition) {
                 cDBFactory::getInstance()->executeQuery("UPDATE pxm_board SET b_position = b_position+1 WHERE b_position >= $iPosition AND b_position < $this->m_iPosition");
@@ -365,7 +320,7 @@ class cBoard
      */
     public function updateStatus(BoardStatus $eStatus): bool
     {
-        if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_board SET b_status='.cDBFactory::getInstance()->quote($eStatus->value)." WHERE b_id=$this->m_iId")) {
+        if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_board SET b_status='.intval($eStatus->value)." WHERE b_id=$this->m_iId")) {
             return false;
         }
         $this->m_eStatus = $eStatus;
@@ -541,7 +496,7 @@ class cBoard
     /**
      * get moderators
      *
-     * @return array moderators
+     * @return array<mixed> moderators
      */
     public function getModerators(): array
     {
@@ -551,12 +506,11 @@ class cBoard
     /**
      * set moderators
      *
-     * @param array $arrModeratorUserNames usernames of moderators
+     * @param array<string> $arrModeratorUserNames usernames of moderators
      * @return void
      */
     public function setModeratorsByUserName(array $arrModeratorUserNames): void
     {
-
         $this->m_arrModerators = [];
 
         foreach ($arrModeratorUserNames as $sUserName) {
@@ -577,7 +531,7 @@ class cBoard
      * @param string $sDateFormat php date format
      * @param int $iLastOnlineTimestamp last online timestamp for user
      * @param object $objParser message parser (for signature)
-     * @return array member variables
+     * @return array<string, mixed> member variables
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, object $objParser): array
     {
@@ -588,13 +542,13 @@ class cBoard
         }
 
         return ['id'		=>	$this->m_iId,
-                     'name'		=>	$this->m_sName,
-                     'desc'		=>	$this->m_sDescription,
-                     'position'	=>	$this->m_iPosition,
-                     'lastmsg'	=>	(($this->m_iLastMessageTimestamp > 0) ? date($sDateFormat, ($this->m_iLastMessageTimestamp + $iTimeOffset)) : 0),
-                     'new'		=>	(($iLastOnlineTimestamp > $this->m_iLastMessageTimestamp) ? 0 : 1),
-                     'status'	=>	$this->m_eStatus->value,
-                     'status_label'	=>	$this->m_eStatus->getLabel(),
-                     'moderator' =>	$arrModerators];
+                'name'		=>	$this->m_sName,
+                'desc'		=>	$this->m_sDescription,
+                'position'	=>	$this->m_iPosition,
+                'lastmsg'	=>	(($this->m_iLastMessageTimestamp > 0) ? date($sDateFormat, ($this->m_iLastMessageTimestamp + $iTimeOffset)) : 0),
+                'new'		=>	(($iLastOnlineTimestamp > $this->m_iLastMessageTimestamp) ? 0 : 1),
+                'status'	=>	$this->m_eStatus->value,
+                'status_label'	=>	$this->m_eStatus->getLabel(),
+                'moderator' =>	$arrModerators];
     }
 }

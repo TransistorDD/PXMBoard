@@ -2,6 +2,7 @@
 
 require_once(SRCDIR . '/Model/cMessage.php');
 require_once(SRCDIR . '/Model/cUser.php');
+require_once(SRCDIR . '/Enum/eError.php');
 require_once(SRCDIR . '/Enum/ePrivateMessage.php');
 /**
  * private message handling
@@ -13,25 +14,9 @@ require_once(SRCDIR . '/Enum/ePrivateMessage.php');
  */
 class cPrivateMessage extends cMessage
 {
-    protected int $m_iToUserId;					// destination user id
-    protected PrivateMessageStatus $m_eToState;		// state for the recipient
-    protected PrivateMessageStatus $m_eFromState;	// state for the sender
-
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-
-        parent::__construct();
-
-        $this->m_iToUserId = 0;
-        $this->m_eToState = PrivateMessageStatus::UNREAD;
-
-        $this->m_eFromState = PrivateMessageStatus::READ;
-    }
+    protected int $m_iToUserId = 0;					                            // destination user id
+    protected PrivateMessageStatus $m_eToState = PrivateMessageStatus::UNREAD;	// state for the recipient
+    protected PrivateMessageStatus $m_eFromState = PrivateMessageStatus::READ;	// state for the sender
 
     /**
      * get data from database by message id
@@ -41,13 +26,9 @@ class cPrivateMessage extends cMessage
      */
     public function loadDataById(int $iMessageId): bool
     {
-
         $bReturn = false;
-        $iMessageId = intval($iMessageId);
 
         if ($iMessageId > 0) {
-
-
             if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT p_id,'.
                                                             'p_subject,'.
                                                             'p_body,'.
@@ -96,7 +77,6 @@ class cPrivateMessage extends cMessage
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         $this->m_iId = intval($objResultRow->p_id);
         $this->m_sSubject = $objResultRow->p_subject;
         $this->m_sBody = $objResultRow->p_body;
@@ -159,12 +139,11 @@ class cPrivateMessage extends cMessage
     /**
      * insert new data into database
      *
-     * @return int error id
+     * @return ?eError null on success, eError enum on failure
      */
-    public function insertData(): int
+    public function insertData(): ?eError
     {
-
-        $iErrorId = 8;												// could not insert data
+        $eError = eError::COULD_NOT_INSERT_DATA;
 
         if ($this->m_iToUserId > 0 && $this->m_objAuthor->getId() > 0) {
             if (!empty($this->m_sSubject)) {
@@ -176,7 +155,7 @@ class cPrivateMessage extends cMessage
                                                                              $this->m_iMessageTimestamp.','.
                                                                              cDBFactory::getInstance()->quote($this->m_sIp).')')) {
                     if ($objResultSet->getAffectedRows() > 0) {
-                        $iErrorId = 0;
+                        $eError = null;
                         $this->m_iId = cDBFactory::getInstance()->getInsertID('pxm_priv_message', 'p_id');
 
                         // Update unread count in pxm_user
@@ -187,13 +166,12 @@ class cPrivateMessage extends cMessage
                     }
                 }
             } else {
-                $iErrorId = 7;
-            }										// missing subject
+                $eError = eError::SUBJECT_MISSING;
+            }
         } else {
-            $iErrorId = 20;
-        }										// invalid user id
-
-        return $iErrorId;
+            $eError = eError::INVALID_USER_ID;
+        }
+        return $eError;
     }
 
     /**
@@ -203,8 +181,6 @@ class cPrivateMessage extends cMessage
      */
     public function deleteData(): bool
     {
-
-
         $bReturn = false;
 
         // set the message to deleted if we are the recipient
@@ -288,7 +264,6 @@ class cPrivateMessage extends cMessage
     {
         if ($this->m_eToState->isUnread()) {
 
-
             cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_tostate='.PrivateMessageStatus::READ->value." WHERE p_id=$this->m_iId");
 
             // Update unread count in pxm_user
@@ -328,7 +303,7 @@ class cPrivateMessage extends cMessage
      * @param int $iLastOnlineTimestamp last online timestamp for user
      * @param string $sSubjectQuotePrefix prefix for quoted subject
      * @param ?cParser $objParser message parser
-     * @return array member variables
+     * @return array<string, mixed> member variables
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, string $sSubjectQuotePrefix = '', ?cParser $objParser = null): array
     {

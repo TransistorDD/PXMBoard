@@ -33,7 +33,7 @@ class cSkinTemplateXslt extends cSkinTemplate
     /**
      * add data to the template (internal recursive template method)
      *
-     * @param array $arrData key - value pairs
+     * @param array<int|string, mixed> $arrData key - value pairs
      * @param string $sSubst subst string for integer keys
      * @return bool success / failure
      */

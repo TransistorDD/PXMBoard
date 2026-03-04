@@ -3,8 +3,10 @@
 /**
  * Success message enumeration
  *
- * @author Torsten Rentsch <forum@torsten-rentsch.de>
- * @copyright Torsten Rentsch 2001 - 2026
+ * @link      https://github.com/TransistorDD/PXMBoard
+ * @author    Torsten Rentsch <forum@torsten-rentsch.de>
+ * @copyright 2001-2026 Torsten Rentsch
+ * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
 enum eSuccessMessage: string
 {
@@ -13,6 +15,7 @@ enum eSuccessMessage: string
     case MESSAGE_TREE_DELETED = 'Subthread erfolgreich gelöscht';
     case MESSAGE_TREE_MOVED = 'Subthread erfolgreich verschoben';
     case MESSAGE_TREE_EXTRACTED = 'Subthread erfolgreich ausgegliedert';
+    case PRIVATE_MESSAGE_SENT = 'Ihre private Nachricht wurde erfolgreich gesendet.';
 
     // Notification operations
     case NOTIFICATION_MARKED_READ = 'Benachrichtigung als gelesen markiert';

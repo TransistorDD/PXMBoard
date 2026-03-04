@@ -11,24 +11,23 @@ require_once(SRCDIR . '/Model/cUser.php');
  */
 class cUserProfile extends cUser
 {
-    protected int $m_iLastUpdateTimestap;		// timestamp of last profileupdate
+    protected int $m_iLastUpdateTimestap = 0;		// timestamp of last profileupdate
+    /** @var array<string, mixed> */
     protected array $m_arrAddFields;			// additional profile fields
-    protected array $m_arrAddData;				// additional profile data
+    /** @var array<string, mixed> */
+    protected array $m_arrAddData = [];				// additional profile data
 
     /**
      * Constructor
      *
-     * @param array $arrAddFields additional profile fields
+     * @param array<string, mixed> $arrAddFields additional profile fields
      * @return void
      */
     public function __construct(array $arrAddFields = [])
     {
-
         parent::__construct();
 
-        $this->m_iLastUpdateTimestap = 0;
         $this->m_arrAddFields = $arrAddFields;
-        $this->m_arrAddData = [];
     }
 
     /**
@@ -39,7 +38,6 @@ class cUserProfile extends cUser
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         cUser::_setDataFromDb($objResultRow);
 
         $this->m_sSignature	= $objResultRow->u_signature;
@@ -60,7 +58,6 @@ class cUserProfile extends cUser
      */
     protected function _getDbAttributes(): string
     {
-
         $sAddDbFields = '';
         foreach (array_keys($this->m_arrAddFields) as $sFieldName) {
             $sAddDbFields .= ',u_profile_'.$sFieldName;
@@ -75,7 +72,6 @@ class cUserProfile extends cUser
      */
     public function updateData(): bool
     {
-
         $sAddUpdateQuery = '';
 
         foreach ($this->m_arrAddData as $sFieldName => $mData) {
@@ -116,7 +112,7 @@ class cUserProfile extends cUser
      */
     public function setLastUpdateTimestamp(int $iLastUpdateTimestap): void
     {
-        $this->m_iLastUpdateTimestap = intval($iLastUpdateTimestap);
+        $this->m_iLastUpdateTimestap = $iLastUpdateTimestap;
     }
 
     /**
@@ -155,10 +151,10 @@ class cUserProfile extends cUser
      *
      * @param int $iTimeOffset time offset in seconds
      * @param string $sDateFormat php date format
-     * @param object $objParser message parser (for signature)
-     * @return array member variables
+     * @param object|null $objParser message parser (for signature)
+     * @return array<string, mixed> member variables
      */
-    public function getDataArray(int $iTimeOffset, string $sDateFormat, object $objParser): array
+    public function getDataArray(int $iTimeOffset, string $sDateFormat, ?object $objParser): array
     {
         return array_merge(
             cUser::getDataArray($iTimeOffset, $sDateFormat, $objParser),

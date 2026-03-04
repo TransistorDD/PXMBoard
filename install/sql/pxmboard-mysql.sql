@@ -33,7 +33,6 @@ CREATE TABLE `pxm_configuration` (
   `c_onlinetime` smallint(5) unsigned NOT NULL default '0',
   `c_closethreads` smallint(5) unsigned NOT NULL default '0',
   `c_usrperpage` mediumint(8) unsigned NOT NULL default '0',
-  `c_msgperpage` mediumint(8) unsigned NOT NULL default '0',
   `c_msgheaderperpage` mediumint(8) unsigned NOT NULL default '0',
   `c_privatemsgperpage` mediumint(8) unsigned NOT NULL default '0',
   `c_thrdperpage` mediumint(8) unsigned NOT NULL default '0',
@@ -49,7 +48,7 @@ CREATE TABLE `pxm_configuration` (
   PRIMARY KEY  (`c_id`)
 ) ENGINE=InnoDB;
 
-INSERT INTO `pxm_configuration` (`c_id`, `c_quickpost`, `c_directregistration`, `c_uniquemail`, `c_dateformat`, `c_timeoffset`, `c_onlinetime`, `c_closethreads`, `c_usrperpage`, `c_msgperpage`, `c_msgheaderperpage`, `c_privatemsgperpage`, `c_thrdperpage`, `c_mailwebmaster`, `c_maxprofilepicsize`, `c_maxprofilepicwidth`, `c_maxprofilepicheight`, `c_profileimgdir`, `c_usesignatures`, `c_skinid`, `c_quotesubject`, `c_skindir`) VALUES (1, 1, 1, 1, 'j.m.Y H:i', 0, 300, 0, 10, 10, 50, 10, 20, '', 50000, 200, 250, 'images/profile/', 1, 1, 'Re:', 'skins/');
+INSERT INTO `pxm_configuration` (`c_id`, `c_quickpost`, `c_directregistration`, `c_uniquemail`, `c_dateformat`, `c_timeoffset`, `c_onlinetime`, `c_closethreads`, `c_usrperpage`, `c_msgheaderperpage`, `c_privatemsgperpage`, `c_thrdperpage`, `c_mailwebmaster`, `c_maxprofilepicsize`, `c_maxprofilepicwidth`, `c_maxprofilepicheight`, `c_profileimgdir`, `c_usesignatures`, `c_skinid`, `c_quotesubject`, `c_skindir`) VALUES (1, 1, 1, 1, 'j.m.Y H:i', 0, 300, 0, 10, 50, 10, 20, '', 50000, 200, 250, 'images/profile/', 1, 1, 'Re:', 'skins/');
 # --------------------------------------------------------
 
 CREATE TABLE `pxm_forbiddenmail` (

@@ -32,14 +32,13 @@ class cPrivateOutboxList extends cPrivateMessageList
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         $this->m_arrResultList[] = ['id'		=> $objResultRow->p_id,
-                                         'subject'	=> $objResultRow->p_subject,
-                                         'date'		=> date($this->m_sDateFormat, ($objResultRow->p_tstmp + $this->m_iTimeOffset)),
-                                         'read'		=> ($objResultRow->p_fromstate == PrivateMessageStatus::READ->value ? '1' : '0'),
-                                         'user'		=> ['id'		=> $objResultRow->u_id,
-                                                            'username'	=> $objResultRow->u_username,
-                                                            'highlight'	=> $objResultRow->u_highlight]];
+                                    'subject'	=> $objResultRow->p_subject,
+                                    'date'		=> date($this->m_sDateFormat, ($objResultRow->p_tstmp + $this->m_iTimeOffset)),
+                                    'read'		=> ($objResultRow->p_fromstate == PrivateMessageStatus::READ->value ? '1' : '0'),
+                                    'user'		=> ['id'		=> $objResultRow->u_id,
+                                                    'username'	=> $objResultRow->u_username,
+                                                    'highlight'	=> $objResultRow->u_highlight]];
         return true;
     }
 
@@ -50,8 +49,6 @@ class cPrivateOutboxList extends cPrivateMessageList
      */
     public function deleteData(): bool
     {
-
-
         // set the message to deleted if we are the author
         cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_fromstate='.PrivateMessageStatus::DELETED->value." WHERE p_fromuserid=$this->m_iUserId");
 

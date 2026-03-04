@@ -6,6 +6,7 @@ require_once(SRCDIR . '/Model/cBadwordList.php');
 require_once(SRCDIR . '/Model/cUserConfig.php');
 require_once(SRCDIR . '/Model/cNotification.php');
 require_once(SRCDIR . '/Enum/eNotification.php');
+require_once(SRCDIR . '/Enum/eSuccessMessage.php');
 /**
  * saves a private message
  *
@@ -49,11 +50,11 @@ class cActionPrivatemessagesave extends cPublicAction
                 if (empty($sSubject)) {
                     $this->m_objTemplate = $this->_getTemplateObject('privatemessageform');
                     $this->m_objTemplate->addData($this->getContextDataArray(['type' => 'outbox']));
-                    $this->m_objTemplate->addData(['error' => ['text' => eError::SUBJECT_MISSING->value]]);
-                    $this->m_objTemplate->addData(['touser'	=> ['id'		=> $objDestinationUser->getId(),
-                                                                                    'username'	=> $objDestinationUser->getUserName()]]);
-                    $this->m_objTemplate->addData(['msg'		=> ['subject'	=> $sSubject,
-                                                                                    '_body'		=> htmlspecialchars($sBody)]]);
+                    $this->m_objTemplate->addData(['error' => ['text'   => eError::SUBJECT_MISSING->value]]);
+                    $this->m_objTemplate->addData(['touser'	=> ['id'        => $objDestinationUser->getId(),
+                                                                'username'	=> $objDestinationUser->getUserName()]]);
+                    $this->m_objTemplate->addData(['msg'	=> ['subject'	=> $sSubject,
+                                                                '_body'		=> htmlspecialchars($sBody)]]);
                 } else {
                     // replace badwords
                     $objBadwordList = new cBadwordList();
@@ -69,8 +70,8 @@ class cActionPrivatemessagesave extends cPublicAction
                     $objPrivateMessage->setMessageTimestamp($this->m_objConfig->getAccessTimestamp());
                     $objPrivateMessage->setIp($this->m_objServerHandler->getRemoteAddr());
 
-                    $iErrorId = $objPrivateMessage->insertData();
-                    if ($iErrorId == 0) {
+                    $eError = $objPrivateMessage->insertData();
+                    if ($eError === null) {
 
                         // Create in-app notification
                         $sNotificationTitle = 'Neue private Nachricht';
@@ -103,17 +104,16 @@ class cActionPrivatemessagesave extends cPublicAction
                                 'From: '.$this->m_objConfig->getMailWebmaster()."\nReply-To: ".$this->m_objConfig->getMailWebmaster()
                             );
                         }
-                        // Use consolidated confirm template (Story 18)
                         $this->m_objTemplate = $this->_getTemplateObject('confirm');
                         $this->m_objTemplate->addData($this->getContextDataArray([
                             'show_pm_tabs' => true,
                             'type' => 'outbox'
                         ]));
                         $this->m_objTemplate->addData([
-                            'message' => 'Ihre private Nachricht wurde erfolgreich gesendet.'
+                            'message' => eSuccessMessage::PRIVATE_MESSAGE_SENT->value,
                         ]);
                     } else {
-                        $this->m_objTemplate = $this->_getErrorTemplateObject(eError::COULD_NOT_INSERT_DATA);
+                        $this->m_objTemplate = $this->_getErrorTemplateObject($eError);
                     }
                 }
             } else {

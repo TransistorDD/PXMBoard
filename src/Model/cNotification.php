@@ -13,36 +13,19 @@ require_once(SRCDIR . '/Model/cUser.php');
  */
 class cNotification
 {
-    protected int $m_iId;
-    protected int $m_iUserId;
-    protected string $m_sType;
-    protected NotificationStatus $m_eStatus;
-    protected string $m_sTitle;
-    protected string $m_sMessage;
-    protected string $m_sLink;
-    protected int $m_iRelatedMessageId;
-    protected int $m_iRelatedPmId;
-    protected int $m_iCreatedTimestamp;
-    protected int $m_iReadTimestamp;
-    protected NotificationType $m_eType;
-    protected string $m_sStatus;
-
-    public function __construct()
-    {
-        $this->m_iId = 0;
-        $this->m_iUserId = 0;
-        $this->m_sType = '';
-        $this->m_eStatus = NotificationStatus::UNREAD;
-        $this->m_sTitle = '';
-        $this->m_sMessage = '';
-        $this->m_sLink = '';
-        $this->m_iRelatedMessageId = 0;
-        $this->m_iRelatedPmId = 0;
-        $this->m_iCreatedTimestamp = 0;
-        $this->m_iReadTimestamp = 0;
-        $this->m_eType = NotificationType::REPLY;
-        $this->m_sStatus = NotificationStatus::UNREAD->value;
-    }
+    protected int $m_iId = 0;
+    protected int $m_iUserId = 0;
+    protected string $m_sType = '';
+    protected NotificationStatus $m_eStatus = NotificationStatus::UNREAD;
+    protected string $m_sTitle = '';
+    protected string $m_sMessage = '';
+    protected string $m_sLink = '';
+    protected int $m_iRelatedMessageId = 0;
+    protected int $m_iRelatedPmId = 0;
+    protected int $m_iCreatedTimestamp = 0;
+    protected int $m_iReadTimestamp = 0;
+    protected NotificationType $m_eType = NotificationType::REPLY;
+    protected string $m_sStatus = NotificationStatus::UNREAD->value;
 
     /**
      * Create a new notification
@@ -66,7 +49,6 @@ class cNotification
         int $iRelatedPmId = 0
     ): bool {
         $objDb = cDBFactory::getInstance();
-        $iUserId = intval($iUserId);
         $iTimestamp = time();
 
         if (($iUserId <= 0) || empty($sTitle)) {
@@ -109,7 +91,6 @@ class cNotification
     public function loadDataById(int $iId): bool
     {
         $objDb = cDBFactory::getInstance();
-        $iId = intval($iId);
 
         if ($iId <= 0) {
             return false;

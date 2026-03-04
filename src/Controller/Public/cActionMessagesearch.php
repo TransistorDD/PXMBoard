@@ -124,9 +124,11 @@ class cActionMessagesearch extends cPublicAction
     /**
      * init the search form
      *
+     * @param $iIdBoard board id
+     * @param $objSearchProfileList recent searchprofiles
      * @return void
      */
-    private function _initSearchForm($iIdBoard, $objSearchProfileList): void
+    private function _initSearchForm(int $iIdBoard, cSearchProfileList $objSearchProfileList): void
     {
 
         // load recent searchprofiles
@@ -135,7 +137,9 @@ class cActionMessagesearch extends cPublicAction
         $this->m_objTemplate = $this->_getTemplateObject('messagesearch');
         $this->m_objTemplate->addData($this->getContextDataArray());
 
-        $this->m_objTemplate->addData(['searchprofiles' => ['searchprofile' => $objSearchProfileList->getDataArray($this->m_objConfig->getTimeOffset() * 3600,
-            $this->m_objConfig->getDateFormat())]]);
+        $this->m_objTemplate->addData(['searchprofiles' => ['searchprofile' => $objSearchProfileList->getDataArray(
+            $this->m_objConfig->getTimeOffset() * 3600,
+            $this->m_objConfig->getDateFormat()
+        )]]);
     }
 }

@@ -12,23 +12,12 @@ require_once(SRCDIR . '/Model/cTemplate.php');
 class cTemplateList
 {
     /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * get all templates
      *
-     * @return array templates
+     * @return array<cTemplate> templates
      */
     public function getList(): array
     {
-
-
         $arrTemplates = [];
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT te_id,te_message,te_name,te_description FROM pxm_template ORDER BY te_id ASC')) {
