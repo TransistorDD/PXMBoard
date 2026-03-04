@@ -12,7 +12,7 @@
  * - Mobile page switching, swipe gesture, card click
  */
 
-(function() {
+(function () {
   'use strict';
 
   // ====================================================================
@@ -23,7 +23,7 @@
     return document.querySelector('meta[name="csrf-token"]')?.content ?? '';
   }
 
-  document.addEventListener('htmx:configRequest', function(e) {
+  document.addEventListener('htmx:configRequest', function (e) {
     e.detail.headers['X-CSRF-Token'] = getCsrfToken();
   });
 
@@ -47,7 +47,7 @@
    * Set and persist theme choice
    * @param {string} theme - 'light', 'dark', or 'auto'
    */
-  window.setTheme = function(theme) {
+  window.setTheme = function (theme) {
     if (theme === 'auto') {
       localStorage.removeItem('pxmboard-skin-theme');
     } else {
@@ -59,7 +59,7 @@
 
   function updateThemeCheckmarks(theme) {
     var options = document.querySelectorAll('[data-theme-option]');
-    options.forEach(function(btn) {
+    options.forEach(function (btn) {
       var checkmark = btn.querySelector('[data-checkmark]');
       if (checkmark) {
         checkmark.textContent = (btn.getAttribute('data-theme-option') === theme) ? '\u2713 ' : '';
@@ -72,7 +72,7 @@
   applyTheme(savedTheme);
 
   // Listen for system color scheme changes when on 'auto'
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
     if (localStorage.getItem('pxmboard-skin-theme') === 'auto') {
       applyTheme('auto');
     }
@@ -87,7 +87,7 @@
    * On 'auto': removes inline grid styles (CSS defaults apply), saved splits are preserved.
    * @param {string} layout - 'sidebyside', 'stacked', or 'auto'
    */
-  window.setLayout = function(layout) {
+  window.setLayout = function (layout) {
     if (layout === 'auto') {
       localStorage.removeItem('pxmboard-skin-layout');
     } else {
@@ -117,7 +117,7 @@
 
   function updateLayoutCheckmarks(layout) {
     var options = document.querySelectorAll('[data-layout-option]');
-    options.forEach(function(btn) {
+    options.forEach(function (btn) {
       var checkmark = btn.querySelector('[data-checkmark]');
       if (checkmark) {
         checkmark.textContent = (btn.getAttribute('data-layout-option') === layout) ? '\u2713 ' : '';
@@ -187,7 +187,7 @@
    * Set and persist view mode choice.
    * @param {string} view - 'mobile', 'desktop', or 'auto'
    */
-  window.setView = function(view) {
+  window.setView = function (view) {
     if (view === 'auto') {
       localStorage.removeItem(VIEW_KEY);
     } else {
@@ -198,7 +198,7 @@
   };
 
   function updateViewCheckmarks(view) {
-    document.querySelectorAll('[data-view-option]').forEach(function(btn) {
+    document.querySelectorAll('[data-view-option]').forEach(function (btn) {
       var checkmark = btn.querySelector('[data-checkmark]');
       if (checkmark) {
         checkmark.textContent = (btn.getAttribute('data-view-option') === view) ? '\u2713 ' : '';
@@ -211,9 +211,9 @@
   applyView(savedView);
 
   var SPLIT_KEY_SIDEBYSIDE = 'pxmboard-split-sidebyside';
-  var SPLIT_KEY_STACKED    = 'pxmboard-split-stacked';
-  var SPLIT_KEY_MOBILE     = 'pxmboard-split-mobile';
-  var SPLIT_MIN_PCT        = 10;
+  var SPLIT_KEY_STACKED = 'pxmboard-split-stacked';
+  var SPLIT_KEY_MOBILE = 'pxmboard-split-mobile';
+  var SPLIT_MIN_PCT = 10;
 
   function loadSplitSideBySide() {
     try {
@@ -221,11 +221,11 @@
       if (v) {
         var o = JSON.parse(v);
         if (o && o.left >= SPLIT_MIN_PCT && o.left <= 100 - SPLIT_MIN_PCT &&
-                 o.top >= SPLIT_MIN_PCT && o.top <= 100 - SPLIT_MIN_PCT) {
+          o.top >= SPLIT_MIN_PCT && o.top <= 100 - SPLIT_MIN_PCT) {
           return o;
         }
       }
-    } catch(e) {}
+    } catch (e) { }
     return null;
   }
 
@@ -235,12 +235,12 @@
       if (v) {
         var o = JSON.parse(v);
         if (o && !Array.isArray(o) &&
-            o.top >= SPLIT_MIN_PCT && o.mid >= SPLIT_MIN_PCT &&
-            o.top + o.mid <= 100 - SPLIT_MIN_PCT) {
+          o.top >= SPLIT_MIN_PCT && o.mid >= SPLIT_MIN_PCT &&
+          o.top + o.mid <= 100 - SPLIT_MIN_PCT) {
           return { h1: o.top, h2: o.mid };
         }
       }
-    } catch(e) {}
+    } catch (e) { }
     return null;
   }
 
@@ -253,7 +253,7 @@
           return pct;
         }
       }
-    } catch(e) {}
+    } catch (e) { }
     return null;
   }
 
@@ -310,7 +310,7 @@
       var sbs = loadSplitSideBySide();
       if (sbs) {
         el.style.gridTemplateColumns = sbs.left + 'fr 6px ' + (100 - sbs.left) + 'fr';
-        el.style.gridTemplateRows    = sbs.top + 'fr 6px ' + (100 - sbs.top) + 'fr';
+        el.style.gridTemplateRows = sbs.top + 'fr 6px ' + (100 - sbs.top) + 'fr';
       }
     } else {
       var st = loadSplitStacked();
@@ -345,10 +345,10 @@
    */
   function updateSplitCheckmarks() {
     var hasCustom = localStorage.getItem(SPLIT_KEY_SIDEBYSIDE) !== null ||
-                    localStorage.getItem(SPLIT_KEY_STACKED) !== null ||
-                    localStorage.getItem(SPLIT_KEY_MOBILE) !== null;
+      localStorage.getItem(SPLIT_KEY_STACKED) !== null ||
+      localStorage.getItem(SPLIT_KEY_MOBILE) !== null;
     var active = hasCustom ? 'custom' : 'auto';
-    document.querySelectorAll('[data-split-option]').forEach(function(btn) {
+    document.querySelectorAll('[data-split-option]').forEach(function (btn) {
       var checkmark = btn.querySelector('[data-checkmark]');
       if (checkmark) {
         checkmark.textContent = (btn.getAttribute('data-split-option') === active) ? '\u2713 ' : '';
@@ -360,7 +360,7 @@
    * Reset split layout to defaults (clears saved values).
    * @param {string} mode - currently only 'auto' is supported
    */
-  window.setSplitLayout = function(mode) {
+  window.setSplitLayout = function (mode) {
     if (mode === 'auto') {
       clearSplits();
       updateSplitCheckmarks();
@@ -374,9 +374,9 @@
   var _drag = null;
 
   function initDividerDrag() {
-    document.querySelectorAll('.htmx-divider').forEach(function(div) {
-      div.addEventListener('mousedown', function(e) { startDrag(e, div); });
-      div.addEventListener('touchstart', function(e) { startDrag(e, div); }, { passive: false });
+    document.querySelectorAll('.htmx-divider').forEach(function (div) {
+      div.addEventListener('mousedown', function (e) { startDrag(e, div); });
+      div.addEventListener('touchstart', function (e) { startDrag(e, div); }, { passive: false });
     });
   }
 
@@ -503,7 +503,7 @@
     }
 
     _drag = null;
-    document.querySelectorAll('.htmx-divider.htmx-dragging').forEach(function(d) {
+    document.querySelectorAll('.htmx-divider.htmx-dragging').forEach(function (d) {
       d.classList.remove('htmx-dragging');
     });
     document.body.style.cursor = '';
@@ -526,7 +526,7 @@
    * @param {string} type - 'pm' or 'notification'
    * @param {number} count - new count
    */
-  window.updateBadge = function(type, count) {
+  window.updateBadge = function (type, count) {
     var badge = document.getElementById(type + '-badge');
     if (count > 0) {
       if (badge) {
@@ -548,13 +548,13 @@
    * Handle notification click: mark as read, then either swap modal content
    * (for private messages) or navigate via full page load (for board links).
    */
-  window.handleNotificationClick = function(evt, nid) {
+  window.handleNotificationClick = function (evt, nid) {
     evt.preventDefault();
     var url = evt.currentTarget.href;
     if (url.indexOf('mode=privatemessage') !== -1) {
       // PM: wait for mark-read, then swap modal content in place
       fetch('pxmboard.php?mode=ajaxnotificationmarkread&nid=' + nid, { credentials: 'same-origin', headers: { 'X-CSRF-Token': getCsrfToken() } })
-        .finally(function() {
+        .finally(function () {
           document.getElementById('htmxModalTitle').textContent = 'Private Nachrichten';
           htmx.ajax('GET', url, { target: '#htmxModalBody', swap: 'innerHTML' });
         });
@@ -568,43 +568,47 @@
   /**
    * Toggle email notification on reply for a message
    */
-  window.toggleNotifyOnReply = function(link, msgId, brdId) {
+  window.toggleNotifyOnReply = function (btn, msgId, brdId) {
+    var svgOn = '<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg>';
+    var svgOff = '<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/><line x1="2" y1="2" x2="22" y2="22"/></svg>';
     fetch('pxmboard.php?mode=ajaxMessagenotifyonreply&brdid=' + brdId, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': getCsrfToken() },
       body: 'msgid=' + msgId
     })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (data.success) {
-        link.textContent = 'Mailbenachrichtigung ' + (data.active ? 'deaktivieren' : 'aktivieren');
-      }
-    })
-    .catch(function(e) {
-      console.error('toggleNotifyOnReply error:', e);
-    });
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) {
+          btn.innerHTML = data.active ? svgOn : svgOff;
+          btn.title = data.active ? 'Mailbenachrichtigung deaktivieren' : 'Mailbenachrichtigung aktivieren';
+          btn.dataset.active = data.active ? '1' : '0';
+        }
+      })
+      .catch(function (e) {
+        console.error('toggleNotifyOnReply error:', e);
+      });
   };
 
   /**
    * Toggle message watch notification
    */
-  window.toggleMessageNotification = function(msgId, brdId, btn) {
+  window.toggleMessageNotification = function (msgId, brdId, btn) {
     fetch('pxmboard.php?mode=ajaxMessagenotificationtoggle&msgid=' + msgId + '&brdid=' + brdId, {
       credentials: 'same-origin',
       headers: { 'X-CSRF-Token': getCsrfToken() }
     })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (data.success) {
-        var svgOn = '<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
-        var svgOff = '<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.7 3A6 6 0 0 1 18 8c0 2.9.86 5.4 1.64 7"/><path d="M6 6a6 6 0 0 0-.7 2c0 7-3 9-3 9h14"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><line x1="2" y1="2" x2="22" y2="22"/></svg>';
-        btn.innerHTML = data.active ? svgOn : svgOff;
-        btn.title = data.active ? 'Benachrichtigungen deaktivieren' : 'Benachrichtigungen aktivieren';
-      }
-    })
-    .catch(function(e) {
-      console.error('toggleMessageNotification error:', e);
-    });
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) {
+          var svgOn = '<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
+          var svgOff = '<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.7 3A6 6 0 0 1 18 8c0 2.9.86 5.4 1.64 7"/><path d="M6 6a6 6 0 0 0-.7 2c0 7-3 9-3 9h14"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><line x1="2" y1="2" x2="22" y2="22"/></svg>';
+          btn.innerHTML = data.active ? svgOn : svgOff;
+          btn.title = data.active ? 'Benachrichtigungen deaktivieren' : 'Benachrichtigungen aktivieren';
+        }
+      })
+      .catch(function (e) {
+        console.error('toggleMessageNotification error:', e);
+      });
   };
 
   // ====================================================================
@@ -623,8 +627,8 @@
    */
   function _adminAjax(url, brdid, clearPanels, reloadThreadId) {
     fetch(url, { credentials: 'same-origin', headers: { 'X-CSRF-Token': getCsrfToken() } })
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
         if (data.success) {
           htmx.ajax('GET',
             'pxmboard.php?mode=threadlist&brdid=' + brdid,
@@ -645,25 +649,61 @@
           alert('Fehler: ' + (data.error || 'Unbekannter Fehler'));
         }
       })
-      .catch(function(e) {
+      .catch(function (e) {
         alert('Verbindungsfehler: ' + e.message);
       });
   }
 
   /**
+   * Show the styled confirm dialog and call onConfirm if accepted.
+   * Falls back to native confirm() when the dialog element is unavailable.
+   * @param {string}   question  - Question text to display
+   * @param {Function} onConfirm - Called when the user confirms
+   */
+  function _pxmConfirm(question, onConfirm) {
+    var dialog = document.getElementById('htmxConfirmDialog');
+    var questionEl = document.getElementById('htmxConfirmQuestion');
+    if (!dialog || !questionEl) {
+      if (window.confirm(question)) onConfirm();
+      return;
+    }
+    questionEl.textContent = question;
+    dialog.showModal();
+
+    var okBtn = document.getElementById('htmxConfirmOk');
+    var cancelBtn = document.getElementById('htmxConfirmCancel');
+
+    function onOk() {
+      dialog.close();
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      onConfirm();
+    }
+    function onCancel() {
+      dialog.close();
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+    }
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+  }
+
+  /**
    * Execute admin action on a thread/message.
    * Called from onchange on admin dropdowns in thread.tpl and message.tpl.
-   * @param {string} action   - action key
-   * @param {number} brdid    - board id
-   * @param {number} id       - message/thread id
-   * @param {number} threadid - thread id (optional, only passed from message.tpl)
+   * @param {string}      action    - action key
+   * @param {number}      brdid     - board id
+   * @param {number}      id        - message/thread id
+   * @param {number}      threadid  - thread id (optional, only passed from message.tpl)
+   * @param {HTMLElement} selectEl  - the <select> element that triggered the change
    */
-  window.adminaction = function(action, brdid, id, threadid) {
+  window.adminaction = function (action, brdid, id, threadid, selectEl) {
     if (!action) return;
 
     // Reset dropdown to placeholder after selection
-    if (event && event.target) {
-      event.target.selectedIndex = 0;
+    if (selectEl) {
+      selectEl.selectedIndex = 0;
     }
 
     switch (action) {
@@ -683,84 +723,87 @@
 
       case 'movethread':
         fetch('pxmboard.php?mode=ajaxThreadmove&brdid=' + brdid + '&id=' + id, { credentials: 'same-origin', headers: { 'X-CSRF-Token': getCsrfToken() } })
-          .then(function(r) { return r.json(); })
-          .then(function(data) {
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
             if (!data.boards) {
-              alert('Fehler: ' + (data.error || 'Unbekannter Fehler'));
+              _pxmConfirm('Fehler: ' + (data.error || 'Unbekannter Fehler'), function () { });
               return;
             }
             var dlg = document.createElement('dialog');
-            dlg.className = 'pxm-dialog';
-            var options = data.boards.map(function(b) {
+            dlg.className = 'rounded-lg shadow-2xl p-0 max-w-sm backdrop:bg-black/50 fixed inset-0 m-auto h-fit bg-surface-primary text-content-primary';
+            var options = data.boards.map(function (b) {
               return '<option value="' + b.id + '">' + b.name + '</option>';
             }).join('');
-            dlg.innerHTML = '<div class="pxm-dialog__header">Move thread</div>'
-              + '<div class="pxm-dialog__body">'
-              + '<label for="dlg-destboard">Move to board:</label>'
-              + '<select id="dlg-destboard">' + options + '</select>'
+            dlg.innerHTML = '<div class="p-4">'
+              + '<p class="mb-2 font-medium text-content-primary">Thread verschieben nach:</p>'
+              + '<select id="dlg-destboard" class="w-full mb-4 text-sm rounded px-2 py-1 bg-surface-secondary text-content-primary border border-border-default">' + options + '</select>'
+              + '<div class="flex justify-end gap-2">'
+              + '<button type="button" class="htmx-btn-primary text-sm px-4 py-1" id="dlg-confirm">Verschieben</button>'
+              + '<button type="button" class="htmx-btn text-sm px-4 py-1" id="dlg-cancel">Abbrechen</button>'
               + '</div>'
-              + '<div class="pxm-dialog__footer">'
-              + '<button type="button" class="pxm-btn pxm-btn--primary" id="dlg-confirm">Move</button>'
-              + '<button type="button" class="pxm-btn" id="dlg-cancel">Cancel</button>'
               + '</div>';
             document.body.appendChild(dlg);
             dlg.showModal();
-            dlg.querySelector('#dlg-cancel').addEventListener('click', function() {
+            dlg.querySelector('#dlg-cancel').addEventListener('click', function () {
               dlg.close();
               dlg.remove();
             });
-            dlg.querySelector('#dlg-confirm').addEventListener('click', function() {
+            dlg.querySelector('#dlg-confirm').addEventListener('click', function () {
               var destId = dlg.querySelector('#dlg-destboard').value;
               dlg.close();
               dlg.remove();
               _adminAjax(
-                'pxmboard.php?mode=ajaxThreadmove&brdid=' + brdid + '&id=' + id + '&destid=' + destId,
+                'pxmboard.php?mode=ajaxMessagetreemove&brdid=' + brdid + '&id=' + id + '&destid=' + destId,
                 brdid, true
               );
             });
           })
-          .catch(function(e) {
-            alert('Verbindungsfehler: ' + e.message);
+          .catch(function (e) {
+            _pxmConfirm('Verbindungsfehler: ' + e.message, function () { });
           });
         break;
 
       case 'deletethread':
-        if (!confirm('Thread wirklich löschen?')) return;
-        _adminAjax(
-          'pxmboard.php?mode=ajaxMessagetreedelete&brdid=' + brdid + '&msgid=' + id + '&thrdid=' + (threadid || id),
-          brdid, true
-        );
+        _pxmConfirm('Thread wirklich löschen?', function () {
+          _adminAjax(
+            'pxmboard.php?mode=ajaxMessagetreedelete&brdid=' + brdid + '&msgid=' + id + '&thrdid=' + (threadid || id),
+            brdid, true
+          );
+        });
         break;
 
       case 'deletemessage':
-        if (!confirm('Nachricht wirklich löschen?')) return;
-        _adminAjax(
-          'pxmboard.php?mode=ajaxMessagedelete&brdid=' + brdid + '&msgid=' + id,
-          brdid, true
-        );
+        _pxmConfirm('Nachricht wirklich löschen?', function () {
+          _adminAjax(
+            'pxmboard.php?mode=ajaxMessagedelete&brdid=' + brdid + '&msgid=' + id,
+            brdid, true
+          );
+        });
         break;
 
       case 'deletesubthread':
-        if (!confirm('Subthread wirklich löschen?')) return;
-        _adminAjax(
-          'pxmboard.php?mode=ajaxMessagetreedelete&brdid=' + brdid + '&msgid=' + id + '&thrdid=' + (threadid || id),
-          brdid, true
-        );
+        _pxmConfirm('Subthread wirklich löschen?', function () {
+          _adminAjax(
+            'pxmboard.php?mode=ajaxMessagetreedelete&brdid=' + brdid + '&msgid=' + id + '&thrdid=' + (threadid || id),
+            brdid, true
+          );
+        });
         break;
 
       case 'extractsubthread':
-        if (!confirm('Subthread wirklich ausgliedern?')) return;
-        _adminAjax(
-          'pxmboard.php?mode=ajaxSubthreadextract&brdid=' + brdid + '&msgid=' + id,
-          brdid, true
-        );
+        _pxmConfirm('Subthread wirklich ausgliedern?', function () {
+          _adminAjax(
+            'pxmboard.php?mode=ajaxMessagetreeextract&brdid=' + brdid + '&msgid=' + id,
+            brdid, true
+          );
+        });
         break;
 
       case 'selectmove':
         if (typeof MessageMove !== 'undefined') {
           var subject = MessageMove._extractSubject();
-          var author  = MessageMove._extractAuthor();
-          var date    = MessageMove._extractDate();
+          var author = MessageMove._extractAuthor();
+          var date = MessageMove._extractDate();
           MessageMove.selectMessageForMove(id, subject, author, date, brdid);
         }
         break;
@@ -768,8 +811,8 @@
       case 'inserthere':
         if (typeof MessageMove !== 'undefined') {
           var tSubject = MessageMove._extractSubject();
-          var tAuthor  = MessageMove._extractAuthor();
-          var tDate    = MessageMove._extractDate();
+          var tAuthor = MessageMove._extractAuthor();
+          var tDate = MessageMove._extractDate();
           MessageMove.performMove(id, tSubject, tAuthor, tDate);
         }
         break;
@@ -782,7 +825,7 @@
   var _statusPopup = null;
   var _statusPopupBoardId = null;
 
-  window.openStatusPopup = function(btn, boardId) {
+  window.openStatusPopup = function (btn, boardId) {
     if (_statusPopupBoardId === boardId && _statusPopup && _statusPopup.style.display !== 'none') {
       closeStatusPopup();
       return;
@@ -792,7 +835,7 @@
     if (!_statusPopup) {
       _statusPopup = document.getElementById('boardStatusPopup');
     }
-    _statusPopup.querySelectorAll('button[data-boardid]').forEach(function(b) {
+    _statusPopup.querySelectorAll('button[data-boardid]').forEach(function (b) {
       b.setAttribute('data-boardid', boardId);
     });
     var rect = btn.getBoundingClientRect();
@@ -801,37 +844,37 @@
     _statusPopup.style.display = 'flex';
   };
 
-  window.closeStatusPopup = function() {
+  window.closeStatusPopup = function () {
     if (_statusPopup) { _statusPopup.style.display = 'none'; }
     _statusPopupBoardId = null;
   };
 
-  document.addEventListener('click', function(e) {
+  document.addEventListener('click', function (e) {
     if (_statusPopup && _statusPopup.style.display !== 'none' &&
-        !_statusPopup.contains(e.target) && !e.target.closest('.status-icon-btn')) {
+      !_statusPopup.contains(e.target) && !e.target.closest('.status-icon-btn')) {
       closeStatusPopup();
     }
   });
 
-  window.changeBoardStatus = function(boardId, newStatus) {
+  window.changeBoardStatus = function (boardId, newStatus) {
     closeStatusPopup();
     fetch('pxmboard.php?mode=ajaxboardchangestatus', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': getCsrfToken() },
       body: 'boardid=' + boardId + '&status=' + newStatus
     })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (data.success) {
-        location.reload();
-      } else {
-        alert('Fehler beim Aendern des Status: ' + (data.error || 'Unbekannter Fehler'));
-      }
-    })
-    .catch(function(e) {
-      console.error('Error:', e);
-      alert('Fehler beim Aendern des Status');
-    });
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert('Fehler beim Aendern des Status: ' + (data.error || 'Unbekannter Fehler'));
+        }
+      })
+      .catch(function (e) {
+        console.error('Error:', e);
+        alert('Fehler beim Aendern des Status');
+      });
   };
 
   // ====================================================================
@@ -848,7 +891,7 @@
    * Exposed globally so onclick handlers in templates can call it.
    * @param {number} msgId - the message id to highlight
    */
-  window.selectMessage = function(msgId) {
+  window.selectMessage = function (msgId) {
     currentMsgId = msgId;
     updateThreadHighlight();
   };
@@ -885,7 +928,7 @@
    * @param {number} msgid  - message id to display and highlight
    * @param {number} thrdid - thread id for the tree
    */
-  window.loadThreadAndMessage = function(brdid, msgid, thrdid) {
+  window.loadThreadAndMessage = function (brdid, msgid, thrdid) {
     currentMsgId = msgid;
     htmx.ajax('GET',
       'pxmboard.php?mode=message&brdid=' + brdid + '&msgid=' + msgid,
@@ -902,7 +945,7 @@
    * Load message (and thread only if not already loaded).
    * Used when navigating from search results.
    */
-  window.loadMessageSmart = function(brdid, msgid, thrdid) {
+  window.loadMessageSmart = function (brdid, msgid, thrdid) {
     var threadEl = document.querySelector('#thread-container > div[data-thrdid]');
     var loadedThrdId = threadEl ? threadEl.getAttribute('data-thrdid') : null;
     if (loadedThrdId && loadedThrdId == thrdid) {
@@ -934,7 +977,7 @@
    * @param {number} brdid  - board id
    * @param {number} thrdid - thread id
    */
-  window.loadThreadOnly = function(brdid, thrdid) {
+  window.loadThreadOnly = function (brdid, thrdid) {
     var row = document.getElementById('thread_' + thrdid);
     if (row) {
       var icon = row.querySelector('.thread-status-icon');
@@ -977,7 +1020,7 @@
    * On detail page: go back to threadlist.
    * On threadlist: go back to board list.
    */
-  window.mobileGoBack = function() {
+  window.mobileGoBack = function () {
     var el = document.getElementById('board-layout');
     if (el && el.classList.contains('mobile-show-detail')) {
       showMobileThreadlistPage();
@@ -991,7 +1034,7 @@
    * Loads the message form and switches to detail page.
    * @param {number} brdid - board id
    */
-  window.mobileNewPost = function(brdid) {
+  window.mobileNewPost = function (brdid) {
     htmx.ajax('GET',
       'pxmboard.php?mode=messageform&brdid=' + brdid,
       { target: '#message-container', swap: 'innerHTML' }
@@ -1012,7 +1055,7 @@
     var container = document.getElementById('threadlist-container');
     if (!container) return;
 
-    container.addEventListener('click', function(e) {
+    container.addEventListener('click', function (e) {
       if (!isMobileView()) return;
 
       // Find the clicked thread row
@@ -1052,7 +1095,7 @@
     var detailPage = document.getElementById('detail-page');
     if (!detailPage) return;
 
-    detailPage.addEventListener('touchstart', function(e) {
+    detailPage.addEventListener('touchstart', function (e) {
       if (!isMobileView()) return;
       var boardLayout = document.getElementById('board-layout');
       if (!boardLayout || !boardLayout.classList.contains('mobile-show-detail')) return;
@@ -1064,7 +1107,7 @@
       };
     }, { passive: true });
 
-    detailPage.addEventListener('touchmove', function(e) {
+    detailPage.addEventListener('touchmove', function (e) {
       if (!_swipe) return;
 
       var deltaX = e.touches[0].clientX - _swipe.startX;
@@ -1089,7 +1132,7 @@
       }
     }, { passive: true });
 
-    detailPage.addEventListener('touchend', function() {
+    detailPage.addEventListener('touchend', function () {
       if (!_swipe) return;
 
       var boardLayout = document.getElementById('board-layout');
@@ -1127,7 +1170,7 @@
   // BROWSER HISTORY (BACK/FORWARD)
   // ====================================================================
 
-  window.addEventListener('popstate', function() {
+  window.addEventListener('popstate', function () {
     var params = new URLSearchParams(window.location.search);
     var mode = params.get('mode');
     var brdid = params.get('brdid');
@@ -1160,7 +1203,7 @@
   // ====================================================================
 
   // Replace native window.confirm() for hx-confirm attributes with custom dialog
-  document.addEventListener('htmx:confirm', function(evt) {
+  document.addEventListener('htmx:confirm', function (evt) {
     if (!evt.detail.question) return;
     evt.preventDefault();
     var dialog = document.getElementById('htmxConfirmDialog');
@@ -1196,7 +1239,7 @@
   });
 
 
-  document.addEventListener('htmx:afterSwap', function(evt) {
+  document.addEventListener('htmx:afterSwap', function (evt) {
     // Re-apply theme/layout/view checkmarks after content swap
     var currentTheme = localStorage.getItem('pxmboard-skin-theme') || 'auto';
     updateThemeCheckmarks(currentTheme);
@@ -1211,7 +1254,7 @@
   });
 
   // Scroll to top of swapped target for main content changes
-  document.addEventListener('htmx:afterSwap', function(evt) {
+  document.addEventListener('htmx:afterSwap', function (evt) {
     var target = evt.detail.target;
     if (target && target.id === 'main-content') {
       target.scrollTop = 0;
@@ -1219,17 +1262,17 @@
   });
 
   // After thread tree loads: reset all status spinners, invalidate cached row ref, apply highlight
-  document.addEventListener('htmx:afterSwap', function(evt) {
+  document.addEventListener('htmx:afterSwap', function (evt) {
     if (evt.detail.target.id === 'thread-container') {
-      document.querySelectorAll('.thread-status-spinner').forEach(function(s) { s.hidden = true; });
-      document.querySelectorAll('.thread-status-icon').forEach(function(i) { i.hidden = false; });
+      document.querySelectorAll('.thread-status-spinner').forEach(function (s) { s.hidden = true; });
+      document.querySelectorAll('.thread-status-icon').forEach(function (i) { i.hidden = false; });
       _highlightedRow = null;
       updateThreadHighlight();
     }
   });
 
   // After message container loads: update thread highlight and move dropdown options
-  document.addEventListener('htmx:afterSwap', function(evt) {
+  document.addEventListener('htmx:afterSwap', function (evt) {
     if (evt.detail.target.id === 'message-container') {
       var elt = evt.detail.elt;
       if (elt && elt.dataset && elt.dataset.msgid) {
@@ -1249,7 +1292,7 @@
   });
 
   // Update header badge counts after each HTMX swap
-  document.addEventListener('htmx:afterSwap', function(event) {
+  document.addEventListener('htmx:afterSwap', function (event) {
     var d = event.detail.target.querySelector('#badge-data');
     if (!d) return;
     var pm = parseInt(d.dataset.pm) || 0;
@@ -1270,11 +1313,11 @@
   // DOM READY INITIALIZATION
   // ====================================================================
 
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     // Clear modal body when native dialog closes (ESC key, backdrop click, or close button)
     var htmxModal = document.getElementById('htmxModal');
     if (htmxModal) {
-      htmxModal.addEventListener('close', function() {
+      htmxModal.addEventListener('close', function () {
         var body = document.getElementById('htmxModalBody');
         if (body) body.innerHTML = '';
       });
@@ -1297,7 +1340,7 @@
     // CSS media queries can take effect (e.g. after Windows Restore button).
     // applyMobileSplit() is called additionally when entering mobile mode.
     var _lastMobile = isMobileView();
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
       var nowMobile = isMobileView();
       syncMobileClass();
       applyGridSplits();
@@ -1341,7 +1384,7 @@
   // Override MessageMove extractors to work with the htmx skin DOM structure.
   // These run after message-move.js has loaded (script order in layout_footer.tpl).
   if (typeof MessageMove !== 'undefined') {
-    MessageMove._extractSubject = function() {
+    MessageMove._extractSubject = function () {
       var mc = document.getElementById('message-container');
       if (!mc) return '';
       // Subject is the font-semibold span inside the Thema section (py-2 header)
@@ -1349,7 +1392,7 @@
       return el ? el.textContent.trim() : '';
     };
 
-    MessageMove._extractAuthor = function() {
+    MessageMove._extractAuthor = function () {
       var mc = document.getElementById('message-container');
       if (!mc) return '';
       // Registered user: anchor to userprofile inside the py-3 header
@@ -1360,7 +1403,7 @@
       return nameDiv ? nameDiv.textContent.trim() : '';
     };
 
-    MessageMove._extractDate = function() {
+    MessageMove._extractDate = function () {
       var mc = document.getElementById('message-container');
       if (!mc) return '';
       // Date is inside the text-xs.text-content-secondary div in the py-3 header
@@ -1373,9 +1416,9 @@
     };
 
     // Show the move badge bar directly (no iframe postMessage needed)
-    MessageMove.showMoveBadge = function(messageId, subject, author, date) {
+    MessageMove.showMoveBadge = function (messageId, subject, author, date) {
       var badge = document.getElementById('move-badge');
-      var msg   = document.getElementById('move-badge-message');
+      var msg = document.getElementById('move-badge-message');
       if (badge && msg) {
         msg.textContent = MessageMove._buildBadgeText(messageId, subject, author, date);
         badge.classList.remove('hidden');
@@ -1383,7 +1426,7 @@
     };
 
     // Hide the move badge bar
-    MessageMove.hideMoveBadge = function() {
+    MessageMove.hideMoveBadge = function () {
       var badge = document.getElementById('move-badge');
       if (badge) {
         badge.classList.add('hidden');
@@ -1393,7 +1436,7 @@
     // Wire up "Auswahl aufheben" cancel button
     var cancelBtn = document.getElementById('btn-cancel-move');
     if (cancelBtn) {
-      cancelBtn.addEventListener('click', function() {
+      cancelBtn.addEventListener('click', function () {
         MessageMove.clearMoveSelection();
       });
     }

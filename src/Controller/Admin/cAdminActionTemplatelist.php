@@ -1,4 +1,5 @@
 <?php
+
 require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
 require_once(SRCDIR . '/Model/cTemplateList.php');
 /**
@@ -9,29 +10,39 @@ require_once(SRCDIR . '/Model/cTemplateList.php');
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-class cAdminActionTemplatelist extends cAdminAction{
+class cAdminActionTemplatelist extends cAdminAction
+{
+    /**
+     * Validate permissions - requires admin rights.
+     *
+     * @return bool true if user is admin, false otherwise
+     */
+    public function validateBasePermissionsAndConditions(): bool
+    {
+        return $this->_requireAdminPermission();
+    }
 
-	/**
-	 * perform the action
-	 *
-	 * @return void
-	 */
-	public function performAction(): void{
+    /**
+     * perform the action
+     *
+     * @return void
+     */
+    public function performAction(): void
+    {
 
-		$this->m_sOutput .= $this->_getHead();
+        $this->m_sOutput .= $this->_getHead();
 
-		$this->m_sOutput .= "<h4>template configuration</h4>\n";
-		$this->m_sOutput .= "<table class=\"pxm-table\">\n";
-		$this->m_sOutput .= "<thead><tr><th>templates</th></tr></thead><tbody>\n";
+        $this->m_sOutput .= "<h4>template configuration</h4>\n";
+        $this->m_sOutput .= "<table class=\"pxm-table\">\n";
+        $this->m_sOutput .= "<thead><tr><th>templates</th></tr></thead><tbody>\n";
 
-		$objTemplateList = new cTemplateList();
+        $objTemplateList = new cTemplateList();
 
-		foreach($objTemplateList->getList() as $objTemplate){
-			$this->m_sOutput .= "<tr><td><a href=\"pxmboard.php?mode=admtemplateform&id=".$objTemplate->getId()."\">".htmlspecialchars($objTemplate->getName())."</a></td></tr>\n";
-		}
-		$this->m_sOutput .= "</tbody></table>";
+        foreach ($objTemplateList->getList() as $objTemplate) {
+            $this->m_sOutput .= '<tr><td><a href="pxmboard.php?mode=admtemplateform&id='.$objTemplate->getId().'">'.htmlspecialchars($objTemplate->getName())."</a></td></tr>\n";
+        }
+        $this->m_sOutput .= '</tbody></table>';
 
-		$this->m_sOutput .= $this->_getFooter();
-	}
+        $this->m_sOutput .= $this->_getFooter();
+    }
 }
-?>

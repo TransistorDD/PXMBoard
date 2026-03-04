@@ -109,7 +109,7 @@ $iBoardId = $objInputHandler->getIntFormVar('brdid', true, true, true);
 // switch board modes
 $sBoardMode = $objInputHandler->getStringFormVar('mode', 'boardmode', true, true, 'trim');
 
-$sPath = '';
+$sPath = 'Public/';
 $arrBoardMode = [];
 if (preg_match('/^(adm|ajax)?([a-zA-Z]+)$/', $sBoardMode, $arrBoardMode)) {
     if ($arrBoardMode[1] === 'adm') {
@@ -120,22 +120,22 @@ if (preg_match('/^(adm|ajax)?([a-zA-Z]+)$/', $sBoardMode, $arrBoardMode)) {
         $sPath = 'Ajax/';
     } else {
         $sClassName = 'cAction';
+        $sPath = 'Public/';
     }
     $sClassName .= ucfirst(strtolower($arrBoardMode[2]));
 } else {
     $sClassName = 'cActionLogin';							// default mode
+    $sPath = 'Public/';
 }
 
 // For non-HTMX direct browser requests to partial actions: substitute with the fullpage Board action.
 // HTMX automatically sets the HX-Request header on all partial loads; its absence means full-page browser access.
 // Admin and Ajax actions are excluded from substitution via $sPath check.
-if ($sPath === '' && !$objServerHandler->isHtmxRequest()) {
+if ($sPath === 'Public/' && !$objServerHandler->isHtmxRequest()) {
     $arrPartialRoutes = [
         'message'         => 'Board',
         'thread'          => 'Board',
-        'threadlist'      => 'Board',
-        'messageform'     => 'Board',
-        'messageeditform' => 'Board',
+        'threadlist'      => 'Board'
     ];
     $sResolvedMode = strtolower($arrBoardMode[2] ?? '');
     if (isset($arrPartialRoutes[$sResolvedMode])) {
@@ -146,11 +146,11 @@ if ($sPath === '' && !$objServerHandler->isHtmxRequest()) {
 // include action class and instantiate object
 try {
     if (file_exists(SRCDIR . '/Controller/'.$sPath.$sClassName.'.php')) {
-        include_once(SRCDIR . '/Controller/'.$sPath.$sClassName.'.php');
+        require_once(SRCDIR . '/Controller/'.$sPath.$sClassName.'.php');
         $objAction = new $sClassName($objConfig, $iUserId, $iBoardId);
         $objAction->setCsrfToken($sCsrfToken);
     } else {														// invalid action -> show error
-        include_once(SRCDIR . '/Controller/cActionError.php');
+        require_once(SRCDIR . '/Controller/Public/cActionError.php');
         $objAction = new cActionError($objConfig, $iUserId, $iBoardId);
     }
 } catch (SkinInitializationException $e) {

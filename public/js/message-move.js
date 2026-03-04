@@ -23,7 +23,7 @@ const MessageMove = {
 	 * Build badge text from message data
 	 * @private
 	 */
-	_buildBadgeText: function(messageId, subject, author, date) {
+	_buildBadgeText: function (messageId, subject, author, date) {
 		let text = 'Nachricht #' + messageId;
 		if (subject) {
 			text += ': "' + subject + '"';
@@ -46,7 +46,7 @@ const MessageMove = {
 	 * @param {string} date Message date
 	 * @param {number} boardId Board ID
 	 */
-	selectMessageForMove: function(messageId, subject, author, date, boardId) {
+	selectMessageForMove: function (messageId, subject, author, date, boardId) {
 		sessionStorage.setItem(this.STORAGE_KEY_ID, messageId);
 		sessionStorage.setItem(this.STORAGE_KEY_SUBJECT, subject || '');
 		sessionStorage.setItem(this.STORAGE_KEY_AUTHOR, author || '');
@@ -59,7 +59,7 @@ const MessageMove = {
 	/**
 	 * Clear move selection
 	 */
-	clearMoveSelection: function() {
+	clearMoveSelection: function () {
 		sessionStorage.removeItem(this.STORAGE_KEY_ID);
 		sessionStorage.removeItem(this.STORAGE_KEY_SUBJECT);
 		sessionStorage.removeItem(this.STORAGE_KEY_AUTHOR);
@@ -74,7 +74,7 @@ const MessageMove = {
 	 *
 	 * @return {object|null} Selected message data or null
 	 */
-	getMoveSelection: function() {
+	getMoveSelection: function () {
 		const id = sessionStorage.getItem(this.STORAGE_KEY_ID);
 		if (!id) return null;
 
@@ -95,7 +95,7 @@ const MessageMove = {
 	 * @param {string} author Message author
 	 * @param {string} date Message date
 	 */
-	showMoveBadge: function(messageId, subject, author, date) {
+	showMoveBadge: function (messageId, subject, author, date) {
 		const text = this._buildBadgeText(messageId, subject, author, date);
 		if (window.parent && window.parent !== window) {
 			window.parent.postMessage({
@@ -108,7 +108,7 @@ const MessageMove = {
 	/**
 	 * Hide move badge via postMessage to parent window
 	 */
-	hideMoveBadge: function() {
+	hideMoveBadge: function () {
 		if (window.parent && window.parent !== window) {
 			window.parent.postMessage({
 				action: 'hideMoveBadge'
@@ -119,7 +119,7 @@ const MessageMove = {
 	/**
 	 * Update visibility of move buttons based on selection
 	 */
-	updateMoveButtons: function() {
+	updateMoveButtons: function () {
 		const selection = this.getMoveSelection();
 		const selectedId = selection ? selection.id : null;
 		const selectButtons = document.querySelectorAll('.btn-select-move');
@@ -156,7 +156,7 @@ const MessageMove = {
 	/**
 	 * Update visibility of dropdown options based on selection
 	 */
-	updateDropdownOptions: function() {
+	updateDropdownOptions: function () {
 		const selection = this.getMoveSelection();
 		const selectedId = selection ? selection.id : null;
 
@@ -199,7 +199,7 @@ const MessageMove = {
 	 * @param {string} targetAuthor Target message author
 	 * @param {string} targetDate Target message date
 	 */
-	performMove: function(targetMessageId, targetSubject, targetAuthor, targetDate) {
+	performMove: function (targetMessageId, targetSubject, targetAuthor, targetDate) {
 		const selection = this.getMoveSelection();
 
 		if (!selection) {
@@ -227,14 +227,37 @@ const MessageMove = {
 			return;
 		}
 
-		// Build URL with board ID from selection
-		const url = 'pxmboard.php?mode=messagemove&brdid=' + selection.boardId + '&sourcemsgid=' + selection.id + '&targetmsgid=' + targetMessageId;
+		// Build endpoints
+		const ajaxUrl = 'pxmboard.php?mode=ajaxMessagetreemove&brdid=' + selection.boardId;
+		const destUrl = 'pxmboard.php?mode=message&brdid=' + selection.boardId + '&msgid=' + selection.id;
+		const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+		const sourceId = selection.id;
+		const targetId = targetMessageId;
 
 		// Clear selection
 		this.clearMoveSelection();
 
-		// Redirect to action
-		window.location.href = url;
+		// Execute move via Ajax action, then do a full-page navigation to ensure thread and threadlist are refreshed
+		fetch(ajaxUrl, {
+			method: 'POST',
+			credentials: 'same-origin',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+				'X-CSRF-Token': csrfToken
+			},
+			body: 'sourcemsgid=' + sourceId + '&targetmsgid=' + targetId
+		})
+			.then(function (r) { return r.json(); })
+			.then(function (data) {
+				if (data.success) {
+					window.location.href = destUrl;
+				} else {
+					alert('Fehler: ' + (data.error || 'Unbekannter Fehler'));
+				}
+			})
+			.catch(function () {
+				alert('Fehler beim Verschieben: Netzwerkfehler. Bitte Seite neu laden.');
+			});
 	},
 
 	/**
@@ -242,7 +265,7 @@ const MessageMove = {
 	 *
 	 * @return {object} Message data
 	 */
-	extractMessageData: function() {
+	extractMessageData: function () {
 		const subject = this._extractSubject();
 		const author = this._extractAuthor();
 		const date = this._extractDate();
@@ -258,7 +281,7 @@ const MessageMove = {
 	 * Extract subject from DOM
 	 * @private
 	 */
-	_extractSubject: function() {
+	_extractSubject: function () {
 		const subjectArea = document.querySelector('.bg-gray-100 .font-semibold');
 		if (subjectArea) {
 			return subjectArea.textContent.trim();
@@ -270,7 +293,7 @@ const MessageMove = {
 	 * Extract author from DOM
 	 * @private
 	 */
-	_extractAuthor: function() {
+	_extractAuthor: function () {
 		const headerLink = document.querySelector('.bg-pxm-dark a[href*="userprofile"]');
 		if (headerLink) {
 			return headerLink.textContent.trim();
@@ -289,7 +312,7 @@ const MessageMove = {
 	 * Extract date from DOM
 	 * @private
 	 */
-	_extractDate: function() {
+	_extractDate: function () {
 		const dateSpan = document.querySelector('.bg-pxm-dark .text-gray-300');
 		if (dateSpan) {
 			const text = dateSpan.textContent;
@@ -304,7 +327,7 @@ const MessageMove = {
 	/**
 	 * Initialize on page load
 	 */
-	init: function() {
+	init: function () {
 		const selection = this.getMoveSelection();
 
 		if (selection) {
@@ -350,7 +373,7 @@ const MessageMove = {
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
-	document.addEventListener('DOMContentLoaded', function() {
+	document.addEventListener('DOMContentLoaded', function () {
 		MessageMove.init();
 	});
 } else {

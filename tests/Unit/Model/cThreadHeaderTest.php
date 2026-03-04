@@ -196,5 +196,4 @@ class cThreadHeaderTest extends TestCase
         $this->assertFalse($this->threadHeader->isThreadMsgRead());
         $this->assertFalse($this->threadHeader->isLastMsgRead());
     }
-
 }

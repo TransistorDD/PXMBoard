@@ -37,7 +37,7 @@ class cSession
      *
      * @return void
      */
-    public function startSession()
+    public function startSession(): void
     {
         @session_start();
     }
@@ -69,7 +69,7 @@ class cSession
      *
      * @return void
      */
-    public function writeCloseSession()
+    public function writeCloseSession(): void
     {
         session_write_close();
     }
@@ -133,7 +133,7 @@ class cSession
      * @param  mixed  $mVarValue  value of the variable
      * @return void
      */
-    public function setSessionVar(string $sVarName, mixed $mVarValue)
+    public function setSessionVar(string $sVarName, mixed $mVarValue): void
     {
         if ($mVarValue !== null) {
             $_SESSION[$sVarName] = $mVarValue;
@@ -166,7 +166,7 @@ class cSession
      * @param  int  $iExpireDate  when expires the cookie? (unix timestamp)
      * @return void
      */
-    public static function setCookieVar(string $sVarName, string $sVarValue, int $iExpireDate)
+    public static function setCookieVar(string $sVarName, string $sVarValue, int $iExpireDate): void
     {
         if (strlen($sVarValue) > 0) {
             setcookie($sVarName, $sVarValue, $iExpireDate, '/');

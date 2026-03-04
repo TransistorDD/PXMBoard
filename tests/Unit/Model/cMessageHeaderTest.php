@@ -184,5 +184,4 @@ class cMessageHeaderTest extends TestCase
         $this->assertSame(0, $this->messageHeader->getMessageTimestamp());
         $this->assertSame(0, $this->messageHeader->getAuthorId());
     }
-
 }

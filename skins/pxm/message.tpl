@@ -43,18 +43,17 @@
 			{/if}
 			{if $config.admin == 1 or $config.moderator == 1}
 			<div>
-				<select id="admin-dropdown-{$msg.id}" onchange="adminaction(this.value,{$config.board.id},{$msg.id},{$msg.thread.id})" class="text-xs rounded px-2 py-1 bg-surface-secondary text-content-primary border border-border-default">
+				<select id="admin-dropdown-{$msg.id}" onchange="adminaction(this.value,{$config.board.id},{$msg.id},{$msg.thread.id},this)" class="text-xs rounded px-2 py-1 bg-surface-secondary text-content-primary border border-border-default">
 					<option value="">IP: {$msg.ip}</option>
 					{if $msg.replyto.id>0}
 					<option value="deletemessage">L&ouml;schen</option>
 					<option value="deletesubthread">Subthread l&ouml;schen</option>
 					<option value="extractsubthread">Subthread extrahieren</option>
-					<option value="selectmove" class="option-select-move">Nachricht verschieben</option>
+					<option value="selectmove" class="option-select-move">Subthread verschieben</option>
 					<option value="inserthere" class="option-insert-here" style="display:none">Hier einf&uuml;gen</option>
 					{else}
 					<option value="deletethread">Thread l&ouml;schen</option>
-					<option value="movethread">Thread verschieben</option>
-					<option value="selectmove" class="option-select-move">Als Subthread verschieben</option>
+					<option value="selectmove" class="option-select-move">Subthread verschieben</option>
 					<option value="inserthere" class="option-insert-here" style="display:none">Hier einf&uuml;gen</option>
 					{/if}
 				</select>
@@ -84,41 +83,57 @@
 	</div>
 
 	<!-- Aktionsleiste -->
-	<div class="px-4 py-2 flex items-center justify-between text-xs bg-surface-secondary border-t border-border-light text-content-primary">
-		<div class="space-x-2">
+	<div class="px-4 py-2 flex items-center justify-end gap-1.5 text-xs bg-surface-secondary border-t border-border-light text-content-primary">
+		<!-- Gruppe 1: Kommunikation -->
+		<button type="button"
+		   hx-get="pxmboard.php?mode=messageform&brdid={$config.board.id}&msgid={$msg.id}"
+		   hx-target="#message-container"
+		   hx-swap="innerHTML"
+		   class="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-surface-tertiary transition-colors text-content-primary cursor-pointer border-none bg-transparent"
+		   title="Antworten">
+			<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M15 14v-5H8"/><polyline points="10 7 8 9 10 11"/></svg>
+		</button>
+{if $config.admin == 1 || $config.moderator == 1 || $config.edit == 1}
+		<button type="button"
+		   hx-get="pxmboard.php?mode=messageeditform&brdid={$config.board.id}&msgid={$msg.id}"
+		   hx-target="#message-container"
+		   hx-swap="innerHTML"
+		   class="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-surface-tertiary transition-colors text-content-primary cursor-pointer border-none bg-transparent"
+		   title="Editieren">
+			<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3Z"/></svg>
+		</button>
+{/if}
 {if $config.logedin == 1}
-		<a href="pxmboard.php?mode=privatemessageform&brdid={$config.board.id}&msgid={$msg.id}&toid={$msg.user.id}"
+		<button type="button"
 		   hx-get="pxmboard.php?mode=privatemessageform&brdid={$config.board.id}&msgid={$msg.id}&toid={$msg.user.id}"
 		   hx-target="#htmxModalBody"
 		   hx-swap="innerHTML"
 		   data-modal-title="Private Nachricht"
 		   hx-on::before-request="document.getElementById('htmxModalTitle').textContent=this.dataset.modalTitle;document.getElementById('htmxModal').showModal();"
-		   class="hover:underline text-link">Private Nachricht</a> |
+		   class="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-surface-tertiary transition-colors text-content-primary cursor-pointer border-none bg-transparent"
+		   title="Private Nachricht">
+			<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="7" r="3"/><path d="M2 20c0-3.314 2.686-6 6-6h1"/><path d="M14 12h6a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-2.5l-2 2.5V18h-.5a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1Z"/></svg>
+		</button>
+		<!-- Trenner: Kommunikation | Benachrichtigungen -->
+		<div class="h-5 w-px opacity-30 shrink-0 bg-current mx-1"></div>
+		<!-- Gruppe 2: Benachrichtigungen -->
 {if $msg.user.id == $config.user.id or $config.admin == 1 or $config.moderator == 1}
-		<a href="#" onclick="toggleNotifyOnReply(this, {$msg.id}, {$config.board.id}); return false;" class="hover:underline text-link" data-active="{$msg.notify_on_reply}">Mailbenachrichtigung {if $msg.notify_on_reply == 1}deaktivieren{else}aktivieren{/if}</a> |
+		<button onclick="toggleNotifyOnReply(this, {$msg.id}, {$config.board.id}); return false;"
+				class="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-surface-tertiary transition-colors text-content-primary cursor-pointer border-none bg-transparent"
+				title="{if $msg.notify_on_reply == 1}Mailbenachrichtigung deaktivieren{else}Mailbenachrichtigung aktivieren{/if}"
+				data-active="{$msg.notify_on_reply}">
+{if $msg.notify_on_reply == 1}
+			<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg>
+{else}
+			<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
 {/if}
-{if $config.admin == 1 || $config.moderator == 1 || $config.edit == 1}
-		<a href="pxmboard.php?mode=messageeditform&brdid={$config.board.id}&msgid={$msg.id}"
-		   hx-get="pxmboard.php?mode=messageeditform&brdid={$config.board.id}&msgid={$msg.id}"
-		   hx-target="#message-container"
-		   hx-swap="innerHTML"
-		   class="hover:underline text-link">Editieren</a> |
+		</button>
 {/if}
-{/if}
-		<a href="pxmboard.php?mode=messageform&brdid={$config.board.id}&msgid={$msg.id}"
-		   hx-get="pxmboard.php?mode=messageform&brdid={$config.board.id}&msgid={$msg.id}"
-		   hx-target="#message-container"
-		   hx-swap="innerHTML"
-		   class="font-medium hover:underline text-link">Antworten</a>
-		</div>
-{if $config.logedin == 1}
-		<div class="flex items-center">
-			<button onclick="toggleMessageNotification({$msg.id}, {$config.board.id}, this); return false;"
-					class="hover:scale-110 transition-transform cursor-pointer border-none bg-transparent text-content-primary"
-					title="{if $msg.notification_active}Benachrichtigungen deaktivieren{else}Benachrichtigungen aktivieren{/if}">
-				{if $msg.notification_active}<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>{else}<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.7 3A6 6 0 0 1 18 8c0 2.9.86 5.4 1.64 7"/><path d="M6 6a6 6 0 0 0-.7 2c0 7-3 9-3 9h14"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><line x1="2" y1="2" x2="22" y2="22"/></svg>{/if}
-			</button>
-		</div>
+		<button onclick="toggleMessageNotification({$msg.id}, {$config.board.id}, this); return false;"
+				class="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-surface-tertiary transition-colors text-content-primary cursor-pointer border-none bg-transparent"
+				title="{if $msg.notification_active}Benachrichtigungen deaktivieren{else}Benachrichtigungen aktivieren{/if}">
+			{if $msg.notification_active}<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>{else}<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.7 3A6 6 0 0 1 18 8c0 2.9.86 5.4 1.64 7"/><path d="M6 6a6 6 0 0 0-.7 2c0 7-3 9-3 9h14"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><line x1="2" y1="2" x2="22" y2="22"/></svg>{/if}
+		</button>
 {/if}
 	</div>
 </div>
