@@ -66,7 +66,7 @@ $objInputHandler = new cInputHandler();
 $sBaseDir = dirname($objServerHandler->getScriptName());
 $sEncodedPath = rtrim(implode('/', array_map('rawurlencode', explode('/', $sBaseDir))), '/') . '/'; // encode special chars
 
-$arrSessionCookieParams = ['lifetime' => 90 * (24 * 60 * 60),	// 90 Tage
+$arrSessionCookieParams = ['lifetime' => 90 * (24 * 60 * 60),	// 90 days
                             'path' => $sEncodedPath,
                             'domain' => '',	// browser deaulft: Host-only
                             'secure' => true,
@@ -124,6 +124,23 @@ if (preg_match('/^(adm|ajax)?([a-zA-Z]+)$/', $sBoardMode, $arrBoardMode)) {
     $sClassName .= ucfirst(strtolower($arrBoardMode[2]));
 } else {
     $sClassName = 'cActionLogin';							// default mode
+}
+
+// For non-HTMX direct browser requests to partial actions: substitute with the fullpage Board action.
+// HTMX automatically sets the HX-Request header on all partial loads; its absence means full-page browser access.
+// Admin and Ajax actions are excluded from substitution via $sPath check.
+if ($sPath === '' && !$objServerHandler->isHtmxRequest()) {
+    $arrPartialRoutes = [
+        'message'         => 'Board',
+        'thread'          => 'Board',
+        'threadlist'      => 'Board',
+        'messageform'     => 'Board',
+        'messageeditform' => 'Board',
+    ];
+    $sResolvedMode = strtolower($arrBoardMode[2] ?? '');
+    if (isset($arrPartialRoutes[$sResolvedMode])) {
+        $sClassName = 'cAction' . $arrPartialRoutes[$sResolvedMode];
+    }
 }
 
 // include action class and instantiate object

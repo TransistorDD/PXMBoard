@@ -77,9 +77,9 @@
 
 	<!-- Nachrichteninhalt -->
 	<div class="px-4 py-3 bg-surface-primary text-content-primary">
-		<div class="prose max-w-none">{$msg._body}</div>
+		<div class="prose max-w-none">{$msg._body nofilter}</div>
 		{if $config.usesignatures>0}
-		<div class="mt-4 pt-2 text-xs text-content-secondary">{$msg.user._signature}</div>
+		<div class="mt-4 pt-2 text-xs text-content-secondary">{$msg.user._signature nofilter}</div>
 		{/if}
 	</div>
 
@@ -122,6 +122,6 @@
 {/if}
 	</div>
 </div>
-<script>!window._skipPushState&&history.pushState(null,'','pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$msg.thread.id}&msgid={$msg.id}');window._skipPushState=false;</script>
+
 {/if}
 {if $config.logedin == 1}<span id="badge-data" data-pm="{$config.user.priv_message_unread_count}" data-notif="{$config.user.notification_unread_count}" hidden></span>{/if}

@@ -1,11 +1,12 @@
 {function name="threadnode"}
 <li><div class="htmx-thread-msg-row" data-msgid="{$msg.id}">
 	<span class="{if $config.logedin == 1 && $msg.new == 1}font-semibold{/if}">
-		<a href="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$msg.id}"
+		<a href="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}&msgid={$msg.id}"
 		   hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$msg.id}"
 		   hx-target="#message-container"
 		   hx-swap="innerHTML"
 		   hx-sync="#message-container:replace"
+		   hx-push-url="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}&msgid={$msg.id}"
 		   onclick="selectMessage({$msg.id})"
 		   name="p{$msg.id}"
 		   data-msgid="{$msg.id}"
@@ -29,11 +30,12 @@
 	<!-- Thread-Kopf: Wurzelnachricht als Header-Zeile -->
 	<div class="htmx-thread-root-header" data-msgid="{$root.id}">
 		<span class="font-semibold">
-			<a href="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$root.id}"
+			<a href="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}&msgid={$root.id}"
 			   hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$root.id}"
 			   hx-target="#message-container"
 			   hx-swap="innerHTML"
 			   hx-sync="#message-container:replace"
+			   hx-push-url="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}&msgid={$root.id}"
 			   onclick="selectMessage({$root.id})"
 			   data-msgid="{$root.id}"
 			   class="hover:underline">{$root.subject}</a>

@@ -53,10 +53,10 @@
 
 			<!-- Nachrichteninhalt -->
 			<div class="px-4 py-3" style="color: var(--color-content-primary);">
-				<div class="prose max-w-none">{$msg._body}</div>
+				<div class="prose max-w-none">{$msg._body nofilter}</div>
 				{if $config.usesignatures > 0 && $msg.user._signature}
 				<div class="mt-4 pt-2 text-xs" style="border-top: 1px solid var(--color-border-light); color: var(--color-content-secondary);">
-					{$msg.user._signature}
+					{$msg.user._signature nofilter}
 				</div>
 				{/if}
 			</div>

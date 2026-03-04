@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Unit tests for cStringValidations
  * Tests string truncation, alpha check, and length table
@@ -54,8 +55,7 @@ class cStringValidationsTest extends TestCase
 
     public function test_getAllLimits_returnsArray(): void
     {
-        $arrLimits = \cStringValidations::getAllLimits();
-        $this->assertIsArray($arrLimits);
+        $this->assertIsArray(\cStringValidations::getAllLimits());
     }
 
     public function test_getAllLimits_containsExpectedKeys(): void
@@ -68,8 +68,7 @@ class cStringValidationsTest extends TestCase
 
     public function test_getAllLimits_valuesMatchGetLength(): void
     {
-        $arrLimits = \cStringValidations::getAllLimits();
-        foreach ($arrLimits as $sKey => $iLimit) {
+        foreach (\cStringValidations::getAllLimits() as $sKey => $iLimit) {
             $this->assertSame($iLimit, \cStringValidations::getLength($sKey));
         }
     }

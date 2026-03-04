@@ -7,6 +7,7 @@
 a:focus {
   outline: none;
 }
+
 /* Remove focus outline on buttons for mouse clicks; keep for keyboard navigation */
 button:focus:not(:focus-visible) {
   outline: none;
@@ -105,10 +106,12 @@ button:focus:not(:focus-visible) {
   .htmx-indicator {
     display: none;
   }
+
   .htmx-request .htmx-indicator,
   .htmx-request.htmx-indicator {
     display: block;
   }
+
   .htmx-indicator-spinner {
     @apply inline-block;
     width: 1.25rem;
@@ -126,14 +129,33 @@ button:focus:not(:focus-visible) {
     background-color: var(--color-accent);
     animation: htmx-progress 1s ease-in-out infinite;
   }
+
   @keyframes htmx-spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
+
   @keyframes htmx-progress {
-    0% { transform: scaleX(0); transform-origin: left; }
-    50% { transform: scaleX(1); transform-origin: left; }
-    50.01% { transform: scaleX(1); transform-origin: right; }
-    100% { transform: scaleX(0); transform-origin: right; }
+    0% {
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+
+    50% {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    50.01% {
+      transform: scaleX(1);
+      transform-origin: right;
+    }
+
+    100% {
+      transform: scaleX(0);
+      transform-origin: right;
+    }
   }
 
   /* --- Buttons --- */
@@ -143,36 +165,43 @@ button:focus:not(:focus-visible) {
     background-color: var(--color-surface-tertiary);
     border: 1px solid var(--color-border-default);
   }
+
   .htmx-btn:hover {
     background-color: var(--color-hover-bg);
     border-color: var(--color-content-secondary);
   }
+
   .htmx-btn-primary {
     @apply px-4 py-2 rounded-lg font-medium transition-colors text-sm;
     color: var(--color-content-inverse);
     background-color: var(--color-accent);
     border: 1px solid var(--color-accent);
   }
+
   .htmx-btn-primary:hover {
     background-color: var(--color-accent-hover);
     border-color: var(--color-accent-hover);
   }
+
   .htmx-btn-danger {
     @apply px-4 py-2 rounded-lg font-medium transition-colors text-sm;
     color: var(--color-content-inverse);
     background-color: var(--color-accent-danger);
     border: 1px solid var(--color-accent-danger);
   }
+
   .htmx-btn-danger:hover {
     background-color: var(--color-accent-danger-hover);
     border-color: var(--color-accent-danger-hover);
   }
+
   .htmx-btn-outline {
     @apply px-4 py-2 rounded-lg font-medium transition-colors text-sm;
     color: var(--color-accent);
     background-color: transparent;
     border: 1px solid var(--color-accent);
   }
+
   .htmx-btn-outline:hover {
     color: var(--color-content-inverse);
     background-color: var(--color-accent);
@@ -184,9 +213,10 @@ button:focus:not(:focus-visible) {
     color: var(--color-content-inverse);
     @apply shadow-md;
   }
+
   .htmx-header nav a,
   .htmx-header nav button,
-  .htmx-header nav > div > button {
+  .htmx-header nav>div>button {
     color: var(--color-content-header-icon);
   }
 
@@ -194,6 +224,7 @@ button:focus:not(:focus-visible) {
   .htmx-table {
     @apply w-full border-collapse text-sm;
   }
+
   .htmx-table th {
     @apply px-3 py-2 text-left;
     background-color: var(--color-surface-secondary);
@@ -204,6 +235,7 @@ button:focus:not(:focus-visible) {
     letter-spacing: 0.05em;
     border-bottom: 1px solid var(--color-border-light);
   }
+
   .htmx-table td {
     @apply px-3 py-1.5;
     border-bottom: 1px solid var(--color-border-light);
@@ -223,12 +255,15 @@ button:focus:not(:focus-visible) {
     color: var(--color-content-secondary);
     border-bottom: 1px solid var(--color-border-light);
   }
+
   .htmx-thread-list-header a {
     color: var(--color-content-secondary);
   }
+
   .htmx-thread-list-header a:hover {
     color: var(--color-content-primary);
   }
+
   .htmx-thread-row {
     display: grid;
     grid-template-columns: 1.5rem minmax(6rem, 1fr) 8rem 7rem 3rem 3rem 9rem;
@@ -237,25 +272,50 @@ button:focus:not(:focus-visible) {
     font-size: 0.875rem;
     border-bottom: 1px solid var(--color-border-light);
   }
+
   .htmx-thread-row:hover {
     background-color: var(--color-hover-bg);
   }
+
   .htmx-thread-row--unread .htmx-col-subject {
     font-weight: 600;
   }
-  .htmx-thread-row-pinned { --thread-status-color: var(--color-status-pinned); }
-  .htmx-thread-row-active { --thread-status-color: var(--color-status-active); }
-  .htmx-thread-row-closed { --thread-status-color: var(--color-status-closed); }
 
-  .htmx-col-status { display: flex; align-items: center; }
-  .htmx-col-subject { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .htmx-col-author { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .htmx-thread-row-pinned {
+    --thread-status-color: var(--color-status-pinned);
+  }
+
+  .htmx-thread-row-active {
+    --thread-status-color: var(--color-status-active);
+  }
+
+  .htmx-thread-row-closed {
+    --thread-status-color: var(--color-status-closed);
+  }
+
+  .htmx-col-status {
+    display: flex;
+    align-items: center;
+  }
+
+  .htmx-col-subject {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .htmx-col-author {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
   /* Read tracking: visited links appear dimmer (works for all users, primary
      indicator for non-logged-in users who have no server-side read status) */
   a.htmx-col-subject:visited {
     color: var(--color-content-secondary);
   }
+
   .htmx-thread-msg-row a:visited {
     color: var(--color-content-secondary);
   }
@@ -266,9 +326,11 @@ button:focus:not(:focus-visible) {
     list-style-type: disc;
     list-style-position: outside;
   }
+
   .htmx-thread-tree li {
     @apply my-0 py-0;
   }
+
   .htmx-thread-msg-row {
     display: flex;
     flex-direction: row;
@@ -276,11 +338,13 @@ button:focus:not(:focus-visible) {
     gap: 0.375rem;
     font-size: 0.875rem;
   }
+
   .htmx-msg-meta {
     display: inline;
     color: var(--color-content-secondary);
     font-size: 0.8125rem;
   }
+
   .htmx-msg-selected {
     background-color: var(--color-accent-tint);
     border-radius: 0.25rem;
@@ -300,9 +364,11 @@ button:focus:not(:focus-visible) {
     font-size: 0.875rem;
     border-bottom: 1px solid var(--color-border-light);
   }
+
   .htmx-thread-root-header a {
     color: var(--color-link);
   }
+
   .htmx-thread-root-header a:hover {
     text-decoration: underline;
   }
@@ -313,15 +379,43 @@ button:focus:not(:focus-visible) {
     border-color: var(--color-accent);
     color: var(--color-content-secondary);
   }
+
   .prose a {
     color: var(--color-link);
     @apply hover:underline;
   }
+
   .prose a:hover {
     color: var(--color-link-hover);
   }
+
   .prose img {
     @apply max-w-full h-auto rounded;
+  }
+
+  /* Video link block (embed-disabled fallback for [yt:] and [ttv:] tags) */
+  .prose a.video-link {
+    @apply flex items-center gap-3 px-4 py-3 my-4 rounded-lg font-medium no-underline;
+    background-color: var(--color-surface-secondary);
+    color: var(--color-content-primary);
+    border: 1px solid var(--color-border-default);
+  }
+
+  .prose a.video-link:hover {
+    background-color: var(--color-hover-bg);
+    border-color: var(--color-accent);
+    color: var(--color-content-primary);
+    @apply no-underline;
+  }
+
+  .prose a.video-link--yt::before {
+    content: '▶';
+    @apply text-xl flex-shrink-0;
+  }
+
+  .prose a.video-link--twitch::before {
+    content: '🎮';
+    @apply text-xl flex-shrink-0;
   }
 
   /* --- TipTap Editor --- */
@@ -330,34 +424,42 @@ button:focus:not(:focus-visible) {
     border: 1px solid var(--color-border-default);
     background-color: var(--color-surface-primary);
   }
+
   .tiptap-editor .ProseMirror {
     @apply outline-none p-4 min-h-[200px] max-h-[600px] overflow-y-auto;
   }
-  .tiptap-editor .ProseMirror > * + * {
+
+  .tiptap-editor .ProseMirror>*+* {
     @apply mt-3;
   }
+
   .tiptap-editor .ProseMirror blockquote {
     @apply border-l-4 pl-4 ml-0;
     border-color: var(--color-accent);
     color: var(--color-content-secondary);
   }
+
   .tiptap-editor .ProseMirror img {
     @apply max-w-full h-auto rounded;
   }
+
   .tiptap-editor .ProseMirror a {
     color: var(--color-link);
     @apply hover:underline;
   }
+
   .tiptap-editor .ProseMirror .spoiler {
     @apply px-3 py-2 rounded border border-dashed my-2;
     background-color: var(--color-surface-secondary);
     border-color: var(--color-border-default);
   }
+
   .tiptap-editor .ProseMirror .member-content {
     @apply px-3 py-2 rounded border-l-2 my-2;
     border-color: var(--color-accent);
     background-color: var(--color-surface-secondary);
   }
+
   .tiptap-editor .ProseMirror .mention {
     color: var(--color-accent);
     @apply font-medium;
@@ -368,24 +470,29 @@ button:focus:not(:focus-visible) {
   .tiptap-editor .ProseMirror .twitch-embed {
     @apply my-4;
   }
+
   .tiptap-editor .ProseMirror .youtube-embed iframe,
   .tiptap-editor .ProseMirror .twitch-embed iframe {
     @apply max-w-full rounded;
   }
+
   .tiptap-editor .ProseMirror .youtube-placeholder,
   .tiptap-editor .ProseMirror .twitch-placeholder {
     @apply flex items-center gap-3 px-4 py-3 my-4 border-2 rounded-lg cursor-pointer;
     background-color: var(--color-surface-secondary);
     border-color: var(--color-border-default);
   }
+
   .tiptap-editor .ProseMirror .youtube-placeholder:hover,
   .tiptap-editor .ProseMirror .twitch-placeholder:hover {
     border-color: var(--color-accent);
     background-color: var(--color-hover-bg);
   }
+
   .tiptap-editor .ProseMirror .video-placeholder-icon {
     @apply text-3xl flex-shrink-0;
   }
+
   .tiptap-editor .ProseMirror .video-placeholder-text {
     @apply text-sm font-medium truncate;
     color: var(--color-content-primary);
@@ -397,20 +504,24 @@ button:focus:not(:focus-visible) {
     background-color: var(--color-surface-secondary);
     border-color: var(--color-border-default);
   }
+
   .tiptap-toolbar button {
     @apply px-3 py-1.5 text-sm font-medium rounded border transition-colors;
     color: var(--color-content-primary);
     background-color: var(--color-surface-primary);
     border-color: var(--color-border-default);
   }
+
   .tiptap-toolbar button:hover {
     background-color: var(--color-hover-bg);
   }
+
   .tiptap-toolbar button.is-active {
     color: var(--color-content-inverse);
     background-color: var(--color-accent);
     border-color: var(--color-accent);
   }
+
   .tiptap-toolbar button:disabled {
     @apply opacity-50 cursor-not-allowed;
   }
@@ -422,6 +533,7 @@ button:focus:not(:focus-visible) {
     padding-bottom: 56.25%;
     height: 0;
   }
+
   .prose .youtube-embed iframe,
   .prose .twitch-embed iframe {
     @apply absolute top-0 left-0 w-full h-full rounded;
@@ -434,13 +546,16 @@ button:focus:not(:focus-visible) {
     height: 1.5rem;
     flex-shrink: 0;
   }
+
   .toggle-switch input {
     @apply absolute opacity-0 w-0 h-0;
   }
+
   .toggle-switch-track {
     @apply absolute inset-0 rounded-full transition-colors;
     background-color: var(--color-border-default);
   }
+
   .toggle-switch-track::before {
     @apply absolute rounded-full transition-transform;
     content: '';
@@ -451,13 +566,16 @@ button:focus:not(:focus-visible) {
     background-color: white;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
-  .toggle-switch input:checked + .toggle-switch-track {
+
+  .toggle-switch input:checked+.toggle-switch-track {
     background-color: var(--color-accent);
   }
-  .toggle-switch input:checked + .toggle-switch-track::before {
+
+  .toggle-switch input:checked+.toggle-switch-track::before {
     transform: translateX(1.25rem);
   }
-  .toggle-switch input:focus-visible + .toggle-switch-track {
+
+  .toggle-switch input:focus-visible+.toggle-switch-track {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
@@ -472,10 +590,12 @@ button:focus:not(:focus-visible) {
     color: var(--color-content-secondary);
     outline: none;
   }
+
   .htmx-close-btn:hover {
     color: var(--color-content-primary);
     background-color: var(--color-hover-bg);
   }
+
   .htmx-close-btn:focus {
     outline: none;
   }
@@ -501,6 +621,7 @@ button:focus:not(:focus-visible) {
     background-color: transparent;
     z-index: 1;
   }
+
   /* Visual indicator: thin 2px line with inset so it doesn't span full height/width */
   .htmx-divider::after {
     content: '';
@@ -509,15 +630,18 @@ button:focus:not(:focus-visible) {
     border-radius: 1px;
     transition: background-color 0.15s;
   }
+
   .htmx-divider:hover::after,
   .htmx-divider.htmx-dragging::after {
     background-color: var(--color-accent);
   }
+
   .htmx-divider[data-divider="h"],
   .htmx-divider[data-divider="h2"] {
     height: 6px;
     cursor: row-resize;
   }
+
   .htmx-divider[data-divider="h"]::after,
   .htmx-divider[data-divider="h2"]::after {
     left: 12px;
@@ -526,10 +650,12 @@ button:focus:not(:focus-visible) {
     transform: translateY(-50%);
     height: 2px;
   }
+
   .htmx-divider[data-divider="v"] {
     width: 6px;
     cursor: col-resize;
   }
+
   .htmx-divider[data-divider="v"]::after {
     top: 12px;
     bottom: 12px;
@@ -540,6 +666,7 @@ button:focus:not(:focus-visible) {
 
   /* --- Desktop: side-by-side layout (>= 1025px) --- */
   @media (min-width: 1025px) {
+
     .htmx-board-layout[data-layout="sidebyside"],
     .htmx-board-layout:not([data-layout]) {
       display: grid;
@@ -552,26 +679,43 @@ button:focus:not(:focus-visible) {
         "divider-h  divider-v thread"
         "message    divider-v thread";
     }
+
     .htmx-board-layout[data-layout="sidebyside"] #threadlist-container,
     .htmx-board-layout:not([data-layout]) #threadlist-container {
-      grid-area: threadlist; overflow: auto; min-height: 0; min-width: 0;
+      grid-area: threadlist;
+      overflow: auto;
+      min-height: 0;
+      min-width: 0;
     }
+
     .htmx-board-layout[data-layout="sidebyside"] #thread-container,
     .htmx-board-layout:not([data-layout]) #thread-container {
-      grid-area: thread; overflow: auto; min-height: 0; min-width: 0;
+      grid-area: thread;
+      overflow: auto;
+      min-height: 0;
+      min-width: 0;
     }
+
     .htmx-board-layout[data-layout="sidebyside"] #message-container,
     .htmx-board-layout:not([data-layout]) #message-container {
-      grid-area: message; overflow: auto; min-height: 0; min-width: 0;
+      grid-area: message;
+      overflow: auto;
+      min-height: 0;
+      min-width: 0;
     }
+
     .htmx-board-layout[data-layout="sidebyside"] .htmx-divider[data-divider="h"],
     .htmx-board-layout:not([data-layout]) .htmx-divider[data-divider="h"] {
-      grid-area: divider-h; height: auto;
+      grid-area: divider-h;
+      height: auto;
     }
+
     .htmx-board-layout[data-layout="sidebyside"] .htmx-divider[data-divider="v"],
     .htmx-board-layout:not([data-layout]) .htmx-divider[data-divider="v"] {
-      grid-area: divider-v; width: auto;
+      grid-area: divider-v;
+      width: auto;
     }
+
     /* h2 divider is stacked-only: hide in side-by-side */
     .htmx-board-layout[data-layout="sidebyside"] .htmx-divider[data-divider="h2"],
     .htmx-board-layout:not([data-layout]) .htmx-divider[data-divider="h2"] {
@@ -591,21 +735,35 @@ button:focus:not(:focus-visible) {
       "divider-h2"
       "message";
   }
+
   .htmx-board-layout[data-layout="stacked"] #threadlist-container {
-    grid-area: threadlist; overflow: auto; min-height: 0;
+    grid-area: threadlist;
+    overflow: auto;
+    min-height: 0;
   }
+
   .htmx-board-layout[data-layout="stacked"] #thread-container {
-    grid-area: thread; overflow: auto; min-height: 0;
+    grid-area: thread;
+    overflow: auto;
+    min-height: 0;
   }
+
   .htmx-board-layout[data-layout="stacked"] #message-container {
-    grid-area: message; overflow: auto; min-height: 0;
+    grid-area: message;
+    overflow: auto;
+    min-height: 0;
   }
+
   .htmx-board-layout[data-layout="stacked"] .htmx-divider[data-divider="h"] {
-    grid-area: divider-h; height: auto;
+    grid-area: divider-h;
+    height: auto;
   }
+
   .htmx-board-layout[data-layout="stacked"] .htmx-divider[data-divider="h2"] {
-    grid-area: divider-h2; height: auto;
+    grid-area: divider-h2;
+    height: auto;
   }
+
   .htmx-board-layout[data-layout="stacked"] .htmx-divider[data-divider="v"] {
     display: none;
   }
@@ -623,21 +781,35 @@ button:focus:not(:focus-visible) {
         "divider-h2"
         "message";
     }
+
     .htmx-board-layout:not([data-layout="sidebyside"]) #threadlist-container {
-      grid-area: threadlist; overflow: auto; min-height: 0;
+      grid-area: threadlist;
+      overflow: auto;
+      min-height: 0;
     }
+
     .htmx-board-layout:not([data-layout="sidebyside"]) #thread-container {
-      grid-area: thread; overflow: auto; min-height: 0;
+      grid-area: thread;
+      overflow: auto;
+      min-height: 0;
     }
+
     .htmx-board-layout:not([data-layout="sidebyside"]) #message-container {
-      grid-area: message; overflow: auto; min-height: 0;
+      grid-area: message;
+      overflow: auto;
+      min-height: 0;
     }
+
     .htmx-board-layout:not([data-layout="sidebyside"]) .htmx-divider[data-divider="h"] {
-      grid-area: divider-h; height: auto;
+      grid-area: divider-h;
+      height: auto;
     }
+
     .htmx-board-layout:not([data-layout="sidebyside"]) .htmx-divider[data-divider="h2"] {
-      grid-area: divider-h2; height: auto;
+      grid-area: divider-h2;
+      height: auto;
     }
+
     .htmx-board-layout:not([data-layout="sidebyside"]) .htmx-divider[data-divider="v"] {
       display: none;
     }
@@ -655,12 +827,6 @@ button:focus:not(:focus-visible) {
     animation: htmx-spin 0.6s linear infinite;
   }
 
-  /* --- Thread container opacity during sort/pagination requests --- */
-  #threadlist-container.htmx-request {
-    opacity: 0.6;
-    pointer-events: none;
-    transition: opacity 0.15s;
-  }
 }
 
 /* ======================================================================
@@ -669,12 +835,21 @@ button:focus:not(:focus-visible) {
 dialog#htmxModal::backdrop {
   background-color: rgba(0, 0, 0, 0.5);
 }
+
 dialog#htmxModal[open] {
   animation: htmx-modal-in 0.15s ease-out;
 }
+
 @keyframes htmx-modal-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* Dropdown options theme-aware */
@@ -692,9 +867,11 @@ select option {
   border: 1px solid var(--color-border-default);
   transition: background-color 0.15s ease-in-out;
 }
+
 .spoiler-button:hover {
   background-color: var(--color-hover-bg);
 }
+
 .spoiler-button .spoiler-emoji {
   @apply text-base;
 }
@@ -702,6 +879,7 @@ select option {
 .member-content {
   @apply inline-flex items-center;
 }
+
 .member-content .member-icon {
   @apply text-base mr-1;
 }
@@ -712,6 +890,7 @@ select option {
   background-color: var(--color-surface-secondary);
   border: 1px solid var(--color-border-default);
 }
+
 .member-locked .member-icon {
   @apply text-base;
 }
@@ -721,6 +900,7 @@ select option {
 .twitch-embed {
   @apply my-4;
 }
+
 .youtube-embed iframe,
 .twitch-embed iframe {
   @apply max-w-full rounded;
@@ -757,11 +937,14 @@ html.is-mobile .mobile-hide {
 
 /* --- Mobile Footer --- */
 :root {
-  --mobile-footer-height: 3.25rem; /* 2.25rem button + 0.5rem padding top + 0.5rem padding bottom */
+  --mobile-footer-height: 3.25rem;
+  /* 2.25rem button + 0.5rem padding top + 0.5rem padding bottom */
 }
+
 .htmx-mobile-footer {
   display: none;
 }
+
 html.is-mobile .htmx-mobile-footer {
   display: flex;
   align-items: center;
@@ -776,10 +959,12 @@ html.is-mobile .htmx-mobile-footer {
   background-color: var(--color-surface-primary);
   color: var(--color-content-primary);
 }
+
 html.is-mobile #main-content {
   overflow: hidden;
   padding-bottom: var(--mobile-footer-height);
 }
+
 .htmx-mobile-footer-btn {
   display: flex;
   align-items: center;
@@ -793,9 +978,11 @@ html.is-mobile #main-content {
   cursor: pointer;
   transition: background-color 0.15s;
 }
+
 .htmx-mobile-footer-btn:hover {
   background-color: var(--color-hover-bg);
 }
+
 .htmx-mobile-footer-newpost {
   margin-left: auto;
   padding: 0.375rem 1rem;
@@ -808,6 +995,7 @@ html.is-mobile #main-content {
   text-decoration: none;
   transition: background-color 0.15s;
 }
+
 .htmx-mobile-footer-newpost:hover {
   background-color: var(--color-accent-danger-hover);
 }
@@ -820,18 +1008,22 @@ html.is-mobile .htmx-board-layout {
   grid-template-areas: none;
   transition: transform 0.3s ease;
 }
+
 html.is-mobile .htmx-board-layout.mobile-show-detail {
   transform: translateX(-100%);
 }
-html.is-mobile .htmx-board-layout > .htmx-divider {
+
+html.is-mobile .htmx-board-layout>.htmx-divider {
   display: none;
 }
+
 /* h2 divider (message/thread split) is inside #detail-page, not a direct child;
    re-show it in mobile so users can adjust the panel heights */
 html.is-mobile #detail-page .htmx-divider[data-divider="h2"] {
   display: block;
   width: 100%;
 }
+
 html.is-mobile #threadlist-container {
   grid-column: 1;
   grid-row: 1;
@@ -841,6 +1033,7 @@ html.is-mobile #threadlist-container {
   border: none;
   border-radius: 0;
 }
+
 html.is-mobile #detail-page {
   display: flex;
   flex-direction: column;
@@ -849,6 +1042,7 @@ html.is-mobile #detail-page {
   overflow: hidden;
   min-height: 0;
 }
+
 html.is-mobile #message-container {
   flex: 1 1 auto;
   overflow-y: auto;
@@ -857,6 +1051,7 @@ html.is-mobile #message-container {
   border: none;
   border-radius: 0;
 }
+
 html.is-mobile #thread-container {
   flex: 0 0 auto;
   max-height: 40%;
@@ -871,6 +1066,7 @@ html.is-mobile #thread-container {
 html.is-mobile .htmx-thread-list-header {
   display: none;
 }
+
 html.is-mobile .htmx-thread-row {
   grid-template-columns: 1.25rem 1fr auto;
   grid-template-rows: auto auto;
@@ -884,14 +1080,17 @@ html.is-mobile .htmx-thread-row {
   cursor: pointer;
   gap: 0.125rem 0.5rem;
 }
+
 html.is-mobile .htmx-thread-row:hover {
   background-color: var(--color-hover-bg);
 }
+
 html.is-mobile .htmx-col-status {
   grid-column: 1;
   grid-row: 1;
   padding-top: 0.125rem;
 }
+
 html.is-mobile .htmx-col-subject {
   grid-column: 2;
   grid-row: 1;
@@ -900,17 +1099,21 @@ html.is-mobile .htmx-col-subject {
   text-overflow: unset;
   font-weight: 500;
 }
+
 html.is-mobile .htmx-col-author {
   grid-column: 2;
   grid-row: 2;
   font-size: 0.75rem;
 }
+
 html.is-mobile .htmx-col-date {
   display: none;
 }
+
 html.is-mobile .htmx-col-views {
   display: none;
 }
+
 html.is-mobile .htmx-col-replies {
   grid-column: 3;
   grid-row: 1;
@@ -923,6 +1126,7 @@ html.is-mobile .htmx-col-replies {
   background-color: var(--color-surface-tertiary);
   color: var(--color-content-secondary);
 }
+
 html.is-mobile .htmx-col-lastpost {
   grid-column: 3;
   grid-row: 2;
@@ -936,9 +1140,11 @@ html.is-mobile .htmx-header {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
 }
+
 html.is-mobile .htmx-header img {
   height: 1.75rem;
 }
+
 html.is-mobile .htmx-header nav {
   gap: 0.5rem;
 }

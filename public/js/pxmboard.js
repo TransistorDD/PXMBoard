@@ -1127,8 +1127,6 @@
   // BROWSER HISTORY (BACK/FORWARD)
   // ====================================================================
 
-  window._skipPushState = false;
-
   window.addEventListener('popstate', function() {
     var params = new URLSearchParams(window.location.search);
     var mode = params.get('mode');
@@ -1138,7 +1136,6 @@
       var thrdid = params.get('thrdid');
       var msgid = params.get('msgid');
       if (thrdid && msgid) {
-        window._skipPushState = true;
         var threadEl = document.querySelector('#thread-container > div[data-thrdid]');
         var loadedThrdId = threadEl ? threadEl.getAttribute('data-thrdid') : null;
         if (loadedThrdId && loadedThrdId === thrdid) {
