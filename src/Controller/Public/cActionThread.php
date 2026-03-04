@@ -49,6 +49,11 @@ class cActionThread extends cPublicAction
                 $iLastOnline,
                 $iCurrentUserId
             )]);
+
+            if ($iCurrentUserId > 0) {
+                require_once(SRCDIR . '/Model/cMessageReadTracker.php');
+                cMessageReadTracker::markThreadAsRead($iCurrentUserId, $objThread->getId());
+            }
         }
     }
 }
