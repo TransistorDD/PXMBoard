@@ -2,7 +2,7 @@
 
 require_once(SRCDIR . '/Search/cSearchEngine.php');
 require_once(SRCDIR . '/Database/cDBFactory.php');
-require_once(SRCDIR . '/Enum/eMessage.php');
+require_once(SRCDIR . '/Enum/eMessageStatus.php');
 /**
  * MySQL FULLTEXT search engine implementation
  *
@@ -83,9 +83,9 @@ class cSearchEngineMySql extends cSearchEngine
         }
 
         // Status filter: only published messages OR drafts from current user
-        $sStatusFilter = '(m_status=' . MessageStatus::PUBLISHED->value;
+        $sStatusFilter = '(m_status=' . eMessageStatus::PUBLISHED->value;
         if ($iCurrentUserId > 0) {
-            $sStatusFilter .= ' OR (m_status=' . MessageStatus::DRAFT->value . ' AND m_userid=' . $iCurrentUserId . ')';
+            $sStatusFilter .= ' OR (m_status=' . eMessageStatus::DRAFT->value . ' AND m_userid=' . $iCurrentUserId . ')';
         }
         $sStatusFilter .= ')';
 
@@ -128,9 +128,9 @@ class cSearchEngineMySql extends cSearchEngine
         if ($objResultSet = $objDb->executeQuery($sQuery)) {
             while ($objRow = $objResultSet->getNextResultRowObject()) {
                 $arrResults[] = [
-                    'id' => intval($objRow->m_id),
-                    'score' => floatval($objRow->score),
-                    'timestamp' => intval($objRow->m_tstmp)
+                    'id' => (int) $objRow->m_id,
+                    'score' => (float) $objRow->score,
+                    'timestamp' => (int) $objRow->m_tstmp
                 ];
             }
             $objResultSet->freeResult();

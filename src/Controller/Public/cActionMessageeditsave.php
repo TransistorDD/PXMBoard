@@ -1,6 +1,7 @@
 <?php
 
 require_once(SRCDIR . '/Controller/Public/cPublicAction.php');
+require_once(SRCDIR . '/Enum/eSuccessKeys.php');
 require_once(SRCDIR . '/Model/cBoardMessage.php');
 require_once(SRCDIR . '/Model/cBadwordList.php');
 /**
@@ -44,12 +45,16 @@ class cActionMessageeditsave extends cPublicAction
                 $sBody = $this->m_objInputHandler->getStringFormVar('body', 'body', true, false, 'rtrim');
 
                 if (empty($sSubject)) {							// missing subject
-                    $objError = eError::SUBJECT_MISSING;
+                    $objError = eErrorKeys::SUBJECT_MISSING;
+
+                    // parse the message body
+                    $objPxmParser = $this->_getPredefinedPxmParser(true);
+
                     $this->m_objTemplate = $this->_getTemplateObject('messageeditform');
                     $this->m_objTemplate->addData($this->getContextDataArray());
-                    $this->m_objTemplate->addData(['error' => ['text' => $objError->value]]);
-                    $this->m_objTemplate->addData(['msg' => ['subject'	=> $sSubject,
-                                                                                '_body'	=> htmlspecialchars($sBody)]]);
+                    $this->m_objTemplate->addData(['error' => ['text'   => $objError->t()]]);
+                    $this->m_objTemplate->addData(['msg' => ['subject'  => $sSubject,
+                                                             '_body'    => $objPxmParser->parse($sBody)]]);
                 } else {
                     if ($iMessageId > 0) {
 
@@ -61,7 +66,7 @@ class cActionMessageeditsave extends cPublicAction
                                     if ($bAdminMode || $objBoardMessage->getReplyQuantity() < 1) {
 
                                         // Determine action based on button clicked
-                                        require_once(SRCDIR . '/Enum/eMessage.php');
+                                        require_once(SRCDIR . '/Enum/eMessageStatus.php');
                                         $bDeleteDraft = (strlen($this->m_objInputHandler->getStringFormVar('delete_draft', 'character', true, true)) > 0);
                                         $bSaveAsDraft = (strlen($this->m_objInputHandler->getStringFormVar('save_draft', 'character', true, true)) > 0);
                                         $bPublish = (strlen($this->m_objInputHandler->getStringFormVar('publish', 'character', true, true)) > 0) || (!$bDeleteDraft && !$bSaveAsDraft);
@@ -73,21 +78,18 @@ class cActionMessageeditsave extends cPublicAction
                                                     $this->m_objTemplate = $this->_getTemplateObject('redirect');
                                                     $this->m_objTemplate->addData([
                                                         'redirect_url' => 'pxmboard.php?mode=threadlist&brdid='.$objActiveBoard->getId(),
-                                                        'message' => 'Der Entwurf wurde gelöscht.'
+                                                        'message' => eSuccessKeys::DRAFT_DELETED->t()
                                                     ]);
                                                     return;
                                                 } else {
-                                                    $this->m_objTemplate = $this->_getErrorTemplateObject(eError::COULD_NOT_INSERT_DATA);
+                                                    $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::COULD_NOT_INSERT_DATA);
                                                     return;
                                                 }
                                             } else {
-                                                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::NOT_AUTHORIZED);
+                                                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::NOT_AUTHORIZED);
                                                 return;
                                             }
                                         }
-                                        require_once(SRCDIR . '/Model/cTemplate.php');
-                                        $objTemplate = new cTemplate();
-                                        $objTemplate->loadDataById(10);
 
                                         // replace badwords
                                         $objBadwordList = new cBadwordList();
@@ -98,26 +100,29 @@ class cActionMessageeditsave extends cPublicAction
                                         $objBoardMessage->setSubject($sSubject);
                                         // Only append edit signature when publishing, not when saving draft
                                         if ($bPublish) {
+                                            require_once(SRCDIR . '/Model/cTemplate.php');
+                                            $objTemplate = new cTemplate();
+                                            $objTemplate->loadDataById(10); // edit Message
                                             $objBoardMessage->setBody($sBody.' '.str_replace(['%date%','%username%'], [date($this->m_objConfig->getDateFormat(), $this->m_objConfig->getAccessTimestamp()),$objActiveUser->getUserName()], $objTemplate->getMessage()));
                                         } else {
                                             $objBoardMessage->setBody($sBody);
                                         }
                                         // Set status based on button
                                         if ($bSaveAsDraft) {
-                                            $objBoardMessage->setStatus(MessageStatus::DRAFT);
+                                            $objBoardMessage->setStatus(eMessageStatus::DRAFT);
                                         } elseif ($bPublish) {
                                             // Update timestamp when publishing a draft
                                             if ($objBoardMessage->isDraft()) {
                                                 $objBoardMessage->setMessageTimestamp($this->m_objConfig->getAccessTimestamp());
                                             }
-                                            $objBoardMessage->setStatus(MessageStatus::PUBLISHED);
+                                            $objBoardMessage->setStatus(eMessageStatus::PUBLISHED);
                                         }
                                         $iReturn = $objBoardMessage->updateData();
                                         if ($iReturn === null) {
                                             $this->m_objTemplate = $this->_getTemplateObject('confirm');
                                             $this->m_objTemplate->addData($this->getContextDataArray());
                                             $this->m_objTemplate->addData([
-                                                'message' => 'Ihre Nachricht wurde erfolgreich aktualisiert.',
+                                                'message' => eSuccessKeys::MESSAGE_UPDATED->t(),
                                                 'msg' => [
                                                     'id' => $iMessageId,
                                                     'thread' => ['id' => $objBoardMessage->getThreadId()],
@@ -128,26 +133,26 @@ class cActionMessageeditsave extends cPublicAction
                                             $this->m_objTemplate = $this->_getErrorTemplateObject($iReturn);
                                         }
                                     } else {
-                                        $this->m_objTemplate = $this->_getErrorTemplateObject(eError::MESSAGE_HAS_REPLY);
+                                        $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::MESSAGE_HAS_REPLY);
                                     } // replies exist
                                 } else {
-                                    $this->m_objTemplate = $this->_getErrorTemplateObject(eError::NOT_AUTHORIZED);
+                                    $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::NOT_AUTHORIZED);
                                 } // forbidden
                             } else {
-                                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::THREAD_CLOSED);
+                                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::THREAD_CLOSED);
                             } // thread closed
                         } else {
-                            $this->m_objTemplate = $this->_getErrorTemplateObject(eError::INVALID_MESSAGE_ID);
+                            $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::INVALID_MESSAGE_ID);
                         } // invalid msg id
                     } else {
-                        $this->m_objTemplate = $this->_getErrorTemplateObject(eError::INVALID_MESSAGE_ID);
+                        $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::INVALID_MESSAGE_ID);
                     } // invalid msg id
                 }
             } else {
-                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::NOT_AUTHORIZED);
+                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::NOT_AUTHORIZED);
             } // forbidden
         } else {
-            $this->m_objTemplate = $this->_getErrorTemplateObject(eError::BOARD_CLOSED);
+            $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::BOARD_CLOSED);
         } // board closed
     }
 }

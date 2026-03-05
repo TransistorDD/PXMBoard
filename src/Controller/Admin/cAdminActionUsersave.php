@@ -3,7 +3,7 @@
 require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
 require_once(SRCDIR . '/Model/cProfileConfig.php');
 require_once(SRCDIR . '/Model/cUserAdmin.php');
-require_once(SRCDIR . '/Enum/eUser.php');
+require_once(SRCDIR . '/Enum/eUserStatus.php');
 /**
  * save the user data
  *
@@ -69,11 +69,11 @@ class cAdminActionUsersave extends cAdminAction
 
                 $iStatus = $this->m_objInputHandler->getIntFormVar('state', true, true, true);
                 try {
-                    $eStatus = UserStatus::from($iStatus);
+                    $eStatus = eUserStatus::from($iStatus);
                     $objUser->setStatus($eStatus);
                 } catch (ValueError $e) {
                     // Invalid status, default to ACTIVE
-                    $objUser->setStatus(UserStatus::ACTIVE);
+                    $objUser->setStatus(eUserStatus::ACTIVE);
                 }
                 $objUser->setPostAllowed($this->m_objInputHandler->getIntFormVar('post', true, true, true));
                 $objUser->setEditAllowed($this->m_objInputHandler->getIntFormVar('edit', true, true, true));

@@ -63,8 +63,6 @@ class cProfileConfig
         $arrProfileSlots = $this->getSlotList();
         if (preg_match('/^[a-zA-Z]+$/', $sSlotName) && !isset($arrProfileSlots[$sSlotName])) {
 
-            $iSlotSize = intval($iSlotSize);
-
             $sQuery = "ALTER TABLE pxm_user ADD u_profile_$sSlotName ";
             switch ($sSlotType) {
                 case 'i':	$iSlotSize = 0;

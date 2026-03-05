@@ -46,7 +46,7 @@ class cUserPermissions extends cUser
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT mod_boardid FROM pxm_moderator WHERE mod_userid='.$this->m_iId)) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $this->m_arrModBoards[] = intval($objResultRow->mod_boardid);
+                $this->m_arrModBoards[] = (int) $objResultRow->mod_boardid;
             }
             $objResultSet->freeResult();
         } else {
@@ -74,7 +74,7 @@ class cUserPermissions extends cUser
     {
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT u_status,u_post,u_edit,u_admin FROM pxm_user WHERE u_id='.$this->m_iId)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $this->m_eStatus = UserStatus::tryFrom($objResultRow->u_status) ?? UserStatus::NOT_ACTIVATED;
+                $this->m_eStatus = eUserStatus::tryFrom($objResultRow->u_status) ?? eUserStatus::NOT_ACTIVATED;
                 $this->m_bPost = $objResultRow->u_post ? true : false;
                 $this->m_bEdit = $objResultRow->u_edit ? true : false;
                 $this->m_bIsAdmin = $objResultRow->u_admin ? true : false;
@@ -157,7 +157,7 @@ class cUserPermissions extends cUser
         if (!is_array($this->m_arrModBoards)) {
             $this->_loadModBoards();
         }
-        return in_array(intval($iBoardId), $this->m_arrModBoards);
+        return in_array($iBoardId, $this->m_arrModBoards);
     }
 
     /**

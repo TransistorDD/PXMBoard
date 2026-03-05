@@ -35,16 +35,16 @@ class cUserAdmin extends cUserProfile
     {
         cUserProfile::_setDataFromDb($objResultRow);
 
-        $this->m_bPost = $objResultRow->u_post ? true : false;
-        $this->m_bEdit = $objResultRow->u_edit ? true : false;
-        $this->m_bIsAdmin = $objResultRow->u_admin ? true : false;
+        $this->m_bPost = (bool) $objResultRow->u_post;
+        $this->m_bEdit = (bool) $objResultRow->u_edit;
+        $this->m_bIsAdmin = (bool) $objResultRow->u_admin;
 
-        $this->m_bIsVisible	= $objResultRow->u_visible ? true : false;
-        $this->m_iSkinId = intval($objResultRow->u_skinid);
+        $this->m_bIsVisible	= (bool) $objResultRow->u_visible;
+        $this->m_iSkinId = (int) $objResultRow->u_skinid;
         $this->m_sThreadListSortMode = $objResultRow->u_threadlistsort;
-        $this->m_iTimeOffset = intval($objResultRow->u_timeoffset);
-        $this->m_bEmbedExternal = $objResultRow->u_embed_external ? true : false;
-        $this->m_bPrivateMessageNotification = $objResultRow->u_privatenotification ? true : false;
+        $this->m_iTimeOffset = (int) $objResultRow->u_timeoffset;
+        $this->m_bEmbedExternal = (bool) $objResultRow->u_embed_external;
+        $this->m_bPrivateMessageNotification = (bool) $objResultRow->u_privatenotification;
 
         return true;
     }

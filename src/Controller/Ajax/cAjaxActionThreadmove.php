@@ -41,7 +41,7 @@ class cAjaxActionThreadmove extends cAjaxAction
 
         $iThreadId = $this->m_objInputHandler->getIntFormVar('id', false, true);
         if ($iThreadId <= 0) {
-            $this->_setJsonError(eError::INVALID_THREAD_ID, 400);
+            $this->_setJsonError(eErrorKeys::INVALID_THREAD_ID, 400);
             return;
         }
 
@@ -69,16 +69,16 @@ class cAjaxActionThreadmove extends cAjaxAction
         }
 
         if (!$bIsValidBoard) {
-            $this->_setJsonError(eError::INVALID_BOARD_ID, 400);
+            $this->_setJsonError(eErrorKeys::INVALID_BOARD_ID, 400);
             return;
         }
 
         $objThread = new cThread();
         if (!$objThread->loadDataById($iThreadId, $iBoardId) || !$objThread->moveThread($iDestId)) {
-            $this->_setJsonError(eError::MESSAGE_MOVE_ERROR, 500);
+            $this->_setJsonError(eErrorKeys::MESSAGE_MOVE_ERROR, 500);
             return;
         }
 
-        $this->_setJsonSuccess(eSuccessMessage::THREAD_MOVED, ['destBoardId' => $iDestId]);
+        $this->_setJsonSuccess(eSuccessKeys::THREAD_MOVED, ['destBoardId' => $iDestId]);
     }
 }

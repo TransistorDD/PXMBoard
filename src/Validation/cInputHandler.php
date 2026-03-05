@@ -64,9 +64,9 @@ class cInputHandler
     {
         $iValue = 0;
         if (($bSearchPost) && isset($_POST[$sVarName])) {
-            $iValue = intval($_POST[$sVarName]);
+            $iValue = (int) $_POST[$sVarName];
         } elseif (($bSearchGet) && isset($_GET[$sVarName])) {
-            $iValue = intval($_GET[$sVarName]);
+            $iValue = (int) $_GET[$sVarName];
         }
         if (($iValue < 0) && ($bForcePositive)) {
             $iValue = 0;

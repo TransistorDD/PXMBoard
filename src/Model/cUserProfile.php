@@ -41,11 +41,11 @@ class cUserProfile extends cUser
         cUser::_setDataFromDb($objResultRow);
 
         $this->m_sSignature	= $objResultRow->u_signature;
-        $this->m_iLastUpdateTimestap = intval($objResultRow->u_profilechangedtstmp);
+        $this->m_iLastUpdateTimestap = (int) $objResultRow->u_profilechangedtstmp;
 
         foreach ($this->m_arrAddFields as $sFieldName => $arrFieldAttributes) {
             $sResultVarName = 'u_profile_'.$sFieldName;
-            $this->m_arrAddData[$sFieldName] = ($arrFieldAttributes[0] == 'i' ? intval($objResultRow->$sResultVarName) : $objResultRow->$sResultVarName);
+            $this->m_arrAddData[$sFieldName] = ($arrFieldAttributes[0] == 'i' ? (int) $objResultRow->$sResultVarName : $objResultRow->$sResultVarName);
         }
 
         return true;
@@ -140,7 +140,7 @@ class cUserProfile extends cUser
     {
         if (isset($this->m_arrAddFields[$sElementName])) {
             if ($this->m_arrAddFields[$sElementName][0] == 'i') {
-                $mElementValue = intval($mElementValue);
+                $mElementValue = (int) $mElementValue;
             }
             $this->m_arrAddData[$sElementName] = $mElementValue;
         }

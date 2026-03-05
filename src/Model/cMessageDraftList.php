@@ -1,7 +1,7 @@
 <?php
 
 require_once(SRCDIR . '/Model/cScrollList.php');
-require_once(SRCDIR . '/Enum/eMessage.php');
+require_once(SRCDIR . '/Enum/eMessageStatus.php');
 /**
  * message draft list handling
  *
@@ -43,7 +43,7 @@ class cMessageDraftList extends cScrollList
         $sQuery .= 'FROM pxm_message m ';
         $sQuery .= 'LEFT JOIN pxm_thread t ON m.m_threadid = t.t_id ';
         $sQuery .= 'LEFT JOIN pxm_board b ON t.t_boardid = b.b_id ';
-        $sQuery .= "WHERE m.m_userid=$this->m_iUserId AND m.m_status=".MessageStatus::DRAFT->value;
+        $sQuery .= "WHERE m.m_userid=$this->m_iUserId AND m.m_status=".eMessageStatus::DRAFT->value;
         $sQuery .= ' ORDER BY m.m_tstmp DESC';
         return $sQuery;
     }
@@ -76,9 +76,9 @@ class cMessageDraftList extends cScrollList
      */
     public function countDrafts(): int
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS msgcount FROM pxm_message WHERE m_userid=$this->m_iUserId AND m_status=".MessageStatus::DRAFT->value)) {
+        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS msgcount FROM pxm_message WHERE m_userid=$this->m_iUserId AND m_status=".eMessageStatus::DRAFT->value)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                return intval($objResultRow->msgcount);
+                return (int) $objResultRow->msgcount;
             }
         }
         return 0;

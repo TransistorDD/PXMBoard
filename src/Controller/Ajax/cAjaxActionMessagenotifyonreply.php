@@ -36,14 +36,14 @@ class cAjaxActionMessagenotifyonreply extends cAjaxAction
         // Input-Validierung
         $iMessageId = $this->m_objInputHandler->getIntFormVar('msgid', true, true, true);
         if ($iMessageId <= 0) {
-            $this->_setJsonError(eError::INVALID_MESSAGE_ID, 400);
+            $this->_setJsonError(eErrorKeys::INVALID_MESSAGE_ID, 400);
             return;
         }
 
         // Load message
         $objBoardMessage = new cBoardMessage();
         if (!$objBoardMessage->loadDataById($iMessageId, $objActiveBoard->getId())) {
-            $this->_setJsonError(eError::INVALID_MESSAGE_ID, 404);
+            $this->_setJsonError(eErrorKeys::INVALID_MESSAGE_ID, 404);
             return;
         }
 
@@ -53,19 +53,19 @@ class cAjaxActionMessagenotifyonreply extends cAjaxAction
         $bIsModerator = $objActiveUser->isModerator($objActiveBoard->getId());
 
         if (!$bIsAuthor && !$bIsAdmin && !$bIsModerator) {
-            $this->_setJsonError(eError::NOT_AUTHORIZED, 403);
+            $this->_setJsonError(eErrorKeys::NOT_AUTHORIZED, 403);
             return;
         }
 
         // Toggle notification
         $bNewNotify = !$objBoardMessage->shouldNotifyOnReply();
         if (!$objBoardMessage->updateNotifyOnReply($bNewNotify)) {
-            $this->_setJsonError(eError::COULD_NOT_DELETE_DATA, 500);
+            $this->_setJsonError(eErrorKeys::COULD_NOT_DELETE_DATA, 500);
             return;
         }
 
         // Success response
-        $eMessage = $bNewNotify ? eSuccessMessage::NOTIFICATION_ENABLED : eSuccessMessage::NOTIFICATION_DISABLED;
+        $eMessage = $bNewNotify ? eSuccessKeys::NOTIFICATION_ENABLED : eSuccessKeys::NOTIFICATION_DISABLED;
         $this->_setJsonSuccess($eMessage, ['active' => $bNewNotify]);
     }
 }

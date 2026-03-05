@@ -51,10 +51,10 @@ class cActionUserprofile extends cPublicAction
                     $objParser
                 )]);
             } else {
-                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::INVALID_USER_ID);
+                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::INVALID_USER_ID);
             }// invalid user id
         } else {
-            $this->m_objTemplate = $this->_getErrorTemplateObject(eError::INVALID_USER_ID);
+            $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::INVALID_USER_ID);
         }	// invalid user id
     }
 }

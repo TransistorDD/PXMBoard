@@ -5,8 +5,10 @@ require_once(SRCDIR . '/Model/cPrivateMessage.php');
 require_once(SRCDIR . '/Model/cBadwordList.php');
 require_once(SRCDIR . '/Model/cUserConfig.php');
 require_once(SRCDIR . '/Model/cNotification.php');
-require_once(SRCDIR . '/Enum/eNotification.php');
-require_once(SRCDIR . '/Enum/eSuccessMessage.php');
+require_once(SRCDIR . '/Enum/eNotificationType.php');
+require_once(SRCDIR . '/Enum/eNotificationStatus.php');
+require_once(SRCDIR . '/Enum/eNotificationKeys.php');
+require_once(SRCDIR . '/Enum/eSuccessKeys.php');
 /**
  * saves a private message
  *
@@ -48,13 +50,16 @@ class cActionPrivatemessagesave extends cPublicAction
                 $sBody = $this->m_objInputHandler->getStringFormVar('body', 'body', true, false, 'rtrim');
 
                 if (empty($sSubject)) {
+                    // parse the message body
+                    $objPxmParser = $this->_getPredefinedPxmParser(true);
+
                     $this->m_objTemplate = $this->_getTemplateObject('privatemessageform');
                     $this->m_objTemplate->addData($this->getContextDataArray(['type' => 'outbox']));
-                    $this->m_objTemplate->addData(['error' => ['text'   => eError::SUBJECT_MISSING->value]]);
+                    $this->m_objTemplate->addData(['error' => ['text'   => eErrorKeys::SUBJECT_MISSING->t()]]);
                     $this->m_objTemplate->addData(['touser'	=> ['id'        => $objDestinationUser->getId(),
                                                                 'username'	=> $objDestinationUser->getUserName()]]);
                     $this->m_objTemplate->addData(['msg'	=> ['subject'	=> $sSubject,
-                                                                '_body'		=> htmlspecialchars($sBody)]]);
+                                                                '_body'		=> $objPxmParser->parse($sBody)]]);
                 } else {
                     // replace badwords
                     $objBadwordList = new cBadwordList();
@@ -74,13 +79,16 @@ class cActionPrivatemessagesave extends cPublicAction
                     if ($eError === null) {
 
                         // Create in-app notification
-                        $sNotificationTitle = 'Neue private Nachricht';
-                        $sNotificationMessage = $objActiveUser->getUserName().' hat dir eine PM gesendet: "'.$sSubject.'"';
+                        $sNotificationTitle = eNotificationKeys::PRIVATE_MESSAGE_TITLE->t();
+                        $sNotificationMessage = eNotificationKeys::PRIVATE_MESSAGE_MESSAGE->t([
+                            'username' => $objActiveUser->getUserName(),
+                            'subject'  => $sSubject,
+                        ]);
                         $sNotificationLink = 'pxmboard.php?mode=privatemessage&type=inbox&msgid='.$objPrivateMessage->getId();
 
                         cNotification::createNotification(
                             $objDestinationUser->getId(),
-                            NotificationType::PRIVATE_MESSAGE,
+                            eNotificationType::PRIVATE_MESSAGE,
                             $sNotificationTitle,
                             $sNotificationMessage,
                             $sNotificationLink,
@@ -110,17 +118,17 @@ class cActionPrivatemessagesave extends cPublicAction
                             'type' => 'outbox'
                         ]));
                         $this->m_objTemplate->addData([
-                            'message' => eSuccessMessage::PRIVATE_MESSAGE_SENT->value,
+                            'message' => eSuccessKeys::PRIVATE_MESSAGE_SENT->t(),
                         ]);
                     } else {
                         $this->m_objTemplate = $this->_getErrorTemplateObject($eError);
                     }
                 }
             } else {
-                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::INVALID_USER_ID);
+                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::INVALID_USER_ID);
             }// invalid user id
         } else {
-            $this->m_objTemplate = $this->_getErrorTemplateObject(eError::INVALID_USER_ID);
+            $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::INVALID_USER_ID);
         }	// invalid user id
     }
 }

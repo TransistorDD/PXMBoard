@@ -71,25 +71,25 @@ class cActionMessageeditform extends cPublicAction
                                         $objPxmParser
                                     )]);
                                 } else {
-                                    $this->m_objTemplate = $this->_getErrorTemplateObject(eError::MESSAGE_HAS_REPLY);
+                                    $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::MESSAGE_HAS_REPLY);
                                 }// replies exist
                             } else {
-                                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::NOT_AUTHORIZED);
+                                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::NOT_AUTHORIZED);
                             }	// forbidden
                         } else {
-                            $this->m_objTemplate = $this->_getErrorTemplateObject(eError::THREAD_CLOSED);
+                            $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::THREAD_CLOSED);
                         }			// thread closed
                     } else {
-                        $this->m_objTemplate = $this->_getErrorTemplateObject(eError::INVALID_MESSAGE_ID);
+                        $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::INVALID_MESSAGE_ID);
                     }	// invalid msg id
                 } else {
-                    $this->m_objTemplate = $this->_getErrorTemplateObject(eError::INVALID_MESSAGE_ID);
+                    $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::INVALID_MESSAGE_ID);
                 }		// invalid msg id
             } else {
-                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::NOT_AUTHORIZED);
+                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::NOT_AUTHORIZED);
             }		// forbidden
         } else {
-            $this->m_objTemplate = $this->_getErrorTemplateObject(eError::BOARD_CLOSED);
+            $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::BOARD_CLOSED);
         }			// board closed
     }
 }

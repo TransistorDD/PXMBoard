@@ -78,7 +78,7 @@ class cUserLoginTicket
         $iUserId = 0;
         if ($objResultSet = $objDb->executeQuery($sQuery)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $iUserId = intval($objResultRow->ult_userid);
+                $iUserId = (int) $objResultRow->ult_userid;
 
                 // Update last_used timestamp
                 $iTimestamp = time();
@@ -162,13 +162,13 @@ class cUserLoginTicket
      */
     protected function _setDataFromDb(object $objResultRow): void
     {
-        $this->m_iId = intval($objResultRow->ult_id);
-        $this->m_iUserId = intval($objResultRow->ult_userid);
+        $this->m_iId = (int) $objResultRow->ult_id;
+        $this->m_iUserId = (int) $objResultRow->ult_userid;
         $this->m_sToken = $objResultRow->ult_token;
         $this->m_sUserAgent = $objResultRow->ult_useragent;
         $this->m_sIpAddress = $objResultRow->ult_ipaddress;
-        $this->m_iCreatedTimestamp = intval($objResultRow->ult_created_timestamp);
-        $this->m_iLastUsedTimestamp = intval($objResultRow->ult_last_used_timestamp);
+        $this->m_iCreatedTimestamp = (int) $objResultRow->ult_created_timestamp;
+        $this->m_iLastUsedTimestamp = (int) $objResultRow->ult_last_used_timestamp;
     }
 
     /**

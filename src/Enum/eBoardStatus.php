@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Board status enumeration
+ * Board access/permission status enumeration
  *
  * Defines the different access and write permission levels for boards.
  *
@@ -10,10 +10,10 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-enum BoardStatus: int
+enum eBoardStatus: int
 {
     /**
-     * Check if board is readable for public (non-authenticated users)
+     * Checks whether the board is readable for unauthenticated users.
      *
      * @return bool true if public can read
      */
@@ -23,7 +23,7 @@ enum BoardStatus: int
     }
 
     /**
-     * Check if board is writable (for regular users, not mods/admins)
+     * Checks whether regular authenticated users can write to the board.
      *
      * @return bool true if regular users can write
      */
@@ -33,9 +33,9 @@ enum BoardStatus: int
     }
 
     /**
-     * Check if board requires authentication to read
+     * Checks whether the board requires authentication to read.
      *
-     * @return bool true if authentication required
+     * @return bool true if authentication is required
      */
     public function requiresAuthentication(): bool
     {
@@ -43,7 +43,7 @@ enum BoardStatus: int
     }
 
     /**
-     * Check if board is closed (only mods/admins can access)
+     * Checks whether the board is closed (only moderators/admins may access).
      *
      * @return bool true if closed
      */
@@ -53,42 +53,33 @@ enum BoardStatus: int
     }
 
     /**
-     * Get human-readable label (German)
+     * Returns the translated label for this board status.
      *
-     * @return string label
+     * @return string translated label
      */
     public function getLabel(): string
     {
-        return match($this) {
-            self::PUBLIC => 'Öffentlich',
-            self::MEMBERS_ONLY => 'Nur Mitglieder',
-            self::READONLY_PUBLIC => 'Nur Lesen (Öffentlich)',
-            self::READONLY_MEMBERS => 'Nur Lesen (Mitglieder)',
-            self::CLOSED => 'Geschlossen',
-        };
+        return cTranslator::translate(match ($this) {
+            self::PUBLIC           => 'board_status.public',
+            self::MEMBERS_ONLY     => 'board_status.members_only',
+            self::READONLY_PUBLIC  => 'board_status.readonly_public',
+            self::READONLY_MEMBERS => 'board_status.readonly_members',
+            self::CLOSED           => 'board_status.closed',
+        });
     }
-    /**
-     * Public board - everyone can read, authenticated users with post permission can write
-     */
+
+    /** Public board — everyone can read; authenticated users with post permission can write. */
     case PUBLIC = 1;
 
-    /**
-     * Members only - only authenticated users can read and write (with post permission)
-     */
+    /** Members only — only authenticated users can read and write (with post permission). */
     case MEMBERS_ONLY = 2;
 
-    /**
-     * Read-only public - everyone can read, only moderators/admins can write
-     */
+    /** Read-only public — everyone can read; only moderators/admins can write. */
     case READONLY_PUBLIC = 3;
 
-    /**
-     * Read-only members - only authenticated users can read, only moderators/admins can write
-     */
+    /** Read-only members — only authenticated users can read; only moderators/admins can write. */
     case READONLY_MEMBERS = 4;
 
-    /**
-     * Closed - only moderators and admins can access
-     */
+    /** Closed — only moderators and admins can access. */
     case CLOSED = 5;
 }

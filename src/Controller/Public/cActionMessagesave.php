@@ -1,12 +1,15 @@
 <?php
 
 require_once(SRCDIR . '/Controller/Public/cPublicAction.php');
+require_once(SRCDIR . '/Enum/eSuccessKeys.php');
 require_once(SRCDIR . '/Model/cUserConfig.php');
 require_once(SRCDIR . '/Model/cBoardMessage.php');
 require_once(SRCDIR . '/Model/cMessage.php');
-require_once(SRCDIR . '/Enum/eMessage.php');
+require_once(SRCDIR . '/Enum/eMessageStatus.php');
 require_once(SRCDIR . '/Model/cNotification.php');
-require_once(SRCDIR . '/Enum/eNotification.php');
+require_once(SRCDIR . '/Enum/eNotificationType.php');
+require_once(SRCDIR . '/Enum/eNotificationKeys.php');
+require_once(SRCDIR . '/Enum/eNotificationStatus.php');
 /**
  * saves a message
  *
@@ -43,7 +46,7 @@ class cActionMessagesave extends cPublicAction
         $sBody = $this->m_objInputHandler->getStringFormVar('body', 'body', true, false, 'rtrim');
         $bEditMode = (strlen($this->m_objInputHandler->getStringFormVar('btn_edit', 'character', true, true)) > 0);
         $bSaveAsDraft = (strlen($this->m_objInputHandler->getStringFormVar('btn_draft', 'character', true, true)) > 0);
-        $eMessageStatus = $bSaveAsDraft ? MessageStatus::DRAFT : MessageStatus::PUBLISHED;
+        $eMessageStatus = $bSaveAsDraft ? eMessageStatus::DRAFT : eMessageStatus::PUBLISHED;
 
         if (!$bEditMode) {
 
@@ -61,26 +64,26 @@ class cActionMessagesave extends cPublicAction
                     if (!empty($sUserName)) {
                         if ($objActiveUser->loadDataByUserName($sUserName)) {
                             if (!$objActiveUser->validatePassword($this->m_objInputHandler->getStringFormVar('pass', 'password', true, true, 'trim'))) {
-                                $arrErrors[] = eError::INVALID_PASSWORD;	// invalid password
-                            } elseif ($objActiveUser->getStatus() != UserStatus::ACTIVE) {
-                                $arrErrors[] = eError::NOT_AUTHORIZED;	// not allowed
+                                $arrErrors[] = eErrorKeys::INVALID_PASSWORD;	// invalid password
+                            } elseif ($objActiveUser->getStatus() != eUserStatus::ACTIVE) {
+                                $arrErrors[] = eErrorKeys::NOT_AUTHORIZED;	// not allowed
                             } elseif ($this->m_objConfig->getOnlineTime() > 0) {
                                 $objActiveUser->updateLastOnlineTimestamp($this->m_objConfig->getAccessTimestamp());
                             }
                         } else {
-                            $arrErrors[] = eError::USERNAME_UNKNOWN;		// user unknown
+                            $arrErrors[] = eErrorKeys::USERNAME_UNKNOWN;		// user unknown
                         }
                     } else {
-                        $arrErrors[] = eError::USERNAME_REQUIRED;
+                        $arrErrors[] = eErrorKeys::USERNAME_REQUIRED;
                     }				// empty username
                 } else {
-                    $arrErrors[] = eError::NOT_LOGGED_IN;
+                    $arrErrors[] = eErrorKeys::NOT_LOGGED_IN;
                 }						// not loged in
             }
         }
 
         if (empty($sSubject)) {
-            $arrErrors[] = eError::SUBJECT_MISSING;								// missing subject
+            $arrErrors[] = eErrorKeys::SUBJECT_MISSING;								// missing subject
         }
 
         if (!empty($arrErrors) || ($bEditMode)) {
@@ -91,7 +94,7 @@ class cActionMessagesave extends cPublicAction
             if (!empty($arrErrors)) {
                 $arrErrorTexts = [];
                 foreach ($arrErrors as $objError) {
-                    $arrErrorTexts[] = ['text' => $objError->value];
+                    $arrErrorTexts[] = ['text' => $objError->t()];
                 }
                 $this->m_objTemplate->addData(['error' => $arrErrorTexts]);
             }
@@ -100,8 +103,8 @@ class cActionMessagesave extends cPublicAction
             $objPxmParser = $this->_getPredefinedPxmParser(true);
 
             $this->m_objTemplate->addData(['msg' => ['id'		=> $iMessageId,
-                                                                'subject'	=> $sSubject,
-                                                                '_body'		=> $objPxmParser->parse($sBody)]]);
+                                                     'subject'	=> $sSubject,
+                                                     '_body'	=> $objPxmParser->parse($sBody)]]);
         } else {
             if ($objActiveUser->isPostAllowed()) {
 
@@ -135,7 +138,7 @@ class cActionMessagesave extends cPublicAction
                     }
 
                     // Auto-activate notification for author (only for published messages)
-                    if ($eMessageStatus === MessageStatus::PUBLISHED && $objActiveUser->getId() > 0) {
+                    if ($eMessageStatus === eMessageStatus::PUBLISHED && $objActiveUser->getId() > 0) {
                         $objBoardMessage->setNotificationForUser($objActiveUser->getId(), true);
                     }
 
@@ -152,13 +155,16 @@ class cActionMessagesave extends cPublicAction
                             }
 
                             // Create in-app notification
-                            $sNotificationTitle = 'Neue Antwort auf einen Beitrag';
-                            $sNotificationMessage = $objActiveUser->getUserName().' hat auf "'.$objReplyMessage->getSubject().'" geantwortet';
+                            $sNotificationTitle = eNotificationKeys::REPLY_TITLE->t();
+                            $sNotificationMessage = eNotificationKeys::REPLY_MESSAGE->t([
+                                'username' => $objActiveUser->getUserName(),
+                                'subject'  => $objReplyMessage->getSubject(),
+                            ]);
                             $sNotificationLink = 'pxmboard.php?mode=board&brdid='.$objBoardMessage->getBoardId().'&thrdid='.$objBoardMessage->getThreadId().'&msgid='.$objBoardMessage->getId().'#msg'.$objBoardMessage->getId();
 
                             cNotification::createNotification(
                                 $iSubscriberId,
-                                NotificationType::REPLY,
+                                eNotificationType::REPLY,
                                 $sNotificationTitle,
                                 $sNotificationMessage,
                                 $sNotificationLink,
@@ -183,19 +189,19 @@ class cActionMessagesave extends cPublicAction
                                         $objReplyNotificationMailSubject->getMessage(),
                                         str_replace(
                                             ['%username%',
-                                                            '%subject%',
-                                                            '%id%',
-                                                            '%replysubject%',
-                                                            '%replyid%',
-                                                            '%boardid%',
-                                                            '%threadid%'],
+                                            '%subject%',
+                                            '%id%',
+                                            '%replysubject%',
+                                            '%replyid%',
+                                            '%boardid%',
+                                            '%threadid%'],
                                             [$objActiveUser->getUserName(),
-                                                            $objReplyMessage->getSubject(),
-                                                            (string)$objReplyMessage->getId(),
-                                                            $sSubject,
-                                                            (string)$objBoardMessage->getId(),
-                                                            (string)$iBoardId,
-                                                            (string)$objReplyMessage->getThreadId()],
+                                            $objReplyMessage->getSubject(),
+                                            (string)$objReplyMessage->getId(),
+                                            $sSubject,
+                                            (string)$objBoardMessage->getId(),
+                                            (string)$iBoardId,
+                                            (string)$objReplyMessage->getThreadId()],
                                             $objReplyNotificationMailBody->getMessage()
                                         ),
                                         'From: '.$this->m_objConfig->getMailWebmaster()."\nReply-To: ".$this->m_objConfig->getMailWebmaster()
@@ -206,7 +212,7 @@ class cActionMessagesave extends cPublicAction
                     }
 
                     // Mention notifications (only for published messages, not drafts)
-                    if ($eMessageStatus === MessageStatus::PUBLISHED) {
+                    if ($eMessageStatus === eMessageStatus::PUBLISHED) {
                         $this->_createMentionNotifications($objBoardMessage);
                     }
 
@@ -216,7 +222,9 @@ class cActionMessagesave extends cPublicAction
                     // Pass structured data instead of HTML (separation of concerns)
                     $this->m_objTemplate->addData($this->getContextDataArray());
                     $this->m_objTemplate->addData([
-                        'message' => 'Ihre Nachricht wurde erfolgreich gespeichert.',
+                        'message' => ($eMessageStatus === eMessageStatus::DRAFT)
+                            ? eSuccessKeys::DRAFT_SAVED->t()
+                            : eSuccessKeys::MESSAGE_SAVED->t(),
                         'msg' => [
                             'id' => $objBoardMessage->getId(),
                             'thread' => ['id' => $objBoardMessage->getThreadId()],
@@ -230,13 +238,13 @@ class cActionMessagesave extends cPublicAction
                     $objPxmParser = $this->_getPredefinedPxmParser(true);
 
                     $this->m_objTemplate->addData($this->getContextDataArray(['quickpost' => $this->m_objConfig->useQuickPost()]));
-                    $this->m_objTemplate->addData(['error' => [['text' => $iReturn->value]]]);
+                    $this->m_objTemplate->addData(['error' => [['text' => $iReturn->t()]]]);
                     $this->m_objTemplate->addData(['msg' => ['id'		=> $iMessageId,
-                                                                                'subject'	=> $sSubject,
-                                                                                '_body'	=> $objPxmParser->parse($sBody)]]);
+                                                             'subject'	=> $sSubject,
+                                                             '_body'	=> $objPxmParser->parse($sBody)]]);
                 }
             } else {
-                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::NOT_AUTHORIZED);
+                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::NOT_AUTHORIZED);
             }	// forbidden
         }
     }
@@ -272,13 +280,13 @@ class cActionMessagesave extends cPublicAction
             if (!empty($arrUserIds)) {
                 // Create notification for each mentioned user
                 foreach ($arrUserIds as $iUserId) {
-                    $sNotificationTitle = 'Du wurdest erwähnt';
-                    $sNotificationMessage = $sAuthorUsername.' hat dich in einem Beitrag erwähnt';
+                    $sNotificationTitle = eNotificationKeys::MENTION_TITLE->t();
+                    $sNotificationMessage = eNotificationKeys::MENTION_MESSAGE->t(['username' => $sAuthorUsername]);
                     $sNotificationLink = 'pxmboard.php?mode=board&brdid='.$iBoardId.'&thrdid='.$iThreadId.'&msgid='.$iMessageId.'#msg'.$iMessageId;
 
                     cNotification::createNotification(
                         $iUserId,
-                        NotificationType::MENTION,
+                        eNotificationType::MENTION,
                         $sNotificationTitle,
                         $sNotificationMessage,
                         $sNotificationLink,

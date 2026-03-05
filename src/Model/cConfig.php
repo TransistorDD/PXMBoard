@@ -95,30 +95,30 @@ class cConfig
                 $objResultSet->freeResult();
                 unset($objResultSet);
 
-                $this->m_iDefaultSkinId = intval($objResultRow->c_skinid);
+                $this->m_iDefaultSkinId = (int) $objResultRow->c_skinid;
 
-                $this->m_bUseQuickPost = $objResultRow->c_quickpost ? true : false;
-                $this->m_bUseDirectRegistration = $objResultRow->c_directregistration ? true : false;
-                $this->m_bUniqueRegistrationMails = $objResultRow->c_uniquemail ? true : false;
-                $this->m_bUseSignatures = $objResultRow->c_usesignatures ? true : false;
+                $this->m_bUseQuickPost = (bool) $objResultRow->c_quickpost;
+                $this->m_bUseDirectRegistration = (bool) $objResultRow->c_directregistration;
+                $this->m_bUniqueRegistrationMails = (bool) $objResultRow->c_uniquemail;
+                $this->m_bUseSignatures = (bool) $objResultRow->c_usesignatures;
                 $this->m_sDateFormat = $objResultRow->c_dateformat;
-                $this->m_iTimeOffset = intval($objResultRow->c_timeoffset);
-                $this->m_iOnlineTime = intval($objResultRow->c_onlinetime);
+                $this->m_iTimeOffset = (int) $objResultRow->c_timeoffset;
+                $this->m_iOnlineTime = (int) $objResultRow->c_onlinetime;
 
-                $this->m_iThreadSizeLimit = intval($objResultRow->c_closethreads);
-                $this->m_iUserPerPage = intval($objResultRow->c_usrperpage);
-                $this->m_iMessageHeaderPerPage = intval($objResultRow->c_msgheaderperpage);
-                $this->m_iPrivateMessagesPerPage = intval($objResultRow->c_privatemsgperpage);
-                $this->m_iThreadsPerPage = intval($objResultRow->c_thrdperpage);
+                $this->m_iThreadSizeLimit = (int) $objResultRow->c_closethreads;
+                $this->m_iUserPerPage = (int) $objResultRow->c_usrperpage;
+                $this->m_iMessageHeaderPerPage = (int) $objResultRow->c_msgheaderperpage;
+                $this->m_iPrivateMessagesPerPage = (int) $objResultRow->c_privatemsgperpage;
+                $this->m_iThreadsPerPage = (int) $objResultRow->c_thrdperpage;
 
                 $this->m_sQuoteSubject = $objResultRow->c_quotesubject;
 
                 $this->m_sMailWebmaster	= $objResultRow->c_mailwebmaster;
 
                 $this->m_sSkinDir = $objResultRow->c_skindir;
-                $this->m_iMaxProfileImgSize = intval($objResultRow->c_maxprofilepicsize);
-                $this->m_iMaxProfileImgWidth = intval($objResultRow->c_maxprofilepicwidth);
-                $this->m_iMaxProfileImgHeight = intval($objResultRow->c_maxprofilepicheight);
+                $this->m_iMaxProfileImgSize = (int) $objResultRow->c_maxprofilepicsize;
+                $this->m_iMaxProfileImgWidth = (int) $objResultRow->c_maxprofilepicwidth;
+                $this->m_iMaxProfileImgHeight = (int) $objResultRow->c_maxprofilepicheight;
                 $this->m_sProfileImgDir = $objResultRow->c_profileimgdir;
 
                 unset($objResultRow);
@@ -210,7 +210,7 @@ class cConfig
      */
     public function setDefaultSkinId(int $iDefaultSkinId): void
     {
-        $this->m_iDefaultSkinId = intval($iDefaultSkinId);
+        $this->m_iDefaultSkinId = $iDefaultSkinId;
     }
 
     /**
@@ -369,7 +369,7 @@ class cConfig
      */
     public function setOnlineTime(int $iOnlineTime): void
     {
-        $this->m_iOnlineTime = intval($iOnlineTime);
+        $this->m_iOnlineTime = $iOnlineTime;
     }
 
     /**
@@ -390,7 +390,7 @@ class cConfig
      */
     public function setThreadSizeLimit(int $iThreadSizeLimit): void
     {
-        $this->m_iThreadSizeLimit = intval($iThreadSizeLimit);
+        $this->m_iThreadSizeLimit = $iThreadSizeLimit;
     }
 
     /**
@@ -411,7 +411,7 @@ class cConfig
      */
     public function setUserPerPage(int $iUserPerPage): void
     {
-        $this->m_iUserPerPage = intval($iUserPerPage);
+        $this->m_iUserPerPage = $iUserPerPage;
     }
 
     /**
@@ -432,7 +432,7 @@ class cConfig
      */
     public function setMessageHeaderPerPage(int $iMessageHeaderPerPage): void
     {
-        $this->m_iMessageHeaderPerPage = intval($iMessageHeaderPerPage);
+        $this->m_iMessageHeaderPerPage = $iMessageHeaderPerPage;
     }
 
     /**
@@ -453,7 +453,7 @@ class cConfig
      */
     public function setPrivateMessagesPerPage(int $iPrivateMessagesPerPage): void
     {
-        $this->m_iPrivateMessagesPerPage = intval($iPrivateMessagesPerPage);
+        $this->m_iPrivateMessagesPerPage = $iPrivateMessagesPerPage;
     }
 
     /**
@@ -474,7 +474,7 @@ class cConfig
      */
     public function setThreadsPerPage(int $iThreadsPerPage): void
     {
-        $this->m_iThreadsPerPage = intval($iThreadsPerPage);
+        $this->m_iThreadsPerPage = $iThreadsPerPage;
     }
 
     /**
@@ -683,7 +683,7 @@ class cConfig
     {
         $arrGeneralConfiguration = [
             'webmaster'			=> $this->m_sMailWebmaster,
-            'usesignatures'		=> intval($this->m_bUseSignatures),
+            'usesignatures'		=> (int) $this->m_bUseSignatures,
             'profile_img_dir'	=> $this->m_sProfileImgDir
         ];
         //TODO: additonalConfig entfernen

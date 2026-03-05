@@ -63,7 +63,7 @@ class cThreadList extends cScrollList
      */
     protected function _getQuery(): string
     {
-        require_once(SRCDIR . '/Enum/eMessage.php');
+        require_once(SRCDIR . '/Enum/eMessageStatus.php');
         $objDb = cDBFactory::getInstance();
 
         // For logged-in users: Add read status via LEFT JOIN (more efficient than EXISTS subqueries)
@@ -89,7 +89,7 @@ class cThreadList extends cScrollList
             $sReadSelectLastMsg = ', (mr_last.mr_messageid IS NOT null) AS last_msg_read';
         }
 
-        $sStatusFilter = '(m_status='.MessageStatus::PUBLISHED->value.' OR (m_status='.MessageStatus::DRAFT->value.' AND m_userid='.$this->m_iUserId.'))';
+        $sStatusFilter = '(m_status='.eMessageStatus::PUBLISHED->value.' OR (m_status='.eMessageStatus::DRAFT->value.' AND m_userid='.$this->m_iUserId.'))';
 
         return 'SELECT    m_id,'
                     .'m_subject,'

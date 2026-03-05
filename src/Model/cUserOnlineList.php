@@ -66,11 +66,11 @@ class cUserOnlineList extends cScrollList
         if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT u_visible,count(*) AS anz  FROM pxm_user WHERE u_lastonlinetstmp>$this->m_iOnlineTimestamp GROUP BY u_visible")) {
             $iAll = 0;
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $iAll += intval($objResultRow->anz);
+                $iAll += (int) $objResultRow->anz;
                 if ($objResultRow->u_visible) {
-                    $arrTmp['visible'] = strval($objResultRow->anz);
+                    $arrTmp['visible'] = (string) $objResultRow->anz;
                 } else {
-                    $arrTmp['invisible'] = strval($objResultRow->anz);
+                    $arrTmp['invisible'] = (string) $objResultRow->anz;
                 }
             }
             $arrTmp['all'] = strval($iAll);

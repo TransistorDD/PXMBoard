@@ -63,7 +63,7 @@ class cBoardTest extends IntegrationTestCase
         $objBoard->loadDataById($iBoardId);
 
         $objStatus = $objBoard->getStatus();
-        $this->assertInstanceOf(\BoardStatus::class, $objStatus);
-        $this->assertSame(\BoardStatus::PUBLIC, $objStatus);
+        $this->assertInstanceOf(\eBoardStatus::class, $objStatus);
+        $this->assertSame(\eBoardStatus::PUBLIC, $objStatus);
     }
 }

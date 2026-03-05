@@ -2,7 +2,8 @@
 
 require_once(SRCDIR . '/Controller/Public/cPublicAction.php');
 require_once(SRCDIR . '/Model/cNotificationList.php');
-require_once(SRCDIR . '/Enum/eNotification.php');
+require_once(SRCDIR . '/Enum/eNotificationType.php');
+require_once(SRCDIR . '/Enum/eNotificationStatus.php');
 /**
  * list of notifications
  *

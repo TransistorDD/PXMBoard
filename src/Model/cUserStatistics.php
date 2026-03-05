@@ -102,7 +102,7 @@ class cUserStatistics
                 $objUser->setRegistrationTimestamp($objResultRow->u_registrationtstmp);
                 $objUser->setMessageQuantity($objResultRow->u_msgquantity);
                 $objUser->setHighlightUser($objResultRow->u_highlight);
-                $objUser->setStatus(UserStatus::from(intval($objResultRow->u_status)));
+                $objUser->setStatus(eUserStatus::from((int) $objResultRow->u_status));
 
                 $arrUsers[] = $objUser;
             }

@@ -2,7 +2,7 @@
 
 require_once(SRCDIR . '/Controller/Public/cPublicAction.php');
 require_once(SRCDIR . '/Model/cSkin.php');
-require_once(SRCDIR . '/Enum/eSuccessMessage.php');
+require_once(SRCDIR . '/Enum/eSuccessKeys.php');
 /**
  * saves a user configuration
  *
@@ -48,9 +48,9 @@ class cActionUserconfigsave extends cPublicAction
         if ($objActiveUser->updateData()) {
             $this->m_objTemplate = $this->_getTemplateObject('confirm');
             $this->m_objTemplate->addData($this->getContextDataArray());
-            $this->m_objTemplate->addData(['message' => eSuccessMessage::USER_CONFIG_SAVED->value]);
+            $this->m_objTemplate->addData(['message' => eSuccessKeys::USER_CONFIG_SAVED->t()]);
         } else {
-            $this->m_objTemplate = $this->_getErrorTemplateObject(eError::COULD_NOT_INSERT_DATA);
+            $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::COULD_NOT_INSERT_DATA);
         }	// could not insert data
     }
 }

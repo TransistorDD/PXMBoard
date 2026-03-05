@@ -45,11 +45,11 @@ class cMessageSearchList extends cScrollList
         }
         $this->m_sUserName = $objSearch->getSearchUser();
         $this->m_sSearchString = $objSearch->getSearchMessage();
-        $this->m_iSearchDays = intval($objSearch->getSearchDays());
-        $this->m_iSearchTimestamp = intval($objSearch->getTimestamp());
-        $this->m_iTimeOffset = intval($iTimeOffset);
+        $this->m_iSearchDays = (int) $objSearch->getSearchDays();
+        $this->m_iSearchTimestamp = (int) $objSearch->getTimestamp();
+        $this->m_iTimeOffset = $iTimeOffset;
         $this->m_sDateFormat = $sDateFormat;
-        $this->m_iCurrentUserId = intval($iCurrentUserId);
+        $this->m_iCurrentUserId = $iCurrentUserId;
         $this->m_bGroupByThread = false;
 
         parent::__construct();
@@ -191,7 +191,7 @@ class cMessageSearchList extends cScrollList
         $arrThreadIds = [];
         foreach ($this->m_arrResultList as $arrMessage) {
             if (!in_array($arrMessage['threadid'], $arrThreadIds)) {
-                $arrThreadIds[] = intval($arrMessage['threadid']);
+                $arrThreadIds[] = (int) $arrMessage['threadid'];
             }
         }
 
@@ -207,7 +207,7 @@ class cMessageSearchList extends cScrollList
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery($sQuery)) {
             while ($objRow = $objResultSet->getNextResultRowObject()) {
-                $arrRootMessages[intval($objRow->m_threadid)] = [
+                $arrRootMessages[(int) $objRow->m_threadid] = [
                     'id'		=> $objRow->m_id,
                     'threadid'	=> $objRow->m_threadid,
                     'subject'	=> $objRow->m_subject,
@@ -225,7 +225,7 @@ class cMessageSearchList extends cScrollList
         // Reorganize results by thread
         $arrGrouped = [];
         foreach ($this->m_arrResultList as $arrMessage) {
-            $iThreadId = intval($arrMessage['threadid']);
+            $iThreadId = (int) $arrMessage['threadid'];
             if (!isset($arrGrouped[$iThreadId])) {
                 $arrGrouped[$iThreadId] = [
                     'threadid'		=> $iThreadId,

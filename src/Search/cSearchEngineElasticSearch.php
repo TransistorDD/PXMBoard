@@ -1,7 +1,7 @@
 <?php
 
 require_once(SRCDIR . '/Search/cSearchEngine.php');
-require_once(SRCDIR . '/Enum/eMessage.php');
+require_once(SRCDIR . '/Enum/eMessageStatus.php');
 /**
  * ElasticSearch search engine implementation
  *
@@ -114,9 +114,9 @@ class cSearchEngineElasticSearch extends cSearchEngine
             if (isset($response['hits']['hits'])) {
                 foreach ($response['hits']['hits'] as $hit) {
                     $arrResults[] = [
-                        'id' => intval($hit['_id']),
-                        'score' => floatval($hit['_score']),
-                        'timestamp' => intval($hit['_source']['timestamp'])
+                        'id' => (int) $hit['_id'],
+                        'score' => (float) $hit['_score'],
+                        'timestamp' => (int) $hit['_source']['timestamp']
                     ];
                 }
             }
@@ -377,11 +377,11 @@ class cSearchEngineElasticSearch extends cSearchEngine
             $arrFilter[] = [
                 'bool' => [
                     'should' => [
-                        ['term' => ['status' => MessageStatus::PUBLISHED->value]],
+                        ['term' => ['status' => eMessageStatus::PUBLISHED->value]],
                         [
                             'bool' => [
                                 'must' => [
-                                    ['term' => ['status' => MessageStatus::DRAFT->value]],
+                                    ['term' => ['status' => eMessageStatus::DRAFT->value]],
                                     ['term' => ['user_id' => $iCurrentUserId]]
                                 ]
                             ]
@@ -392,7 +392,7 @@ class cSearchEngineElasticSearch extends cSearchEngine
             ];
         } else {
             $arrFilter[] = [
-                'term' => ['status' => MessageStatus::PUBLISHED->value]
+                'term' => ['status' => eMessageStatus::PUBLISHED->value]
             ];
         }
 

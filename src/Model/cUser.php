@@ -1,7 +1,7 @@
 <?php
 
-require_once(SRCDIR . '/Enum/eUser.php');
-require_once(SRCDIR . '/Enum/ePrivateMessage.php');
+require_once(SRCDIR . '/Enum/eUserStatus.php');
+require_once(SRCDIR . '/Enum/ePrivateMessageStatus.php');
 /**
  * user handling
  *
@@ -27,7 +27,7 @@ class cUser
     protected int $m_iRegistrationTimestamp = 0;	// date of registration
     protected int $m_iLastOnlineTimestamp = 0;		// last online timestamp
     protected bool $m_bHighlight = false;			// highlight user ?
-    protected UserStatus $m_eStatus = UserStatus::NOT_ACTIVATED;	// status of the user
+    protected eUserStatus $m_eStatus = eUserStatus::NOT_ACTIVATED;	// status of the user
     protected int $m_iNotificationUnreadCount = 0;	// unread notification count
     protected int $m_iPrivMessageUnreadCount = 0;	// unread private message count
 
@@ -136,7 +136,7 @@ class cUser
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-        $this->m_iId = intval($objResultRow->u_id);
+        $this->m_iId = (int) $objResultRow->u_id;
         $this->m_sUserName = $objResultRow->u_username;
         $this->m_sPassword = $objResultRow->u_password;
         $this->m_sFirstName = $objResultRow->u_firstname;
@@ -146,13 +146,13 @@ class cUser
         $this->m_sPublicMail = $objResultRow->u_publicmail;
         $this->m_sPrivateMail = $objResultRow->u_privatemail;
         $this->m_sRegistrationMail = $objResultRow->u_registrationmail;
-        $this->m_iRegistrationTimestamp = intval($objResultRow->u_registrationtstmp);
-        $this->m_iLastOnlineTimestamp = intval($objResultRow->u_lastonlinetstmp);
-        $this->m_iMessageQuantity = intval($objResultRow->u_msgquantity);
-        $this->m_bHighlight = $objResultRow->u_highlight ? true : false;
-        $this->m_eStatus = UserStatus::tryFrom($objResultRow->u_status) ?? UserStatus::NOT_ACTIVATED;
-        $this->m_iNotificationUnreadCount = intval($objResultRow->u_notification_unread_count);
-        $this->m_iPrivMessageUnreadCount = intval($objResultRow->u_priv_message_unread_count);
+        $this->m_iRegistrationTimestamp = (int) $objResultRow->u_registrationtstmp;
+        $this->m_iLastOnlineTimestamp = (int) $objResultRow->u_lastonlinetstmp;
+        $this->m_iMessageQuantity = (int) $objResultRow->u_msgquantity;
+        $this->m_bHighlight = (bool) $objResultRow->u_highlight;
+        $this->m_eStatus = eUserStatus::tryFrom($objResultRow->u_status) ?? eUserStatus::NOT_ACTIVATED;
+        $this->m_iNotificationUnreadCount = (int) $objResultRow->u_notification_unread_count;
+        $this->m_iPrivMessageUnreadCount = (int) $objResultRow->u_priv_message_unread_count;
 
         return true;
     }
@@ -537,9 +537,9 @@ class cUser
     /**
      * get the user status
      *
-     * @return UserStatus user status
+     * @return eUserStatus user status
      */
-    public function getStatus(): UserStatus
+    public function getStatus(): eUserStatus
     {
         return $this->m_eStatus;
     }
@@ -547,10 +547,10 @@ class cUser
     /**
      * set the user status
      *
-     * @param UserStatus $status user status
+     * @param eUserStatus $status user status
      * @return void
      */
-    public function setStatus(UserStatus $status): void
+    public function setStatus(eUserStatus $status): void
     {
         $this->m_eStatus = $status;
     }
@@ -921,7 +921,7 @@ class cUser
         $iCount = 0;
         if ($objResultSet = cDBFactory::getInstance()->executeQuery($sCountQuery)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $iCount = intval($objResultRow->count);
+                $iCount = (int) $objResultRow->count;
             }
         }
 
@@ -992,12 +992,12 @@ class cUser
     {
         // Count actual unread private messages
         $sCountQuery = 'SELECT COUNT(*) AS count FROM pxm_priv_message '.
-                       'WHERE p_touserid='.$this->m_iId.' AND p_tostate='.PrivateMessageStatus::UNREAD->value;
+                       'WHERE p_touserid='.$this->m_iId.' AND p_tostate='.ePrivateMessageStatus::UNREAD->value;
 
         $iCount = 0;
         if ($objResultSet = cDBFactory::getInstance()->executeQuery($sCountQuery)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $iCount = intval($objResultRow->count);
+                $iCount = (int) $objResultRow->count;
             }
         }
 

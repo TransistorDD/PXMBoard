@@ -29,9 +29,9 @@ class cUserConfig extends cUserPermissions
         cUserPermissions::_setDataFromDb($objResultRow);
 
         $this->m_bIsVisible	= $objResultRow->u_visible ? true : false;
-        $this->m_iSkinId = intval($objResultRow->u_skinid);
+        $this->m_iSkinId = (int) $objResultRow->u_skinid;
         $this->m_sThreadListSortMode = $objResultRow->u_threadlistsort;
-        $this->m_iTimeOffset = intval($objResultRow->u_timeoffset);
+        $this->m_iTimeOffset = (int) $objResultRow->u_timeoffset;
         $this->m_bEmbedExternal = $objResultRow->u_embed_external ? true : false;
         $this->m_bPrivateMessageNotification = $objResultRow->u_privatenotification ? true : false;
 

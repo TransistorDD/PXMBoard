@@ -40,7 +40,7 @@ button:focus:not(:focus-visible) {
   --color-accent-tint: rgba(23, 162, 184, 0.12);
   --color-accent-danger: #e74c3c;
   --color-accent-danger-hover: #c0392b;
-  --color-accent-success: #22c55e;
+  --color-accent-success: #17a2b8;
   --color-accent-warning: #f59e0b;
 
   /* Link colors */
@@ -350,6 +350,14 @@ button:focus:not(:focus-visible) {
     border-radius: 0.25rem;
     padding: 0.125rem 0.25rem;
     outline: 1px solid var(--color-accent);
+    outline-offset: -1px;
+  }
+
+  .htmx-msg-draft {
+    background-color: rgba(245, 158, 11, 0.12);
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.25rem;
+    outline: 1px dashed var(--color-accent-warning);
     outline-offset: -1px;
   }
 

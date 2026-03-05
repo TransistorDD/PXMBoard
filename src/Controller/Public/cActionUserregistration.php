@@ -4,8 +4,8 @@ require_once(SRCDIR . '/Controller/Public/cPublicAction.php');
 require_once(SRCDIR . '/Model/cForbiddenMailList.php');
 require_once(SRCDIR . '/Model/cProfileConfig.php');
 require_once(SRCDIR . '/Model/cUserProfile.php');
-require_once(SRCDIR . '/Enum/eUser.php');
-require_once(SRCDIR . '/Enum/eSuccessMessage.php');
+require_once(SRCDIR . '/Enum/eUserStatus.php');
+require_once(SRCDIR . '/Enum/eSuccessKeys.php');
 /**
  * registers a user
  *
@@ -60,7 +60,7 @@ class cActionUserregistration extends cPublicAction
 
                 $sPassword = $objUserProfile->generatePassword();
 
-                $objUserProfile->setStatus($this->m_objConfig->useDirectRegistration() ? (UserStatus::ACTIVE) : (UserStatus::NOT_ACTIVATED));
+                $objUserProfile->setStatus($this->m_objConfig->useDirectRegistration() ? (eUserStatus::ACTIVE) : (eUserStatus::NOT_ACTIVATED));
 
                 if ($objUserProfile->insertData($this->m_objConfig->uniqueRegistrationMails())) {	// insert profiledata >>>
                     foreach ($arrSlotList as $sKey => $arrVal) {
@@ -94,7 +94,7 @@ class cActionUserregistration extends cPublicAction
 
                             $bSuccess = true;
                         } else {
-                            $this->m_objTemplate = $this->_getErrorTemplateObject(eError::COULD_NOT_SEND_EMAIL); // could not send email
+                            $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::COULD_NOT_SEND_EMAIL); // could not send email
                         }
                     } else {
                         $bSuccess = true;
@@ -102,13 +102,13 @@ class cActionUserregistration extends cPublicAction
 
                     if ($bSuccess) {
                         $this->m_objTemplate = $this->_getTemplateObject('confirm');
-                        $this->m_objTemplate->addData(['message' => eSuccessMessage::USER_REGISTERED->value]);
+                        $this->m_objTemplate->addData(['message' => eSuccessKeys::USER_REGISTERED->t()]);
                     }
                 } else {
-                    $this->m_objTemplate = $this->_getErrorTemplateObject(eError::USERNAME_ALREADY_EXISTS);
+                    $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::USERNAME_ALREADY_EXISTS);
                 }// user already registered
             } else {
-                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::INVALID_EMAIL);
+                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::INVALID_EMAIL);
             }	// invalid email
         }
     }

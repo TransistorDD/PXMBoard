@@ -130,7 +130,7 @@ class cScrollList
     public function getPageCount(): int
     {
         if ($this->m_iItemsPerPage > 0) {
-            return intval(ceil($this->m_iItemCount / $this->m_iItemsPerPage));
+            return (int) ceil($this->m_iItemCount / $this->m_iItemsPerPage);
         }
         return 0;
     }

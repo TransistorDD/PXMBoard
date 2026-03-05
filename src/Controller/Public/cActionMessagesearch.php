@@ -6,7 +6,7 @@ require_once(SRCDIR . '/Model/cSearchProfileList.php');
 require_once(SRCDIR . '/Model/cMessageSearchList.php');
 require_once(SRCDIR . '/Model/cBoardList.php');
 require_once(SRCDIR . '/Parser/cParser.php');
-require_once(SRCDIR . '/Enum/eError.php');
+require_once(SRCDIR . '/Enum/eErrorKeys.php');
 /**
  * search messages
  *
@@ -75,7 +75,7 @@ class cActionMessagesearch extends cPublicAction
             if (cSearchProfile::isRateLimitExceeded($sIpAddress, $iCurrentTime)) {
                 // Rate limit exceeded
                 $this->_initSearchForm($iIdBoard, $objSearchProfileList);
-                $this->m_objTemplate->addData(['error' => ['text' => eError::RATE_LIMIT_EXCEEDED->value]]);
+                $this->m_objTemplate->addData(['error' => ['text' => eErrorKeys::RATE_LIMIT_EXCEEDED->t()]]);
                 return;
             }
 
@@ -95,24 +95,24 @@ class cActionMessagesearch extends cPublicAction
                 $objSearch->setIpAddress($sIpAddress);
                 $objSearch->insertData();
             } else {
-                $objError = eError::RESULT_SET_TOO_LARGE;				// too many results
+                $objError = eErrorKeys::RESULT_SET_TOO_LARGE;				// too many results
             }
             if (is_object($objError)) {
                 // display the search form
                 $this->_initSearchForm($iIdBoard, $objSearchProfileList);
-                $this->m_objTemplate->addData(['error' => ['text' => $objError->value]]);
+                $this->m_objTemplate->addData(['error' => ['text' => $objError->t()]]);
             } else {
                 // display the result
                 $this->m_objTemplate->addData($this->getContextDataArray(['previd'		=> $objMessageSearchList->getPrevPageId(),
-                                                                                'nextid'		=> $objMessageSearchList->getNextPageId(),
-                                                                                'curid'		=> $objMessageSearchList->getCurPageId(),
-                                                                                'count'		=> $objMessageSearchList->getPageCount(),
-                                                                                'items'		=> $objMessageSearchList->getItemCount(),
-                                                                                'group_by_thread' => $bGroupByThread,
-                                                                                'searchprofile' => $objSearch->getDataArray(
-                                                                                    $this->m_objConfig->getTimeOffset(),
-                                                                                    $this->m_objConfig->getDateFormat()
-                                                                                )]));
+                                                                          'nextid'		=> $objMessageSearchList->getNextPageId(),
+                                                                          'curid'		=> $objMessageSearchList->getCurPageId(),
+                                                                          'count'		=> $objMessageSearchList->getPageCount(),
+                                                                          'items'		=> $objMessageSearchList->getItemCount(),
+                                                                          'group_by_thread' => $bGroupByThread,
+                                                                          'searchprofile' => $objSearch->getDataArray(
+                                                                              $this->m_objConfig->getTimeOffset(),
+                                                                              $this->m_objConfig->getDateFormat()
+                                                                          )]));
                 $this->m_objTemplate->addData(['msg' => $objMessageSearchList->getDataArray()]);
             }
         }

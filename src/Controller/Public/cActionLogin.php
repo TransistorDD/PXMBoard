@@ -1,7 +1,7 @@
 <?php
 
 require_once(SRCDIR . '/Controller/Public/cActionBoardlist.php');
-require_once(SRCDIR . '/Enum/eUser.php');
+require_once(SRCDIR . '/Enum/eUserStatus.php');
 require_once(SRCDIR . '/Model/cUserConfig.php');
 require_once(SRCDIR . '/Model/cSession.php');
 /**
@@ -31,13 +31,13 @@ class cActionLogin extends cActionBoardlist
 
             if ($objUser->loadDataByUserName($sUserName)) {
                 if (!$objUser->validatePassword($sPassword)) {
-                    $objError = eError::INVALID_PASSWORD;				// invalid password
+                    $objError = eErrorKeys::INVALID_PASSWORD;				// invalid password
                 }
             } else {
-                $objError = eError::USERNAME_UNKNOWN;					// user not found
+                $objError = eErrorKeys::USERNAME_UNKNOWN;					// user not found
             }
             if (!is_object($objError)) {
-                if ($objUser->getStatus() === UserStatus::ACTIVE) {
+                if ($objUser->getStatus() === eUserStatus::ACTIVE) {
 
                     // Set active user in action context
                     // pxmboard.php will handle session update automatically
@@ -52,7 +52,7 @@ class cActionLogin extends cActionBoardlist
                     // Re-initialize skin with user preferences
                     $this->initSkin();
                 } else {
-                    $objError = eError::NOT_AUTHORIZED;
+                    $objError = eErrorKeys::NOT_AUTHORIZED;
                 }				// forbidden
             }
         }
@@ -60,7 +60,7 @@ class cActionLogin extends cActionBoardlist
         cActionBoardlist::performAction();
 
         if (is_object($objError)) {
-            $this->m_objTemplate->addData(['error' => ['text' => $objError->value]]);
+            $this->m_objTemplate->addData(['error' => ['text' => $objError->t()]]);
         }
     }
 }

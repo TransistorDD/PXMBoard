@@ -33,7 +33,7 @@ class cBoardList
                 $objBoard->setDescription($objResultRow->b_description);
                 $objBoard->setPosition($objResultRow->b_position);
                 $objBoard->setLastMessageTimestamp($objResultRow->b_lastmsgtstmp);
-                $objBoard->setStatus(BoardStatus::from($objResultRow->b_status));
+                $objBoard->setStatus(eBoardStatus::from($objResultRow->b_status));
 
                 $objBoard->loadModData();
 
@@ -62,7 +62,7 @@ class cBoardList
                 $objBoard->setId($objResultRow->b_id);
                 $objBoard->setName($objResultRow->b_name);
                 $objBoard->setPosition($objResultRow->b_position);
-                $objBoard->setStatus(BoardStatus::from($objResultRow->b_status));
+                $objBoard->setStatus(eBoardStatus::from($objResultRow->b_status));
 
                 $this->m_arrBoards[] = $objBoard;
             }

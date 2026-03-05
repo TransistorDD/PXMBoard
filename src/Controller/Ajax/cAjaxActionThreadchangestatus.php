@@ -36,14 +36,14 @@ class cAjaxActionThreadchangestatus extends cAjaxAction
         // Input-Validierung
         $iThreadId = $this->m_objInputHandler->getIntFormVar('id', true, true, true);
         if ($iThreadId <= 0) {
-            $this->_setJsonError(eError::INVALID_THREAD_ID, 400);
+            $this->_setJsonError(eErrorKeys::INVALID_THREAD_ID, 400);
             return;
         }
 
         // Load thread
         $objThread = new cThread();
         if (!$objThread->loadDataById($iThreadId, $iBoardId)) {
-            $this->_setJsonError(eError::INVALID_THREAD_ID, 404);
+            $this->_setJsonError(eErrorKeys::INVALID_THREAD_ID, 404);
             return;
         }
 
@@ -52,7 +52,7 @@ class cAjaxActionThreadchangestatus extends cAjaxAction
         $objThread->updateIsActive($bNewActive);
 
         // Success response
-        $eMessage = $bNewActive ? eSuccessMessage::THREAD_OPENED : eSuccessMessage::THREAD_CLOSED;
+        $eMessage = $bNewActive ? eSuccessKeys::THREAD_OPENED : eSuccessKeys::THREAD_CLOSED;
         $this->_setJsonSuccess($eMessage, ['isActive' => $bNewActive]);
     }
 }

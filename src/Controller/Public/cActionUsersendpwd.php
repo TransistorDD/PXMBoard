@@ -3,8 +3,8 @@
 require_once(SRCDIR . '/Controller/Public/cPublicAction.php');
 require_once(SRCDIR . '/Model/cUser.php');
 require_once(SRCDIR . '/Model/cTemplate.php');
-require_once(SRCDIR . '/Enum/eUser.php');
-require_once(SRCDIR . '/Enum/eSuccessMessage.php');
+require_once(SRCDIR . '/Enum/eUserStatus.php');
+require_once(SRCDIR . '/Enum/eSuccessKeys.php');
 /**
  * send the password to the user
  *
@@ -40,7 +40,7 @@ class cActionUsersendpwd extends cPublicAction
         if (!empty($sUserName)) {
             $objUser = new cUser();
             if ($objUser->loadDataByUserName($sUserName)) {
-                if ($objUser->getStatus() === UserStatus::ACTIVE) {
+                if ($objUser->getStatus() === eUserStatus::ACTIVE) {
                     if (strcasecmp($sEmail, $objUser->getPrivateMail()) == 0) {
 
                         $objNotification = new cTemplate();
@@ -58,23 +58,23 @@ class cActionUsersendpwd extends cPublicAction
 
                             $this->m_objTemplate = $this->_getTemplateObject('confirm');
                             $this->m_objTemplate->addData($this->getContextDataArray());
-                            $this->m_objTemplate->addData(['message' => eSuccessMessage::USER_PASSWORD_RESET_REQUESTED->value]);
+                            $this->m_objTemplate->addData(['message' => eSuccessKeys::USER_PASSWORD_RESET_REQUESTED->t()]);
                         } else {
-                            $this->m_objTemplate = $this->_getErrorTemplateObject(eError::COULD_NOT_SEND_EMAIL);
+                            $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::COULD_NOT_SEND_EMAIL);
                         }// could not send email
                     } else {
-                        $this->m_objTemplate = $this->_getErrorTemplateObject(eError::DATA_MISMATCH);
+                        $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::DATA_MISMATCH);
                     }	// data does not match
                 } else {
-                    $this->m_objTemplate = $this->_getErrorTemplateObject(eError::NOT_AUTHORIZED);
+                    $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::NOT_AUTHORIZED);
                 }		// forbidden
             } else {
-                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::USERNAME_UNKNOWN);
+                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::USERNAME_UNKNOWN);
             }				// invalid username
         } elseif (!empty($sPasswordKey)) {
             $objUser = new cUser();
             if ($objUser->loadDataByPasswordKey($sPasswordKey)) {
-                if ($objUser->getStatus() === UserStatus::ACTIVE) {
+                if ($objUser->getStatus() === eUserStatus::ACTIVE) {
 
                     $objNotification = new cTemplate();
                     $objNotification->loadDataById(8);
@@ -93,18 +93,18 @@ class cActionUsersendpwd extends cPublicAction
 
                             $this->m_objTemplate = $this->_getTemplateObject('confirm');
                             $this->m_objTemplate->addData($this->getContextDataArray());
-                            $this->m_objTemplate->addData(['message' => eSuccessMessage::USER_PASSWORD_SENT->value]);
+                            $this->m_objTemplate->addData(['message' => eSuccessKeys::USER_PASSWORD_SENT->t()]);
                         } else {
-                            $this->m_objTemplate = $this->_getErrorTemplateObject(eError::COULD_NOT_SEND_EMAIL);
+                            $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::COULD_NOT_SEND_EMAIL);
                         }// could not send email
                     } else {
-                        $this->m_objTemplate = $this->_getErrorTemplateObject(eError::COULD_NOT_INSERT_DATA);
+                        $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::COULD_NOT_INSERT_DATA);
                     }	// could not insert data
                 } else {
-                    $this->m_objTemplate = $this->_getErrorTemplateObject(eError::NOT_AUTHORIZED);
+                    $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::NOT_AUTHORIZED);
                 }	// forbidden
             } else {
-                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::INVALID_USER_ID);
+                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::INVALID_USER_ID);
             }		// invalid userid
         } else {
             $this->m_objTemplate = $this->_getTemplateObject('usersendpwdform');

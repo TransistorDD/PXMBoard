@@ -65,7 +65,7 @@ class cUserAdminList extends cScrollList
         $objUser->setLastOnlineTimestamp($objResultRow->u_lastonlinetstmp);
         $objUser->setLastUpdateTimestamp($objResultRow->u_profilechangedtstmp);
         $objUser->setMessageQuantity($objResultRow->u_msgquantity);
-        $objUser->setStatus(UserStatus::from((int)$objResultRow->u_status));
+        $objUser->setStatus(eUserStatus::from((int)$objResultRow->u_status));
 
         $this->m_arrResultList[] = $objUser;
         return true;

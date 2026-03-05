@@ -61,14 +61,14 @@ class cThread
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-        $this->m_iBoardId = intval($objResultRow->t_boardid);
-        $this->m_iId = intval($objResultRow->t_id);
-        $this->m_bIsActive = $objResultRow->t_active ? true : false;
-        $this->m_iLastMessageId = intval($objResultRow->t_lastmsgid);
-        $this->m_iLastMessageTimestamp = intval($objResultRow->t_lastmsgtstmp);
-        $this->m_iMessageQuantity = intval($objResultRow->t_msgquantity);
-        $this->m_iViews = intval($objResultRow->t_views);
-        $this->m_bIsFixed = $objResultRow->t_fixed ? true : false;
+        $this->m_iBoardId = (int) $objResultRow->t_boardid;
+        $this->m_iId = (int) $objResultRow->t_id;
+        $this->m_bIsActive = (bool) $objResultRow->t_active;
+        $this->m_iLastMessageId = (int) $objResultRow->t_lastmsgid;
+        $this->m_iLastMessageTimestamp = (int) $objResultRow->t_lastmsgtstmp;
+        $this->m_iMessageQuantity = (int) $objResultRow->t_msgquantity;
+        $this->m_iViews = (int) $objResultRow->t_views;
+        $this->m_bIsFixed = (bool) $objResultRow->t_fixed;
 
         return true;
     }
@@ -255,7 +255,7 @@ class cThread
         $arrThreadMessageIds = [];
         if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT m_id,m_parentid FROM pxm_message WHERE m_threadid=$this->m_iId")) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $arrThreadMessageIds[intval($objResultRow->m_parentid)][] = intval($objResultRow->m_id);
+                $arrThreadMessageIds[(int) $objResultRow->m_parentid][] = (int) $objResultRow->m_id;
             }
         }
         return $arrThreadMessageIds;
@@ -344,11 +344,11 @@ class cThread
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, int $iCurrentUserId = 0): array
     {
-        require_once(SRCDIR . '/Enum/eMessage.php');
+        require_once(SRCDIR . '/Enum/eMessageStatus.php');
 
         if ($this->m_iId > 0) {
-            $sStatusFilter = '(m_status='.MessageStatus::PUBLISHED->value.' OR (m_status='.MessageStatus::DRAFT->value.' AND m_userid='.$iCurrentUserId.'))';
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT m_id,m_parentid,m_subject,m_tstmp,m_userid,m_username,m_userhighlight FROM pxm_message WHERE m_threadid=$this->m_iId AND ".$sStatusFilter.' ORDER BY m_tstmp DESC')) {
+            $sStatusFilter = '(m_status='.eMessageStatus::PUBLISHED->value.' OR (m_status='.eMessageStatus::DRAFT->value.' AND m_userid='.$iCurrentUserId.'))';
+            if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT m_id,m_parentid,m_subject,m_tstmp,m_userid,m_username,m_userhighlight,m_status FROM pxm_message WHERE m_threadid=$this->m_iId AND ".$sStatusFilter.' ORDER BY m_tstmp DESC')) {
 
                 $objParser = null;	// message parser not needed
 
@@ -362,6 +362,7 @@ class cThread
                     $objMessageHeader->setAuthorId($objResultRow->m_userid);
                     $objMessageHeader->setAuthorUserName($objResultRow->m_username);
                     $objMessageHeader->setAuthorHighlightUser($objResultRow->m_userhighlight);
+                    $objMessageHeader->setStatus(eMessageStatus::tryFrom((int) $objResultRow->m_status) ?? eMessageStatus::PUBLISHED);
 
                     $this->m_arrThreadMessages[$objResultRow->m_parentid][]	= $objMessageHeader->getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp, '', $objParser);
                 }

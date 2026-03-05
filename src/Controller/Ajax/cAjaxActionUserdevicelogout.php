@@ -33,20 +33,20 @@ class cAjaxActionUserdevicelogout extends cAjaxAction
         // Input-Validierung
         $iTicketId = $this->m_objInputHandler->getIntFormVar('ticketid', true, true, true);
         if ($iTicketId <= 0) {
-            $this->_setJsonError(eError::INVALID_MODE, 400);
+            $this->_setJsonError(eErrorKeys::INVALID_MODE, 400);
             return;
         }
 
         // Load ticket
         $objTicket = new cUserLoginTicket();
         if (!$objTicket->loadDataById($iTicketId)) {
-            $this->_setJsonError(eError::INVALID_MODE, 404);
+            $this->_setJsonError(eErrorKeys::INVALID_MODE, 404);
             return;
         }
 
         // Security check: Ticket belongs to current user
         if ($objTicket->getUserId() != $objActiveUser->getId()) {
-            $this->_setJsonError(eError::NOT_AUTHORIZED, 403);
+            $this->_setJsonError(eErrorKeys::NOT_AUTHORIZED, 403);
             return;
         }
 
@@ -62,6 +62,6 @@ class cAjaxActionUserdevicelogout extends cAjaxAction
         $objTicket->deleteTicket();
 
         // Success response
-        $this->_setJsonSuccess(eSuccessMessage::DEVICE_LOGGED_OUT, ['is_current_device' => $bIsCurrentDevice]);
+        $this->_setJsonSuccess(eSuccessKeys::DEVICE_LOGGED_OUT, ['is_current_device' => $bIsCurrentDevice]);
     }
 }

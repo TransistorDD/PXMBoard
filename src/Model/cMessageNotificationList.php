@@ -76,7 +76,7 @@ class cMessageNotificationList extends cScrollList
     {
         if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS notifcount FROM pxm_message_notification WHERE mn_userid=$this->m_iUserId")) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                return intval($objResultRow->notifcount);
+                return (int) $objResultRow->notifcount;
             }
         }
         return 0;

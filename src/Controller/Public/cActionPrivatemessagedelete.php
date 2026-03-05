@@ -57,7 +57,7 @@ class cActionPrivatemessagedelete extends cActionPrivatemessagelist
         if ($bSuccess) {
             parent::performAction();
         } else {
-            $this->m_objTemplate = $this->_getErrorTemplateObject(eError::COULD_NOT_DELETE_DATA);
+            $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::COULD_NOT_DELETE_DATA);
         }
     }
 }

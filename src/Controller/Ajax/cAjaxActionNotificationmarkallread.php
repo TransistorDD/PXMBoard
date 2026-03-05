@@ -36,6 +36,6 @@ class cAjaxActionNotificationmarkallread extends cAjaxAction
         $objActiveUser->loadDataById($objActiveUser->getId());
 
         // Success response
-        $this->_setJsonSuccess(eSuccessMessage::ALL_NOTIFICATIONS_READ, ['count' => 0]);
+        $this->_setJsonSuccess(eSuccessKeys::ALL_NOTIFICATIONS_READ, ['count' => 0]);
     }
 }

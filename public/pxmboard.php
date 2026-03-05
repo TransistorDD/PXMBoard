@@ -33,7 +33,8 @@ require_once(SRCDIR . '/Validation/cServerHandler.php');
 require_once(SRCDIR . '/Model/cConfig.php');
 require_once(SRCDIR . '/Model/cBoard.php');
 require_once(SRCDIR . '/Model/cSession.php');
-require_once(SRCDIR . '/Enum/eError.php');
+require_once(SRCDIR . '/I18n/cTranslator.php');
+require_once(SRCDIR . '/Enum/eErrorKeys.php');
 require_once(SRCDIR . '/Search/cSearchEngineFactory.php');
 
 // establish db connection via singleton
@@ -45,6 +46,9 @@ try {
 
 // load general configuration
 $objConfig = new cConfig($arrTemplateTypes);
+
+// Load language strings (locale can be extended from config or session later)
+cTranslator::load('de');
 
 // Initialize search engine singleton from configuration
 try {
@@ -80,15 +84,15 @@ $iUserId = 0;
 $sCsrfToken = '';
 if ($objSession->sessionDataAvailable()) {
     $objSession->startSession();
-    $iUserId = intval($objSession->getSessionVar('userid'));
+    $iUserId = (int) $objSession->getSessionVar('userid');
     $sCsrfToken = $objSession->ensureCsrfToken();
 } else {
     // Try auto-login via ticket cookie
     if ($sLoginTicket = cSession::getCookieVar('ticket')) {
         require_once(SRCDIR . '/Model/cUserConfig.php');
-        require_once(SRCDIR . '/Enum/eUser.php');
+        require_once(SRCDIR . '/Enum/eUserStatus.php');
         $objUser = new cUserConfig();
-        if ($objUser->loadDataByTicket($sLoginTicket) && ($objUser->getStatus() === UserStatus::ACTIVE)) {
+        if ($objUser->loadDataByTicket($sLoginTicket) && ($objUser->getStatus() === eUserStatus::ACTIVE)) {
             $objSession->startSession();
             $objSession->setSessionVar('userid', $objUser->getId());
             $iUserId = $objUser->getId();

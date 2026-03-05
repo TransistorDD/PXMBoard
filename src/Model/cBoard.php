@@ -16,7 +16,7 @@ class cBoard
     protected string $m_sName = '';					    // board name
     protected string $m_sDescription = '';			    // board description
     protected int $m_iPosition = 0;					    // position in boardlist
-    protected BoardStatus $m_eStatus = BoardStatus::PUBLIC;			// board status (PUBLIC, MEMBERS_ONLY, READONLY_PUBLIC, READONLY_MEMBERS, CLOSED)
+    protected eBoardStatus $m_eStatus = eBoardStatus::PUBLIC;			// board status (PUBLIC, MEMBERS_ONLY, READONLY_PUBLIC, READONLY_MEMBERS, CLOSED)
     protected int $m_iLastMessageTimestamp = 0;		    // timestamp of last message
     protected int $m_iThreadListTimeSpan = 365;		    // timespan for threadlist in days
     protected string $m_sThreadListSortMode = 'last';	// sortmode for threadlist
@@ -66,16 +66,16 @@ class cBoard
      */
     private function _setDataFromDb(object $objResultRow): bool
     {
-        $this->m_iId = intval($objResultRow->b_id);
+        $this->m_iId = (int) $objResultRow->b_id;
         $this->m_sName = $objResultRow->b_name;
         $this->m_sDescription = $objResultRow->b_description;
-        $this->m_iPosition = intval($objResultRow->b_position);
-        $this->m_eStatus = BoardStatus::from($objResultRow->b_status);
-        $this->m_iLastMessageTimestamp = intval($objResultRow->b_lastmsgtstmp);
-        $this->m_iThreadListTimeSpan = intval($objResultRow->b_timespan);
+        $this->m_iPosition = (int) $objResultRow->b_position;
+        $this->m_eStatus = eBoardStatus::from($objResultRow->b_status);
+        $this->m_iLastMessageTimestamp = (int) $objResultRow->b_lastmsgtstmp;
+        $this->m_iThreadListTimeSpan = (int) $objResultRow->b_timespan;
         $this->m_sThreadListSortMode = $objResultRow->b_threadlistsort;
-        $this->m_bEmbedExternal = $objResultRow->b_embed_external ? true : false;
-        $this->m_bDoTextReplacements = $objResultRow->b_replacetext ? true : false;
+        $this->m_bEmbedExternal = (bool) $objResultRow->b_embed_external;
+        $this->m_bDoTextReplacements = (bool) $objResultRow->b_replacetext;
 
         return true;
     }
@@ -294,9 +294,9 @@ class cBoard
     /**
      * Get board status
      *
-     * @return BoardStatus current status
+     * @return eBoardStatus current status
      */
-    public function getStatus(): BoardStatus
+    public function getStatus(): eBoardStatus
     {
         return $this->m_eStatus;
     }
@@ -304,10 +304,10 @@ class cBoard
     /**
      * Set board status
      *
-     * @param BoardStatus $eStatus new status
+     * @param eBoardStatus $eStatus new status
      * @return void
      */
-    public function setStatus(BoardStatus $eStatus): void
+    public function setStatus(eBoardStatus $eStatus): void
     {
         $this->m_eStatus = $eStatus;
     }
@@ -315,10 +315,10 @@ class cBoard
     /**
      * Update board status in database
      *
-     * @param BoardStatus $eStatus new status
+     * @param eBoardStatus $eStatus new status
      * @return bool success / failure
      */
-    public function updateStatus(BoardStatus $eStatus): bool
+    public function updateStatus(eBoardStatus $eStatus): bool
     {
         if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_board SET b_status='.intval($eStatus->value)." WHERE b_id=$this->m_iId")) {
             return false;
@@ -385,7 +385,7 @@ class cBoard
      */
     public function setLastMessageTimestamp(int $iLastMessageTimestamp): void
     {
-        $this->m_iLastMessageTimestamp = intval($iLastMessageTimestamp);
+        $this->m_iLastMessageTimestamp = $iLastMessageTimestamp;
     }
 
     /**
@@ -406,7 +406,7 @@ class cBoard
      */
     public function setThreadsPerPage(int $iThreadsPerPage): void
     {
-        $this->m_iThreadsPerPage = intval($iThreadsPerPage);
+        $this->m_iThreadsPerPage = $iThreadsPerPage;
     }
 
     /**
@@ -427,7 +427,7 @@ class cBoard
      */
     public function setThreadListTimeSpan(int $iThreadListTimeSpan): void
     {
-        $this->m_iThreadListTimeSpan = intval($iThreadListTimeSpan);
+        $this->m_iThreadListTimeSpan = $iThreadListTimeSpan;
     }
 
     /**

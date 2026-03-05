@@ -2,7 +2,7 @@
 
 require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
 require_once(SRCDIR . '/Model/cUserPermissions.php');
-require_once(SRCDIR . '/Enum/eUser.php');
+require_once(SRCDIR . '/Enum/eUserStatus.php');
 /**
  * Ajax-Action: Toggle user status (active <-> disabled)
  *
@@ -36,34 +36,34 @@ class cAjaxActionUserchangestatus extends cAjaxAction
         // Input-Validierung
         $iUserId = $this->m_objInputHandler->getIntFormVar('usrid', true, true, true);
         if ($iUserId <= 0) {
-            $this->_setJsonError(eError::INVALID_USER_ID, 400);
+            $this->_setJsonError(eErrorKeys::INVALID_USER_ID, 400);
             return;
         }
 
         // Load user
         $objUserPermission = new cUserPermissions();
         if (!$objUserPermission->loadDataById($iUserId)) {
-            $this->_setJsonError(eError::INVALID_USER_ID, 404);
+            $this->_setJsonError(eErrorKeys::INVALID_USER_ID, 404);
             return;
         }
 
         // Security: Cannot disable admins
         if ($objUserPermission->isAdmin()) {
-            $this->_setJsonError(eError::NOT_AUTHORIZED, 403);
+            $this->_setJsonError(eErrorKeys::NOT_AUTHORIZED, 403);
             return;
         }
 
         // Toggle status
         $newStatus = null;
         switch ($objUserPermission->getStatus()) {
-            case UserStatus::ACTIVE:
-                $newStatus = UserStatus::DISABLED;
+            case eUserStatus::ACTIVE:
+                $newStatus = eUserStatus::DISABLED;
                 break;
-            case UserStatus::DISABLED:
-                $newStatus = UserStatus::ACTIVE;
+            case eUserStatus::DISABLED:
+                $newStatus = eUserStatus::ACTIVE;
                 break;
             default:
-                $this->_setJsonError(eError::NOT_AUTHORIZED, 403);
+                $this->_setJsonError(eErrorKeys::NOT_AUTHORIZED, 403);
                 return;
         }
 
@@ -71,7 +71,7 @@ class cAjaxActionUserchangestatus extends cAjaxAction
         $objUserPermission->updateData();
 
         // Success response
-        $eMessage = $newStatus === UserStatus::ACTIVE ? eSuccessMessage::USER_ACTIVATED : eSuccessMessage::USER_DEACTIVATED;
+        $eMessage = $newStatus === eUserStatus::ACTIVE ? eSuccessKeys::USER_ACTIVATED : eSuccessKeys::USER_DEACTIVATED;
         $this->_setJsonSuccess($eMessage, ['status' => $newStatus->value]);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Integration test for cActionMessagesave
  *
@@ -104,7 +105,7 @@ class cActionMessagesaveTest extends ActionTestCase
 
         $this->assertFalse($objAction->validateBasePermissionsAndConditions());
         $this->assertStringContainsString(
-            \eError::CSRF_TOKEN_INVALID->value,
+            \eErrorKeys::CSRF_TOKEN_INVALID->t(),
             $objAction->getOutput()
         );
     }
@@ -122,7 +123,7 @@ class cActionMessagesaveTest extends ActionTestCase
 
         $this->assertFalse($objAction->validateBasePermissionsAndConditions());
         $this->assertStringContainsString(
-            \eError::CSRF_TOKEN_INVALID->value,
+            \eErrorKeys::CSRF_TOKEN_INVALID->t(),
             $objAction->getOutput()
         );
     }
@@ -180,7 +181,7 @@ class cActionMessagesaveTest extends ActionTestCase
         $objAction->performAction();
 
         $this->assertStringContainsString(
-            \eError::SUBJECT_MISSING->value,
+            \eErrorKeys::SUBJECT_MISSING->t(),
             $objAction->getOutput()
         );
     }

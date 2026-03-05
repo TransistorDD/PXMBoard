@@ -17,13 +17,24 @@ use PHPUnit\Framework\TestCase;
 class MessageStatusTest extends TestCase
 {
     /**
+     * Load translations before each test.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        \cTranslator::load('de');
+    }
+
+
+    /**
      * Test DRAFT value is 0
      *
      * @return void
      */
     public function test_draftValue_isZero(): void
     {
-        $this->assertSame(0, \MessageStatus::DRAFT->value);
+        $this->assertSame(0, \eMessageStatus::DRAFT->value);
     }
 
     /**
@@ -33,7 +44,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_publishedValue_isOne(): void
     {
-        $this->assertSame(1, \MessageStatus::PUBLISHED->value);
+        $this->assertSame(1, \eMessageStatus::PUBLISHED->value);
     }
 
     /**
@@ -43,7 +54,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_deletedValue_isTwo(): void
     {
-        $this->assertSame(2, \MessageStatus::DELETED->value);
+        $this->assertSame(2, \eMessageStatus::DELETED->value);
     }
 
     /**
@@ -53,7 +64,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_isDraft_forDraft_returnsTrue(): void
     {
-        $this->assertTrue(\MessageStatus::DRAFT->isDraft());
+        $this->assertTrue(\eMessageStatus::DRAFT->isDraft());
     }
 
     /**
@@ -63,7 +74,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_isDraft_forPublished_returnsFalse(): void
     {
-        $this->assertFalse(\MessageStatus::PUBLISHED->isDraft());
+        $this->assertFalse(\eMessageStatus::PUBLISHED->isDraft());
     }
 
     /**
@@ -73,7 +84,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_isPubliclyVisible_forPublished_returnsTrue(): void
     {
-        $this->assertTrue(\MessageStatus::PUBLISHED->isPubliclyVisible());
+        $this->assertTrue(\eMessageStatus::PUBLISHED->isPubliclyVisible());
     }
 
     /**
@@ -83,7 +94,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_isPubliclyVisible_forDraft_returnsFalse(): void
     {
-        $this->assertFalse(\MessageStatus::DRAFT->isPubliclyVisible());
+        $this->assertFalse(\eMessageStatus::DRAFT->isPubliclyVisible());
     }
 
     /**
@@ -93,7 +104,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_isDeleted_forDeleted_returnsTrue(): void
     {
-        $this->assertTrue(\MessageStatus::DELETED->isDeleted());
+        $this->assertTrue(\eMessageStatus::DELETED->isDeleted());
     }
 
     /**
@@ -103,7 +114,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_isDeleted_forPublished_returnsFalse(): void
     {
-        $this->assertFalse(\MessageStatus::PUBLISHED->isDeleted());
+        $this->assertFalse(\eMessageStatus::PUBLISHED->isDeleted());
     }
 
     /**
@@ -113,8 +124,8 @@ class MessageStatusTest extends TestCase
      */
     public function test_from_withValidInt_returnsEnum(): void
     {
-        $status = \MessageStatus::from(1);
-        $this->assertSame(\MessageStatus::PUBLISHED, $status);
+        $status = \eMessageStatus::from(1);
+        $this->assertSame(\eMessageStatus::PUBLISHED, $status);
     }
 
     /**
@@ -124,8 +135,8 @@ class MessageStatusTest extends TestCase
      */
     public function test_label_returnGermanLabel(): void
     {
-        $this->assertSame('Entwurf', \MessageStatus::DRAFT->label());
-        $this->assertSame('Veröffentlicht', \MessageStatus::PUBLISHED->label());
-        $this->assertSame('Gelöscht', \MessageStatus::DELETED->label());
+        $this->assertSame('Entwurf', \eMessageStatus::DRAFT->getLabel());
+        $this->assertSame('Veröffentlicht', \eMessageStatus::PUBLISHED->getLabel());
+        $this->assertSame('Gelöscht', \eMessageStatus::DELETED->getLabel());
     }
 }

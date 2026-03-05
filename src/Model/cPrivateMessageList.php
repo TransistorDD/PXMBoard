@@ -1,7 +1,7 @@
 <?php
 
 require_once(SRCDIR . '/Model/cScrollList.php');
-require_once(SRCDIR . '/Enum/ePrivateMessage.php');
+require_once(SRCDIR . '/Enum/ePrivateMessageStatus.php');
 /**
  * private message list handling (abstract class)
  *

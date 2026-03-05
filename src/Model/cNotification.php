@@ -1,7 +1,8 @@
 <?php
 
 require_once(SRCDIR . '/Database/cDBFactory.php');
-require_once(SRCDIR . '/Enum/eNotification.php');
+require_once(SRCDIR . '/Enum/eNotificationType.php');
+require_once(SRCDIR . '/Enum/eNotificationStatus.php');
 require_once(SRCDIR . '/Model/cUser.php');
 /**
  * User notification
@@ -16,7 +17,7 @@ class cNotification
     protected int $m_iId = 0;
     protected int $m_iUserId = 0;
     protected string $m_sType = '';
-    protected NotificationStatus $m_eStatus = NotificationStatus::UNREAD;
+    protected eNotificationStatus $m_eStatus = eNotificationStatus::UNREAD;
     protected string $m_sTitle = '';
     protected string $m_sMessage = '';
     protected string $m_sLink = '';
@@ -24,14 +25,14 @@ class cNotification
     protected int $m_iRelatedPmId = 0;
     protected int $m_iCreatedTimestamp = 0;
     protected int $m_iReadTimestamp = 0;
-    protected NotificationType $m_eType = NotificationType::REPLY;
-    protected string $m_sStatus = NotificationStatus::UNREAD->value;
+    protected eNotificationType $m_eType = eNotificationType::REPLY;
+    protected string $m_sStatus = eNotificationStatus::UNREAD->value;
 
     /**
      * Create a new notification
      *
      * @param int $iUserId User ID (recipient)
-     * @param NotificationType $eType Notification type
+     * @param eNotificationType $eType Notification type
      * @param string $sTitle Title
      * @param string $sMessage Message
      * @param string $sLink Link to target
@@ -41,7 +42,7 @@ class cNotification
      */
     public static function createNotification(
         int $iUserId,
-        NotificationType $eType,
+        eNotificationType $eType,
         string $sTitle,
         string $sMessage,
         string $sLink = '',
@@ -62,7 +63,7 @@ class cNotification
                   'VALUES ('.
                   intval($iUserId).', '.
                   $objDb->quote($eType->value).', '.
-                  $objDb->quote(NotificationStatus::UNREAD->value).', '.
+                  $objDb->quote(eNotificationStatus::UNREAD->value).', '.
                   $objDb->quote($sTitle).', '.
                   $objDb->quote($sMessage).', '.
                   $objDb->quote($sLink).', '.
@@ -104,18 +105,18 @@ class cNotification
 
         if ($objResultSet = $objDb->executeQuery($sQuery)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $this->m_iId = intval($objResultRow->n_id);
-                $this->m_iUserId = intval($objResultRow->n_userid);
-                $this->m_eType = NotificationType::from($objResultRow->n_type);
-                $this->m_eStatus = NotificationStatus::from($objResultRow->n_status);
+                $this->m_iId = (int) $objResultRow->n_id;
+                $this->m_iUserId = (int) $objResultRow->n_userid;
+                $this->m_eType = eNotificationType::from($objResultRow->n_type);
+                $this->m_eStatus = eNotificationStatus::from($objResultRow->n_status);
                 $this->m_sStatus = $objResultRow->n_status;
                 $this->m_sTitle = $objResultRow->n_title;
                 $this->m_sMessage = $objResultRow->n_message;
                 $this->m_sLink = $objResultRow->n_link;
-                $this->m_iRelatedMessageId = intval($objResultRow->n_related_messageid);
-                $this->m_iRelatedPmId = intval($objResultRow->n_related_pmid);
-                $this->m_iCreatedTimestamp = intval($objResultRow->n_created_timestamp);
-                $this->m_iReadTimestamp = intval($objResultRow->n_read_timestamp);
+                $this->m_iRelatedMessageId = (int) $objResultRow->n_related_messageid;
+                $this->m_iRelatedPmId = (int) $objResultRow->n_related_pmid;
+                $this->m_iCreatedTimestamp = (int) $objResultRow->n_created_timestamp;
+                $this->m_iReadTimestamp = (int) $objResultRow->n_read_timestamp;
                 return true;
             }
         }
@@ -136,18 +137,18 @@ class cNotification
         }
 
         // Already read?
-        if ($this->m_sStatus == NotificationStatus::READ->value) {
+        if ($this->m_sStatus == eNotificationStatus::READ->value) {
             return true;
         }
 
         $iTimestamp = time();
         $sQuery = 'UPDATE pxm_notification SET '.
-                  'n_status='.$objDb->quote(NotificationStatus::READ->value).', '.
+                  'n_status='.$objDb->quote(eNotificationStatus::READ->value).', '.
                   'n_read_timestamp='.intval($iTimestamp).' '.
                   'WHERE n_id='.intval($this->m_iId);
 
         if ($objDb->executeQuery($sQuery)) {
-            $this->m_sStatus = NotificationStatus::READ->value;
+            $this->m_sStatus = eNotificationStatus::READ->value;
             $this->m_iReadTimestamp = $iTimestamp;
 
             // Update unread count in pxm_user
@@ -169,11 +170,11 @@ class cNotification
     {
         return $this->m_iUserId;
     }
-    public function getType(): NotificationType
+    public function getType(): eNotificationType
     {
         return $this->m_eType;
     }
-    public function getStatus(): NotificationStatus
+    public function getStatus(): eNotificationStatus
     {
         return $this->m_eStatus;
     }
@@ -208,6 +209,6 @@ class cNotification
 
     public function isUnread(): bool
     {
-        return $this->m_eStatus == NotificationStatus::UNREAD;
+        return $this->m_eStatus == eNotificationStatus::UNREAD;
     }
 }

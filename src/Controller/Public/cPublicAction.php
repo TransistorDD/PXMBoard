@@ -40,10 +40,10 @@ abstract class cPublicAction extends cBaseAction
     /**
      * Handle permission error by rendering the error template.
      *
-     * @param eError $error the error that caused the permission failure
+     * @param eErrorKeys $error the error that caused the permission failure
      * @return void
      */
-    protected function _handlePermissionError(eError $error): void
+    protected function _handlePermissionError(eErrorKeys $error): void
     {
         $this->m_objTemplate = $this->_getErrorTemplateObject($error);
     }
@@ -124,10 +124,10 @@ abstract class cPublicAction extends cBaseAction
     /**
      * Get the error template object for the given error enum.
      *
-     * @param eError $error error enum
+     * @param eErrorKeys $error error enum
      * @return cSkinTemplate error template object
      */
-    protected function _getErrorTemplateObject(eError $error): cSkinTemplate
+    protected function _getErrorTemplateObject(eErrorKeys $error): cSkinTemplate
     {
         $objTemplate = cSkinTemplateFactory::getTemplateObject(
             $this->m_objConfig->getActiveTemplateEngine(),
@@ -139,7 +139,7 @@ abstract class cPublicAction extends cBaseAction
         }
         $objTemplate->setTemplateName($sTemplateName);
         $objTemplate->addData($this->getContextDataArray());
-        $objTemplate->addData(['error' => ['text' => $error->value]]);
+        $objTemplate->addData(['error' => ['text' => $error->t()]]);
         return $objTemplate;
     }
 
@@ -186,6 +186,7 @@ abstract class cPublicAction extends cBaseAction
 
         $arrContext['input_sizes'] = $this->m_objInputHandler->getInputSizes();
         $arrContext['csrf_token'] = $this->m_sCsrfToken ?? '';
+        $arrContext['css_version'] = (string) (@filemtime(PUBLICDIR . '/css/pxmboard.css') ?: '1');
 
         return [
             'config' => array_merge_recursive(

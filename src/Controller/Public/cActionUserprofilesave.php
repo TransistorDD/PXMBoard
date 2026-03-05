@@ -3,7 +3,7 @@
 require_once(SRCDIR . '/Controller/Public/cPublicAction.php');
 require_once(SRCDIR . '/Model/cUserProfile.php');
 require_once(SRCDIR . '/Model/cProfileConfig.php');
-require_once(SRCDIR . '/Enum/eSuccessMessage.php');
+require_once(SRCDIR . '/Enum/eSuccessKeys.php');
 /**
  * saves a user profile
  *
@@ -81,10 +81,10 @@ class cActionUserProfileSave extends cPublicAction
                                 );
                                 $bSuccess = true;
                             } else {
-                                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::IMAGE_UPLOAD_ERROR);
+                                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::IMAGE_UPLOAD_ERROR);
                             }// file upload error
                         } else {
-                            $this->m_objTemplate = $this->_getErrorTemplateObject(eError::IMAGE_UPLOAD_ERROR);
+                            $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::IMAGE_UPLOAD_ERROR);
                         }	// file upload error
                     } else {
                         if ($this->m_objInputHandler->getIntFormVar('delpic', true, true) == 1) {
@@ -99,13 +99,13 @@ class cActionUserProfileSave extends cPublicAction
                 if ($bSuccess) {
                     $this->m_objTemplate = $this->_getTemplateObject('confirm');
                     $this->m_objTemplate->addData($this->getContextDataArray());
-                    $this->m_objTemplate->addData(['message' => eSuccessMessage::USER_PROFILE_SAVED->value]);
+                    $this->m_objTemplate->addData(['message' => eSuccessKeys::USER_PROFILE_SAVED->t()]);
                 }
             } else {
-                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::COULD_NOT_INSERT_DATA);
+                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::COULD_NOT_INSERT_DATA);
             }	// could not insert data
         } else {
-            $this->m_objTemplate = $this->_getErrorTemplateObject(eError::INVALID_USER_ID);
+            $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::INVALID_USER_ID);
         }// user id invalid
     }
 }

@@ -2,7 +2,7 @@
 
 require_once(SRCDIR . '/Controller/Public/cPublicAction.php');
 require_once(SRCDIR . '/Model/cSession.php');
-require_once(SRCDIR . '/Enum/eSuccessMessage.php');
+require_once(SRCDIR . '/Enum/eSuccessKeys.php');
 /**
  * change the password of an user
  *
@@ -43,9 +43,9 @@ class cActionUserchangepwd extends cPublicAction
 
                 $this->m_objTemplate = $this->_getTemplateObject('confirm');
                 $this->m_objTemplate->addData($this->getContextDataArray());
-                $this->m_objTemplate->addData(['message' => eSuccessMessage::USER_PASSWORD_CHANGED->value]);
+                $this->m_objTemplate->addData(['message' => eSuccessKeys::USER_PASSWORD_CHANGED->t()]);
             } else {
-                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::COULD_NOT_UPDATE_PASSWORD);
+                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::COULD_NOT_UPDATE_PASSWORD);
             }// pwd not valid
         } else {
             $this->m_objTemplate = $this->_getTemplateObject('userchangepwdform');

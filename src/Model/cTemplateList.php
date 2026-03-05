@@ -29,7 +29,7 @@ class cTemplateList
                 $objTemplate->setName($objResultRow->te_name);
                 $objTemplate->setDescription($objResultRow->te_description);
 
-                $arrTemplates[intval($objResultRow->te_id)] = $objTemplate;
+                $arrTemplates[(int) $objResultRow->te_id] = $objTemplate;
             }
             $objResultSet->freeResult();
         }

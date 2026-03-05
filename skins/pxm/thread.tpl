@@ -1,5 +1,5 @@
 {function name="threadnode"}
-<li><div class="htmx-thread-msg-row" data-msgid="{$msg.id}">
+<li><div class="htmx-thread-msg-row{if $msg.status == 0} htmx-msg-draft{/if}" data-msgid="{$msg.id}">
 	<span class="{if $config.logedin == 1 && $msg.new == 1}font-semibold{/if}">
 		<a href="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}&msgid={$msg.id}"
 		   hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$msg.id}"
@@ -28,7 +28,7 @@
 {assign var="root" value=$thread.msg[0]}
 <div data-thrdid="{$thread.id}">
 	<!-- Thread-Kopf: Wurzelnachricht als Header-Zeile -->
-	<div class="htmx-thread-root-header" data-msgid="{$root.id}">
+	<div class="htmx-thread-root-header{if $root.status == 0} htmx-msg-draft{/if}" data-msgid="{$root.id}">
 		<span class="font-semibold">
 			<a href="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}&msgid={$root.id}"
 			   hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$root.id}"

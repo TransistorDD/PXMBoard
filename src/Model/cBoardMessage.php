@@ -1,8 +1,8 @@
 <?php
 
 require_once SRCDIR.'/Model/cMessage.php';
-require_once SRCDIR.'/Enum/eMessage.php';
-require_once SRCDIR.'/Enum/eError.php';
+require_once SRCDIR.'/Enum/eMessageStatus.php';
+require_once SRCDIR.'/Enum/eErrorKeys.php';
 require_once SRCDIR.'/Exception/cMessageMoveException.php';
 /**
  * boardmessage handling
@@ -19,7 +19,6 @@ class cBoardMessage extends cMessage
     protected bool $m_bThreadIsActive = true;		// thread status
     protected bool $m_bNotifyOnReply = false;		// notify author on reply
     protected bool $m_bIsRead = false;				// is message read (for logged-in users)?
-    protected MessageStatus $m_eStatus = MessageStatus::PUBLISHED;		    // message status (draft, published, etc.)
 
     protected cMessageHeader $m_objReplyMsg;		// reply to message
 
@@ -58,8 +57,8 @@ class cBoardMessage extends cMessage
     {
         cMessage::_setDataFromDb($objResultRow);
 
-        $this->m_iBoardId = intval($objResultRow->t_boardid);
-        $this->m_iThreadId = intval($objResultRow->t_id);
+        $this->m_iBoardId = (int) $objResultRow->t_boardid;
+        $this->m_iThreadId = (int) $objResultRow->t_id;
         $this->m_bThreadIsActive = $objResultRow->t_active ? true : false;
 
         // author data
@@ -75,7 +74,6 @@ class cBoardMessage extends cMessage
         $this->m_objReplyMsg = new cMessageHeader();
         $this->m_objReplyMsg->loadDataById($objResultRow->m_parentid);
         $this->m_bNotifyOnReply = $objResultRow->m_notify_on_reply ? true : false;
-        $this->m_eStatus = MessageStatus::tryFrom($objResultRow->m_status) ?? MessageStatus::PUBLISHED;
 
         return true;
     }
@@ -90,7 +88,7 @@ class cBoardMessage extends cMessage
         return cMessage::_getDbAttributes()
                 .',t_id,t_active,t_boardid,m_parentid,m_notify_on_reply'
                 .',u_firstname,u_lastname,u_city,u_imgfile,u_registrationtstmp'
-                .',u_lastonlinetstmp,u_msgquantity,u_signature,m_status';
+                .',u_lastonlinetstmp,u_msgquantity,u_signature';
     }
 
     /**
@@ -119,13 +117,11 @@ class cBoardMessage extends cMessage
      *
      * @param  int  $iParentId  parent id
      * @param  int  $iAutoClose  message limit per thread (thread will be closed when reached)
-     * @return ?eError null on success, eError enum on failure
+     * @return ?eErrorKeys null on success, eErrorKeys enum on failure
      */
-    public function insertData(int $iParentId, int $iAutoClose): ?eError
+    public function insertData(int $iParentId, int $iAutoClose): ?eErrorKeys
     {
-        $eError = eError::COULD_NOT_INSERT_DATA;
-        $iParentId = intval($iParentId);
-        $iAutoClose = intval($iAutoClose);
+        $eError = eErrorKeys::COULD_NOT_INSERT_DATA;
 
         if (! empty($this->m_sSubject)) {
             // dupcheck
@@ -135,7 +131,7 @@ class cBoardMessage extends cMessage
                                                                     ' AND m_tstmp>'.($this->m_iMessageTimestamp - 259200).
                                                                     ' AND m_subject='.cDBFactory::getInstance()->quote($this->m_sSubject));
             if ($objResultSet && $objResultRow = $objResultSet->getNextResultRowObject()) {
-                if (intval($objResultRow->msgcount) < 1) {
+                if (((int) $objResultRow->msgcount) < 1) {
                     if ($iParentId < 1) {							// new thread
                         if (cDBFactory::getInstance()->executeQuery("INSERT INTO pxm_thread (t_boardid,t_active,t_lastmsgtstmp) VALUES ($this->m_iBoardId,1,$this->m_iMessageTimestamp)")) {
                             if (($this->m_iThreadId = cDBFactory::getInstance()->getInsertId('pxm_thread', 't_id')) > 0) {
@@ -155,7 +151,7 @@ class cBoardMessage extends cMessage
 
                                     if ($objResultSet->getAffectedRows() > 0) {
 
-                                        $this->m_iId = intval(cDBFactory::getInstance()->getInsertId('pxm_message', 'm_id'));
+                                        $this->m_iId = (int) cDBFactory::getInstance()->getInsertId('pxm_message', 'm_id');
 
                                         // update board list
                                         cDBFactory::getInstance()->executeQuery("UPDATE pxm_board SET b_lastmsgtstmp=$this->m_iMessageTimestamp WHERE b_id=$this->m_iBoardId");
@@ -191,7 +187,7 @@ class cBoardMessage extends cMessage
                                 $objResultSet->freeResult();
                                 if ($objResultRow->t_active == 1) {
 
-                                    $this->m_iThreadId = intval($objResultRow->m_threadid);
+                                    $this->m_iThreadId = (int) $objResultRow->m_threadid;
 
                                     if ($objResultSet = cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_message (m_threadid,m_parentid,m_userid,m_username,m_usermail,m_userhighlight,m_subject,m_body,m_tstmp,m_ip,m_notify_on_reply,m_status)'.
                                                                                        " VALUES ($this->m_iThreadId,".
@@ -208,7 +204,7 @@ class cBoardMessage extends cMessage
                                                                                                  $this->m_eStatus->value.')')) {
                                         if ($objResultSet->getAffectedRows() > 0) {
 
-                                            $this->m_iId = intval(cDBFactory::getInstance()->getInsertId('pxm_message', 'm_id'));
+                                            $this->m_iId = (int) cDBFactory::getInstance()->getInsertId('pxm_message', 'm_id');
 
                                             // update thread list
                                             cDBFactory::getInstance()->executeQuery("UPDATE pxm_thread SET t_lastmsgtstmp=$this->m_iMessageTimestamp,t_lastmsgid=$this->m_iId,t_msgquantity=t_msgquantity+1 WHERE t_id=$this->m_iThreadId");
@@ -241,19 +237,19 @@ class cBoardMessage extends cMessage
                                         }
                                     }
                                 } else {
-                                    $eError = eError::THREAD_CLOSED;
+                                    $eError = eErrorKeys::THREAD_CLOSED;
                                 }
                             } else {
-                                $eError = eError::INVALID_MESSAGE_ID;
+                                $eError = eErrorKeys::INVALID_MESSAGE_ID;
                             }
                         }
                     }
                 } else {
-                    $eError = eError::MESSAGE_ALREADY_EXISTS;
+                    $eError = eErrorKeys::MESSAGE_ALREADY_EXISTS;
                 }
             }
         } else {
-            $eError = eError::SUBJECT_MISSING;
+            $eError = eErrorKeys::SUBJECT_MISSING;
         }
 
         return $eError;
@@ -262,11 +258,11 @@ class cBoardMessage extends cMessage
     /**
      * update data in database
      *
-     * @return ?eError null on success, eError enum on failure
+     * @return ?eErrorKeys null on success, eErrorKeys enum on failure
      */
-    public function updateData(): ?eError
+    public function updateData(): ?eErrorKeys
     {
-        $eError = eError::COULD_NOT_UPDATE_DATA;
+        $eError = eErrorKeys::COULD_NOT_UPDATE_DATA;
 
         if (! empty($this->m_sSubject)) {
             if ($this->m_iId > 0) {
@@ -277,7 +273,7 @@ class cBoardMessage extends cMessage
                                                                                 'm_tstmp='.$this->m_iMessageTimestamp.
                                                                             " WHERE m_id=$this->m_iId")) {
                     if ($objResultSet->getAffectedRows() > 0) {
-                        // Update search engine index
+                        // Update search engine index if something changed
                         require_once SRCDIR.'/Search/cSearchEngineFactory.php';
                         cSearchEngineFactory::getInstance()->indexMessage(
                             $this->m_iId,
@@ -291,15 +287,14 @@ class cBoardMessage extends cMessage
                             $this->m_iMessageTimestamp,
                             $this->m_eStatus->value
                         );
-
-                        $eError = null;
                     }
+                    $eError = null;
                 }
             } else {
-                $eError = eError::INVALID_MESSAGE_ID;
+                $eError = eErrorKeys::INVALID_MESSAGE_ID;
             }
         } else {
-            $eError = eError::SUBJECT_MISSING;
+            $eError = eErrorKeys::SUBJECT_MISSING;
         }
 
         return $eError;
@@ -370,7 +365,7 @@ class cBoardMessage extends cMessage
      */
     public function setThreadId(int $iThreadId): void
     {
-        $this->m_iThreadId = intval($iThreadId);
+        $this->m_iThreadId = $iThreadId;
     }
 
     /**
@@ -410,7 +405,7 @@ class cBoardMessage extends cMessage
      */
     public function setBoardId(int $iBoardId): void
     {
-        $this->m_iBoardId = intval($iBoardId);
+        $this->m_iBoardId = $iBoardId;
     }
 
     /**
@@ -474,56 +469,6 @@ class cBoardMessage extends cMessage
     }
 
     /**
-     * get message status
-     *
-     * @return MessageStatus message status enum
-     */
-    public function getStatus(): MessageStatus
-    {
-        return $this->m_eStatus;
-    }
-
-    /**
-     * set message status
-     *
-     * @param  MessageStatus  $eStatus  message status
-     */
-    public function setStatus(MessageStatus $eStatus): void
-    {
-        $this->m_eStatus = $eStatus;
-    }
-
-    /**
-     * check if message is a draft
-     *
-     * @return bool true if message is a draft
-     */
-    public function isDraft(): bool
-    {
-        return $this->m_eStatus === MessageStatus::DRAFT;
-    }
-
-    /**
-     * check if message is published
-     *
-     * @return bool true if message is published
-     */
-    public function isPublished(): bool
-    {
-        return $this->m_eStatus === MessageStatus::PUBLISHED;
-    }
-
-    /**
-     * check if message is deleted
-     *
-     * @return bool true if message is deleted
-     */
-    public function isDeleted(): bool
-    {
-        return $this->m_eStatus === MessageStatus::DELETED;
-    }
-
-    /**
      * update the notify on reply flag
      *
      * @param  bool  $bNotifyOnReply  notify on reply
@@ -557,13 +502,12 @@ class cBoardMessage extends cMessage
             cMessage::getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp, $sSubjectQuotePrefix, $objParser),
             ['notify_on_reply' => $this->m_bNotifyOnReply,
                 'thread' => ['id' => $this->m_iThreadId,
-                    'active' => intval($this->m_bThreadIsActive),
-                    'brdid' => $this->m_iBoardId],
+                'active' => (int) $this->m_bThreadIsActive,
+                'brdid' => $this->m_iBoardId],
                 'replyto' => $this->m_objReplyMsg->getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp, '', $objParser),
-                'is_read' => intval($this->m_bIsRead),
-                'status' => $this->m_eStatus,
+                'is_read' => (int) $this->m_bIsRead,
                 'is_draft' => $this->isDraft(),
-                'status_label' => $this->m_eStatus->label()]
+                'status_label' => $this->m_eStatus->getLabel()]
         );
     }
 
@@ -589,7 +533,7 @@ class cBoardMessage extends cMessage
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery($sQuery)) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $arrIds[] = intval($objResultRow->m_id);
+                $arrIds[] = (int) $objResultRow->m_id;
             }
             $objResultSet->freeResult();
         }
@@ -769,7 +713,7 @@ class cBoardMessage extends cMessage
 
         $arrUserIds = [];
         while ($objRow = $objResultSet->getNextResultRowObject()) {
-            $arrUserIds[] = intval($objRow->mn_userid);
+            $arrUserIds[] = (int) $objRow->mn_userid;
         }
 
         return $arrUserIds;

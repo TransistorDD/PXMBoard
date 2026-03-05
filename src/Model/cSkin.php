@@ -27,7 +27,6 @@ class cSkin
     public function loadDataById(int $iSkinId): bool
     {
         $bReturn = false;
-        $iSkinId = intval($iSkinId);
 
         if ($iSkinId > 0) {
             if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT s_fieldname,s_fieldvalue FROM pxm_skin WHERE s_id='.$iSkinId)) {
@@ -92,7 +91,7 @@ class cSkin
      */
     public function setId(int $iId): void
     {
-        $this->m_iId = intval($iId);
+        $this->m_iId = $iId;
     }
 
     /**

@@ -33,7 +33,7 @@ class cTemplate
                                                             ' FROM pxm_template'.
                                                             ' WHERE te_id='.$iTemplateId)) {
                 if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                    $this->m_iId = intval($objResultRow->te_id);
+                    $this->m_iId = (int) $objResultRow->te_id;
                     $this->m_sMessage = $objResultRow->te_message;
                     $this->m_sName = $objResultRow->te_name;
                     $this->m_sDescription = $objResultRow->te_description;

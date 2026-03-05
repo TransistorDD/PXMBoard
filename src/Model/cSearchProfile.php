@@ -29,7 +29,6 @@ class cSearchProfile
     public function loadDataById(int $iSearchId): bool
     {
         $bReturn = false;
-        $iSearchId = intval($iSearchId);
 
         if ($iSearchId > 0) {
             if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT se_id,se_userid,se_message,se_username,se_boardids,se_days,se_tstmp,se_ipaddress FROM pxm_search WHERE se_id='.$iSearchId)) {
@@ -51,13 +50,13 @@ class cSearchProfile
      */
     private function _setDataFromDb(object $objResultRow): bool
     {
-        $this->m_iId = intval($objResultRow->se_id);
-        $this->m_iIdUser = intval($objResultRow->se_userid);
+        $this->m_iId = (int) $objResultRow->se_id;
+        $this->m_iIdUser = (int) $objResultRow->se_userid;
         $this->m_sSearchMessage = $objResultRow->se_message;
         $this->m_sSearchUser = $objResultRow->se_username;
         $this->m_arrBoardIds = explode(',', $objResultRow->se_boardids);
-        $this->m_iSearchDays = intval($objResultRow->se_days);
-        $this->m_iSearchTimestamp = intval($objResultRow->se_tstmp);
+        $this->m_iSearchDays = (int) $objResultRow->se_days;
+        $this->m_iSearchTimestamp = (int) $objResultRow->se_tstmp;
         $this->m_sIpAddress = $objResultRow->se_ipaddress;
 
         return true;
@@ -79,7 +78,7 @@ class cSearchProfile
                                                                 $this->m_iSearchTimestamp.','.
                                                                 cDBFactory::getInstance()->quote($this->m_sIpAddress).')')) {
             if ($objResultSet->getAffectedRows() > 0) {
-                $this->m_iId = intval(cDBFactory::getInstance()->getInsertId('pxm_search', 'se_id'));
+                $this->m_iId = (int) cDBFactory::getInstance()->getInsertId('pxm_search', 'se_id');
             }
         }
 
@@ -125,7 +124,7 @@ class cSearchProfile
      */
     public function setId(int $iId): void
     {
-        $this->m_iId = intval($iId);
+        $this->m_iId = $iId;
     }
 
     /**
@@ -146,7 +145,7 @@ class cSearchProfile
      */
     public function setIdUser(int $iIdUser): void
     {
-        $this->m_iIdUser = intval($iIdUser);
+        $this->m_iIdUser = $iIdUser;
     }
 
     /**
@@ -230,7 +229,7 @@ class cSearchProfile
      */
     public function setSearchDays(int $iSearchDays): void
     {
-        $this->m_iSearchDays = intval($iSearchDays);
+        $this->m_iSearchDays = $iSearchDays;
     }
 
     /**
@@ -251,7 +250,7 @@ class cSearchProfile
      */
     public function setTimestamp(int $iSearchTimestamp): void
     {
-        $this->m_iSearchTimestamp = intval($iSearchTimestamp);
+        $this->m_iSearchTimestamp = $iSearchTimestamp;
     }
 
     /**
@@ -290,7 +289,7 @@ class cSearchProfile
 
         if ($objResultSet = $objDb->executeQuery($sQuery)) {
             if ($objRow = $objResultSet->getNextResultRowObject()) {
-                $iSearchCount = intval($objRow->search_count);
+                $iSearchCount = (int) $objRow->search_count;
                 $objResultSet->freeResult();
                 return $iSearchCount >= 5;
             }

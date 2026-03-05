@@ -69,11 +69,11 @@ class cAdminActionBoardform extends cAdminAction
         // Board status dropdown
         $eStatus = $objBoard->getStatus();
         $this->m_sOutput .= '<div class="pxm-form-group"><label>board status</label><div class="pxm-field"><select name="status" size="1">';
-        $this->m_sOutput .= '<option value="1"'.($eStatus === BoardStatus::PUBLIC ? ' selected' : '').'>Public</option>';
-        $this->m_sOutput .= '<option value="2"'.($eStatus === BoardStatus::MEMBERS_ONLY ? ' selected' : '').'>Members only</option>';
-        $this->m_sOutput .= '<option value="3"'.($eStatus === BoardStatus::READONLY_PUBLIC ? ' selected' : '').'>Read only (public)</option>';
-        $this->m_sOutput .= '<option value="4"'.($eStatus === BoardStatus::READONLY_MEMBERS ? ' selected' : '').'>Read only (members)</option>';
-        $this->m_sOutput .= '<option value="5"'.($eStatus === BoardStatus::CLOSED ? ' selected' : '').'>Closed</option>';
+        $this->m_sOutput .= '<option value="1"'.($eStatus === eBoardStatus::PUBLIC ? ' selected' : '').'>Public</option>';
+        $this->m_sOutput .= '<option value="2"'.($eStatus === eBoardStatus::MEMBERS_ONLY ? ' selected' : '').'>Members only</option>';
+        $this->m_sOutput .= '<option value="3"'.($eStatus === eBoardStatus::READONLY_PUBLIC ? ' selected' : '').'>Read only (public)</option>';
+        $this->m_sOutput .= '<option value="4"'.($eStatus === eBoardStatus::READONLY_MEMBERS ? ' selected' : '').'>Read only (members)</option>';
+        $this->m_sOutput .= '<option value="5"'.($eStatus === eBoardStatus::CLOSED ? ' selected' : '').'>Closed</option>';
         $this->m_sOutput .= "</select></div></div>\n";
         $this->m_sOutput .= $this->_getCheckboxField('embed_external', '1', 'Embed external content (images, YouTube, Twitch)?', $objBoard->embedExternal());
         $this->m_sOutput .= $this->_getCheckboxField('repl', '1', 'do textreplacements?', $objBoard->doTextReplacements());

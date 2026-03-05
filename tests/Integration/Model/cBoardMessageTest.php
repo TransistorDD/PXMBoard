@@ -75,8 +75,8 @@ class cBoardMessageTest extends IntegrationTestCase
         $objMessage->loadDataById($iMessageId, $iBoardId);
 
         $objStatus = $objMessage->getStatus();
-        $this->assertInstanceOf(\MessageStatus::class, $objStatus);
-        $this->assertSame(\MessageStatus::PUBLISHED, $objStatus);
+        $this->assertInstanceOf(\eMessageStatus::class, $objStatus);
+        $this->assertSame(\eMessageStatus::PUBLISHED, $objStatus);
     }
 
     /**

@@ -68,17 +68,17 @@ class cNotificationList extends cScrollList
     protected function _setDataFromDb(object $objResultRow): bool
     {
         $this->m_arrResultList[] = [
-            'id' => intval($objResultRow->n_id),
-            'userid' => intval($objResultRow->n_userid),
+            'id' => (int) $objResultRow->n_id,
+            'userid' => (int) $objResultRow->n_userid,
             'type' => $objResultRow->n_type,
             'status' => $objResultRow->n_status,
             'title' => $objResultRow->n_title,
             'message' => $objResultRow->n_message,
             'link' => $objResultRow->n_link,
-            'related_messageid' => intval($objResultRow->n_related_messageid),
-            'related_pmid' => intval($objResultRow->n_related_pmid),
-            'created_timestamp' => intval($objResultRow->n_created_timestamp),
-            'read_timestamp' => intval($objResultRow->n_read_timestamp),
+            'related_messageid' => (int) $objResultRow->n_related_messageid,
+            'related_pmid' => (int) $objResultRow->n_related_pmid,
+            'created_timestamp' => (int) $objResultRow->n_created_timestamp,
+            'read_timestamp' => (int) $objResultRow->n_read_timestamp,
             'is_unread' => ($objResultRow->n_status == 'unread')
         ];
         return true;

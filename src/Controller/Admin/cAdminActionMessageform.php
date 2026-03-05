@@ -65,9 +65,9 @@ class cAdminActionMessageform extends cAdminAction
         // public messages
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT b_name,count(*) AS msgcount,min(m_tstmp) AS minmsg,max(m_tstmp) AS maxmsg FROM pxm_message,pxm_thread,pxm_board WHERE m_threadid=t_id AND t_boardid=b_id AND t_fixed=0 GROUP BY b_id ORDER BY b_name')) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $iTmpMsgCount = intval($objResultRow->msgcount);
-                $iTmpMsgFirst = intval($objResultRow->minmsg);
-                $iTmpMsgLast = intval($objResultRow->maxmsg);
+                $iTmpMsgCount = (int) $objResultRow->msgcount;
+                $iTmpMsgFirst = (int) $objResultRow->minmsg;
+                $iTmpMsgLast = (int) $objResultRow->maxmsg;
                 $iTmpTimeSpan = $iTmpMsgLast - $iTmpMsgFirst;
                 $iTmpAverage = (($iTmpTimeSpan >= 86400) ? round(($iTmpMsgCount * 86400) / $iTmpTimeSpan, 3) : $iTmpMsgCount);
                 $iAverage += $iTmpAverage;
@@ -88,9 +88,9 @@ class cAdminActionMessageform extends cAdminAction
         // private messages
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT count(*) AS msgcount,min(p_tstmp) AS minmsg,max(p_tstmp) AS maxmsg FROM pxm_priv_message')) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $iTmpMsgCount = intval($objResultRow->msgcount);
-                $iTmpMsgFirst = intval($objResultRow->minmsg);
-                $iTmpMsgLast = intval($objResultRow->maxmsg);
+                $iTmpMsgCount = (int) $objResultRow->msgcount;
+                $iTmpMsgFirst = (int) $objResultRow->minmsg;
+                $iTmpMsgLast = (int) $objResultRow->maxmsg;
                 $iTmpTimeSpan = $iTmpMsgLast - $iTmpMsgFirst;
                 $iTmpAverage = (($iTmpTimeSpan >= 86400) ? round(($iTmpMsgCount * 86400) / $iTmpTimeSpan, 3) : $iTmpMsgCount);
                 $iAverage += $iTmpAverage;

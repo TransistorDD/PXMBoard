@@ -179,7 +179,7 @@ class cPxmParser extends cParser
                                 // user mentions: [user:123]
                             } elseif (preg_match('/^\[user:(\d+)\]/iu', substr($sText, $iCharPointer), $arrMentionMatch)) {
                                 if (!$bMemberSkip) {
-                                    $iUserId = intval($arrMentionMatch[1]);
+                                    $iUserId = (int) $arrMentionMatch[1];
                                     if (isset($this->m_arrMentionCache[$iUserId])) {
                                         $sUsername = htmlspecialchars($this->m_arrMentionCache[$iUserId]);
                                         $sProfileUrl = 'pxmboard.php?mode=userprofile&usrid='.$iUserId;
@@ -352,9 +352,8 @@ class cPxmParser extends cParser
                 $objResultSet = $objDb->executeQuery($sQuery);
 
                 while ($objRow = $objResultSet->getNextResultRowObject()) {
-                    $this->m_arrMentionCache[intval($objRow->u_id)] = $objRow->u_username;
+                    $this->m_arrMentionCache[(int) $objRow->u_id] = $objRow->u_username;
                 }
-
                 $objResultSet->freeResult();
             }
         }

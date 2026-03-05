@@ -32,13 +32,13 @@ class cThreadHeader extends cMessageHeader
     {
         cMessageHeader::_setDataFromDb($objResultRow);
 
-        $this->m_iThreadId = intval($objResultRow->t_id);
-        $this->m_bIsActive = $objResultRow->t_active ? true : false;
-        $this->m_iLastMessageId = intval($objResultRow->t_lastmsgid);
-        $this->m_iLastMessageTimestamp = intval($objResultRow->t_lastmsgtstmp);
-        $this->m_iMessageQuantity = intval($objResultRow->t_msgquantity);
-        $this->m_iViews = intval($objResultRow->t_views);
-        $this->m_bIsFixed = $objResultRow->t_fixed ? true : false;
+        $this->m_iThreadId = (int) $objResultRow->t_id;
+        $this->m_bIsActive = (bool) $objResultRow->t_active;
+        $this->m_iLastMessageId = (int) $objResultRow->t_lastmsgid;
+        $this->m_iLastMessageTimestamp = (int) $objResultRow->t_lastmsgtstmp;
+        $this->m_iMessageQuantity = (int) $objResultRow->t_msgquantity;
+        $this->m_iViews = (int) $objResultRow->t_views;
+        $this->m_bIsFixed = (bool) $objResultRow->t_fixed;
 
         return true;
     }
@@ -299,15 +299,15 @@ class cThreadHeader extends cMessageHeader
         return array_merge(
             cMessageHeader::getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp, '', $objParser),
             ['threadid'	=>	$this->m_iThreadId,
-            'active'	=>	intval($this->m_bIsActive),
-            'views'	    =>	strval($this->m_iViews),
-            'fixed'	    =>	intval($this->m_bIsFixed),
+            'active'	=>	(int) $this->m_bIsActive,
+            'views'	    =>	(string) $this->m_iViews,
+            'fixed'	    =>	(int) $this->m_bIsFixed,
             'lastid'	=>	$this->m_iLastMessageId,
             'lastdate'	=>	(($this->m_iLastMessageTimestamp > $this->m_iMessageTimestamp) ? date($sDateFormat, ($this->m_iLastMessageTimestamp + $iTimeOffset)) : 0),
             'lastnew'	=>	(($iLastOnlineTimestamp > $this->m_iLastMessageTimestamp) ? 0 : 1),
-            'msgquan'	=>	strval($this->m_iMessageQuantity),
-            'thread_msg_read'	=>	intval($this->m_bThreadMsgRead),
-            'last_msg_read'	    =>	intval($this->m_bLastMsgRead)]
+            'msgquan'	=>	(string) $this->m_iMessageQuantity,
+            'thread_msg_read'	=>	(int) $this->m_bThreadMsgRead,
+            'last_msg_read'	    =>	(int) $this->m_bLastMsgRead]
         );
     }
 }

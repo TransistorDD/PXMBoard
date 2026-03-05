@@ -45,7 +45,7 @@ class cAdminActionMessagesdelete extends cAdminAction
                 if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT t_id FROM pxm_thread WHERE t_boardid IN ('.implode(',', $arrBoardIds).') AND t_fixed=0 AND t_lastmsgtstmp<'.($this->m_objConfig->getAccessTimestamp() - $iTimespan))) {
                     $arrThreadIds = [];
                     while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                        $arrThreadIds[] = intval($objResultRow->t_id);
+                        $arrThreadIds[] = (int) $objResultRow->t_id;
                     }
                     if (sizeof($arrThreadIds) > 0) {
                         cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_message WHERE m_threadid IN ('.implode(',', $arrThreadIds).')');

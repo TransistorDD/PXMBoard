@@ -44,7 +44,7 @@ class cActionMessageform extends cPublicAction
 
                 // Check if this is a draft - cannot reply to drafts
                 if ($objMessage->isDraft()) {
-                    $this->m_objTemplate = $this->_getErrorTemplateObject(eError::INVALID_MESSAGE_ID);
+                    $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::INVALID_MESSAGE_ID);
                     return;
                 }
 
@@ -64,10 +64,10 @@ class cActionMessageform extends cPublicAction
                         $objPxmParser
                     )]);
                 } else {
-                    $this->m_objTemplate = $this->_getErrorTemplateObject(eError::THREAD_CLOSED);
+                    $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::THREAD_CLOSED);
                 }	// thread closed
             } else {
-                $this->m_objTemplate = $this->_getErrorTemplateObject(eError::INVALID_MESSAGE_ID);
+                $this->m_objTemplate = $this->_getErrorTemplateObject(eErrorKeys::INVALID_MESSAGE_ID);
             }		// invalid msg id
         } else {
             $this->m_objTemplate = $this->_getTemplateObject('messageform');
