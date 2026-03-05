@@ -1,5 +1,7 @@
 <?php
 
+namespace PXMBoard\Enum;
+
 /**
  * Notification type enumeration
  *

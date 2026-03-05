@@ -1,4 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Unit\Enum;
+
+use PHPUnit\Framework\TestCase;
+use PXMBoard\Enum\eUserStatus;
+use PXMBoard\I18n\cTranslator;
+
 /**
  * Unit tests for UserStatus Enum
  * Tests user status values and methods
@@ -8,12 +17,6 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Unit\Enum;
-
-use PHPUnit\Framework\TestCase;
-
 class UserStatusTest extends TestCase
 {
     /**
@@ -23,7 +26,7 @@ class UserStatusTest extends TestCase
      */
     protected function setUp(): void
     {
-        \cTranslator::load('de');
+        cTranslator::load('de');
     }
 
 
@@ -34,7 +37,7 @@ class UserStatusTest extends TestCase
      */
     public function test_activeValue_isOne(): void
     {
-        $this->assertSame(1, \eUserStatus::ACTIVE->value);
+        $this->assertSame(1, eUserStatus::ACTIVE->value);
     }
 
     /**
@@ -44,7 +47,7 @@ class UserStatusTest extends TestCase
      */
     public function test_notActivatedValue_isTwo(): void
     {
-        $this->assertSame(2, \eUserStatus::NOT_ACTIVATED->value);
+        $this->assertSame(2, eUserStatus::NOT_ACTIVATED->value);
     }
 
     /**
@@ -54,7 +57,7 @@ class UserStatusTest extends TestCase
      */
     public function test_disabledValue_isThree(): void
     {
-        $this->assertSame(3, \eUserStatus::DISABLED->value);
+        $this->assertSame(3, eUserStatus::DISABLED->value);
     }
 
     /**
@@ -64,7 +67,7 @@ class UserStatusTest extends TestCase
      */
     public function test_getLabel_forActive_returnsString(): void
     {
-        $this->assertSame('Aktiv', \eUserStatus::ACTIVE->getLabel());
+        $this->assertSame('Aktiv', eUserStatus::ACTIVE->getLabel());
     }
 
     /**
@@ -74,7 +77,7 @@ class UserStatusTest extends TestCase
      */
     public function test_getLabel_forNotActivated_returnsString(): void
     {
-        $this->assertSame('Nicht aktiviert', \eUserStatus::NOT_ACTIVATED->getLabel());
+        $this->assertSame('Nicht aktiviert', eUserStatus::NOT_ACTIVATED->getLabel());
     }
 
     /**
@@ -84,7 +87,7 @@ class UserStatusTest extends TestCase
      */
     public function test_getLabel_forDisabled_returnsString(): void
     {
-        $this->assertSame('Gesperrt', \eUserStatus::DISABLED->getLabel());
+        $this->assertSame('Gesperrt', eUserStatus::DISABLED->getLabel());
     }
 
     /**
@@ -94,7 +97,7 @@ class UserStatusTest extends TestCase
      */
     public function test_getAll_returnsAllCases(): void
     {
-        $arrAll = \eUserStatus::getAll();
+        $arrAll = eUserStatus::getAll();
         $this->assertIsArray($arrAll);
         $this->assertCount(3, $arrAll);
         $this->assertArrayHasKey(1, $arrAll);
@@ -109,7 +112,7 @@ class UserStatusTest extends TestCase
      */
     public function test_from_withValidInt_returnsEnum(): void
     {
-        $status = \eUserStatus::from(1);
-        $this->assertSame(\eUserStatus::ACTIVE, $status);
+        $status = eUserStatus::from(1);
+        $this->assertSame(eUserStatus::ACTIVE, $status);
     }
 }

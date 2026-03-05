@@ -1,6 +1,7 @@
 <?php
 
-require_once(SRCDIR . '/Skin/cSkinTemplate.php');
+namespace PXMBoard\Skin;
+
 /**
  * abstraction layer for output (xslt)
  *
@@ -85,11 +86,11 @@ class cSkinTemplateXslt extends cSkinTemplate
             return 'Error: XSL extension not loaded.';
         }
 
-        $objXsltProcessor = new XSLTProcessor();
+        $objXsltProcessor = new \XSLTProcessor();
 
         // 1. Prepare the Template (XSL)
         $sTemplatePath = $this->m_sSkinDir . '/' . $this->m_sTemplateName . $this->m_sTemplateExtension;
-        $objStyleDoc = new DOMDocument();
+        $objStyleDoc = new \DOMDocument();
 
         // Load file into the instance. @ suppresses warnings to handle them manually.
         if (!@$objStyleDoc->load($sTemplatePath, LIBXML_NOCDATA)) {
@@ -98,7 +99,7 @@ class cSkinTemplateXslt extends cSkinTemplate
         $objXsltProcessor->importStyleSheet($objStyleDoc);
 
         // 2. Prepare the Data (XML)
-        $objXmlDoc = new DOMDocument();
+        $objXmlDoc = new \DOMDocument();
         if (!@$objXmlDoc->loadXML($this->m_sXmlDoc)) {
             return 'Error: XML source is invalid.';
         }

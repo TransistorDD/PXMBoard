@@ -1,5 +1,9 @@
 <?php
 
+namespace PXMBoard\Enum;
+
+use PXMBoard\I18n\cTranslator;
+
 /**
  * Notification text key enumeration (dot-notation i18n keys)
  *

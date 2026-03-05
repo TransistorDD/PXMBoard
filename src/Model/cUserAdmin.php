@@ -1,7 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cUserProfile.php');
-require_once(SRCDIR . '/Model/cBoard.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * admin user handling
  *

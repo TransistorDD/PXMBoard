@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cBoardMessage.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * message statistics
  *

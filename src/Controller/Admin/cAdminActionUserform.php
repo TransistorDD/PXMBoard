@@ -1,12 +1,12 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cProfileConfig.php');
-require_once(SRCDIR . '/Enum/eUserStatus.php');
-require_once(SRCDIR . '/Model/cBoardList.php');
-require_once(SRCDIR . '/Model/cUserAdmin.php');
-require_once(SRCDIR . '/Model/cSkinList.php');
-require_once(SRCDIR . '/Parser/cParser.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Enum\eUserStatus;
+use PXMBoard\Model\cProfileConfig;
+use PXMBoard\Model\cSkinList;
+use PXMBoard\Model\cUserAdmin;
+
 /**
  * displays the user edit form
  *

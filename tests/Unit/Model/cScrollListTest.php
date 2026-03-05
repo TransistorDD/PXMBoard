@@ -1,4 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Unit\Model;
+
+use PHPUnit\Framework\TestCase;
+use PXMBoard\Model\cScrollList;
+
 /**
  * Unit test for cScrollList class
  *
@@ -7,20 +15,14 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Unit\Model;
-
-use PHPUnit\Framework\TestCase;
-
 class cScrollListTest extends TestCase
 {
-    private \cScrollList $scrollList;
+    private cScrollList $scrollList;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->scrollList = new \cScrollList();
+        $this->scrollList = new cScrollList();
     }
 
     /**

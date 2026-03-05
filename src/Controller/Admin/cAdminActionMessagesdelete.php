@@ -1,7 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cBoardList.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Model\cBoardList;
+
 /**
  * delete messages in the selected boards for the selected timespan
  *

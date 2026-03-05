@@ -1,7 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cForbiddenMailList.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Model\cForbiddenMailList;
+
 /**
  * displays the forbidden mail edit form
  *

@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cScrollList.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * message notification subscription list handling
  *

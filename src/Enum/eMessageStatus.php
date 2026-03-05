@@ -1,5 +1,9 @@
 <?php
 
+namespace PXMBoard\Enum;
+
+use PXMBoard\I18n\cTranslator;
+
 /**
  * Message status enumeration
  *

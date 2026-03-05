@@ -27,15 +27,20 @@ $arrSearchEngine  = $arrConfig['search_engine'] ?? ['type' => 'MySql'];
 $sSessionName     = $arrConfig['session_name'] ?? 'brdsid';
 
 require_once(BASEDIR . '/vendor/autoload.php');
-require_once(SRCDIR . '/Database/cDBFactory.php');
-require_once(SRCDIR . '/Validation/cInputHandler.php');
-require_once(SRCDIR . '/Validation/cServerHandler.php');
-require_once(SRCDIR . '/Model/cConfig.php');
-require_once(SRCDIR . '/Model/cBoard.php');
-require_once(SRCDIR . '/Model/cSession.php');
-require_once(SRCDIR . '/I18n/cTranslator.php');
-require_once(SRCDIR . '/Enum/eErrorKeys.php');
-require_once(SRCDIR . '/Search/cSearchEngineFactory.php');
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Validation\cInputHandler;
+use PXMBoard\Validation\cServerHandler;
+use PXMBoard\Model\cConfig;
+use PXMBoard\Model\cSession;
+use PXMBoard\Model\cUserConfig;
+use PXMBoard\I18n\cTranslator;
+use PXMBoard\Search\cSearchEngineFactory;
+use PXMBoard\Exception\cDatabaseException;
+use PXMBoard\Exception\cSearchEngineException;
+use PXMBoard\Exception\SkinInitializationException;
+use PXMBoard\Enum\eUserStatus;
+use PXMBoard\Controller\Board\cActionError;
 
 // establish db connection via singleton
 try {
@@ -89,8 +94,6 @@ if ($objSession->sessionDataAvailable()) {
 } else {
     // Try auto-login via ticket cookie
     if ($sLoginTicket = cSession::getCookieVar('ticket')) {
-        require_once(SRCDIR . '/Model/cUserConfig.php');
-        require_once(SRCDIR . '/Enum/eUserStatus.php');
         $objUser = new cUserConfig();
         if ($objUser->loadDataByTicket($sLoginTicket) && ($objUser->getStatus() === eUserStatus::ACTIVE)) {
             $objSession->startSession();
@@ -110,7 +113,7 @@ $iBoardId = $objInputHandler->getIntFormVar('brdid', true, true, true);
 // switch board modes
 $sBoardMode = $objInputHandler->getStringFormVar('mode', 'boardmode', true, true, 'trim');
 
-$sPath = 'Public/';
+$sPath = 'Board/';
 $arrBoardMode = [];
 if (preg_match('/^(adm|ajax)?([a-zA-Z]+)$/', $sBoardMode, $arrBoardMode)) {
     if ($arrBoardMode[1] === 'adm') {
@@ -121,18 +124,18 @@ if (preg_match('/^(adm|ajax)?([a-zA-Z]+)$/', $sBoardMode, $arrBoardMode)) {
         $sPath = 'Ajax/';
     } else {
         $sClassName = 'cAction';
-        $sPath = 'Public/';
+        $sPath = 'Board/';
     }
     $sClassName .= ucfirst(strtolower($arrBoardMode[2]));
 } else {
     $sClassName = 'cActionLogin';							// default mode
-    $sPath = 'Public/';
+    $sPath = 'Board/';
 }
 
 // For non-HTMX direct browser requests to partial actions: substitute with the fullpage Board action.
 // HTMX automatically sets the HX-Request header on all partial loads; its absence means full-page browser access.
 // Admin and Ajax actions are excluded from substitution via $sPath check.
-if ($sPath === 'Public/' && !$objServerHandler->isHtmxRequest()) {
+if ($sPath === 'Board/' && !$objServerHandler->isHtmxRequest()) {
     $arrPartialRoutes = [
         'message'         => 'Board',
         'thread'          => 'Board',
@@ -144,14 +147,19 @@ if ($sPath === 'Public/' && !$objServerHandler->isHtmxRequest()) {
     }
 }
 
-// include action class and instantiate object
+// Construct FQCN and instantiate action object via PSR-4 autoloader
+$sNamespace = match ($sPath) {
+    'Admin/' => 'PXMBoard\\Controller\\Admin\\',
+    'Ajax/'  => 'PXMBoard\\Controller\\Ajax\\',
+    default  => 'PXMBoard\\Controller\\Board\\',
+};
+$sFqcn = $sNamespace . $sClassName;
+
 try {
-    if (file_exists(SRCDIR . '/Controller/'.$sPath.$sClassName.'.php')) {
-        require_once(SRCDIR . '/Controller/'.$sPath.$sClassName.'.php');
-        $objAction = new $sClassName($objConfig, $iUserId, $iBoardId);
+    if (class_exists($sFqcn)) {
+        $objAction = new $sFqcn($objConfig, $iUserId, $iBoardId);
         $objAction->setCsrfToken($sCsrfToken);
     } else {														// invalid action -> show error
-        require_once(SRCDIR . '/Controller/Public/cActionError.php');
         $objAction = new cActionError($objConfig, $iUserId, $iBoardId);
     }
 } catch (SkinInitializationException $e) {

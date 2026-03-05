@@ -1,8 +1,8 @@
 <?php
 
-require_once(SRCDIR . '/Model/cScrollList.php');
-require_once(SRCDIR . '/Model/cNotification.php');
-require_once(SRCDIR . '/Model/cUser.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
 
 /**
  * Notification list

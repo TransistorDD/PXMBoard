@@ -1,7 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Database/cDBFactory.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eUserStatus;
+
 /**
  * AJAX endpoint for user autocomplete (mention feature)
  *
@@ -30,8 +33,6 @@ class cAjaxActionUserautocomplete extends cAjaxAction
      */
     public function performAction(): void
     {
-        require_once(SRCDIR . '/Enum/eUserStatus.php');
-
         // Get and validate query parameter
         $sQuery = $this->m_objInputHandler->getStringFormVar('q', 'searchstring', true, true, 'trim');
 

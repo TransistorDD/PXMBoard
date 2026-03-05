@@ -1,11 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cSkinList.php');
-require_once(SRCDIR . '/Model/cBoardList.php');
-require_once(SRCDIR . '/Model/cBoard.php');
-require_once(SRCDIR . '/Enum/eBoardStatus.php');
-require_once(SRCDIR . '/Parser/cParser.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Enum\eBoardStatus;
+use PXMBoard\Model\cBoard;
+
 /**
  * displays the board edit form
  *

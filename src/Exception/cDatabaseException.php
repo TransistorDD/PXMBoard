@@ -1,5 +1,7 @@
 <?php
 
+namespace PXMBoard\Exception;
+
 /**
  * Exception thrown on database errors (connection failure, query errors, configuration issues)
  *
@@ -9,6 +11,6 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-class cDatabaseException extends RuntimeException
+class cDatabaseException extends \RuntimeException
 {
 }

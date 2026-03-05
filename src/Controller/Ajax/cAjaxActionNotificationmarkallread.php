@@ -1,7 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cNotificationList.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Enum\eSuccessKeys;
+use PXMBoard\Model\cNotificationList;
+
 /**
  * Ajax-Action: Mark all notifications as read
  *

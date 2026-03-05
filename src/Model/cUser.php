@@ -1,7 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Enum/eUserStatus.php');
-require_once(SRCDIR . '/Enum/ePrivateMessageStatus.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\ePrivateMessageStatus;
+use PXMBoard\Enum\eUserStatus;
+
 /**
  * user handling
  *
@@ -90,8 +94,6 @@ class cUser
      */
     public function loadDataByTicket(string $sTicket): bool
     {
-        require_once(SRCDIR . '/Model/cUserLoginTicket.php');
-
         $bReturn = false;
 
         if (!empty($sTicket)) {
@@ -525,7 +527,6 @@ class cUser
                 $this->m_sPassword = $sNewPasswordHash;
 
                 // Delete all login tickets for security
-                require_once(SRCDIR . '/Model/cUserLoginTicketList.php');
                 cUserLoginTicketList::deleteAllTicketsForUser($this->m_iId);
 
                 $bReturn = true;
@@ -816,8 +817,6 @@ class cUser
      */
     public function createNewTicket(string $sUserAgent, string $sIpAddress): string
     {
-        require_once(SRCDIR . '/Model/cUserLoginTicket.php');
-
         return cUserLoginTicket::createTicket($this->m_iId, $sUserAgent, $sIpAddress);
     }
 

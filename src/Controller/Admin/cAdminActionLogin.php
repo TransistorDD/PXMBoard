@@ -1,7 +1,10 @@
 <?php
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Enum/eUserStatus.php');
-require_once(SRCDIR . '/Model/cUserConfig.php');
+
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Enum\eUserStatus;
+use PXMBoard\Model\cUserConfig;
+
 /**
  * displays the admin login page
  *

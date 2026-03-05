@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Exception/cDatabaseException.php');
+namespace PXMBoard\Database;
+
+use PXMBoard\Exception\cDatabaseException;
+
 /**
  * abstraction layer for DB handling (interface)
  *

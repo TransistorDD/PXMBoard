@@ -1,6 +1,7 @@
 <?php
 
-require_once(SRCDIR . '/Skin/cSkinTemplate.php');
+namespace PXMBoard\Skin;
+
 use Smarty\Smarty;
 
 /**

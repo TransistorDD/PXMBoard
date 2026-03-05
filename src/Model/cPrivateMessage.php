@@ -1,9 +1,12 @@
 <?php
 
-require_once(SRCDIR . '/Model/cMessage.php');
-require_once(SRCDIR . '/Model/cUser.php');
-require_once(SRCDIR . '/Enum/eErrorKeys.php');
-require_once(SRCDIR . '/Enum/ePrivateMessageStatus.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\ePrivateMessageStatus;
+use PXMBoard\Parser\cParser;
+
 /**
  * private message handling
  *

@@ -1,6 +1,7 @@
 <?php
 
-require_once(SRCDIR . '/Model/cScrollList.php');
+namespace PXMBoard\Model;
+
 /**
  * user search list handling
  *

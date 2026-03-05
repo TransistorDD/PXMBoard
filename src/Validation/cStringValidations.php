@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+
+namespace PXMBoard\Validation;
+
 /**
  * holds the validation rules for string input
  *

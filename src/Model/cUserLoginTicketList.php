@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cUserLoginTicket.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * User login ticket list
  *

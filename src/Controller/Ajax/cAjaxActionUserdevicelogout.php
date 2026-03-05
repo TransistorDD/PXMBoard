@@ -1,8 +1,12 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cUserLoginTicket.php');
-require_once(SRCDIR . '/Model/cSession.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eSuccessKeys;
+use PXMBoard\Model\cSession;
+use PXMBoard\Model\cUserLoginTicket;
+
 /**
  * Ajax-Action: Logout a specific device/session
  *

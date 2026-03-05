@@ -1,7 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cScrollList.php');
-require_once(SRCDIR . '/Model/cUserProfile.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Enum\eUserStatus;
+
 /**
  * user overview for admins
  *

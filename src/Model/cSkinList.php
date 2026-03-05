@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cSkin.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * handles the skins
  *

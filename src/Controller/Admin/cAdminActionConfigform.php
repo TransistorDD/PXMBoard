@@ -1,7 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cSkinList.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Model\cSkinList;
+
 /**
  * displays the general config edit form
  *

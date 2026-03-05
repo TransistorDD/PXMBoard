@@ -1,6 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Model/cPrivateMessageList.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\ePrivateMessageStatus;
+
 /**
  * private message outbox handling
  *

@@ -1,7 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Model/cUser.php');
-require_once(SRCDIR . '/Enum/eBoardStatus.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eBoardStatus;
+
 /**
  * board handling
  *

@@ -1,5 +1,7 @@
 <?php
 
+namespace PXMBoard\Enum;
+
 /**
  * Notification read-status enumeration
  *

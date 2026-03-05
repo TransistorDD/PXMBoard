@@ -1,7 +1,9 @@
 <?php
 
 declare(strict_types=1);
-require_once(SRCDIR . '/Validation/cStringValidations.php');
+
+namespace PXMBoard\Validation;
+
 /**
  * Handles the input from the web
  *
@@ -123,7 +125,6 @@ class cInputHandler
      */
     public function getFileFormObject(string $sVarName): object
     {
-        require_once(SRCDIR . '/Validation/cFileUpload.php');
         $objFileUpload = new cFileUpload($sVarName);
         return $objFileUpload;
     }

@@ -1,4 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Integration\Model;
+
+use PXMBoard\Enum\eMessageStatus;
+use PXMBoard\Model\cBoardMessage;
+use PXMBoard\Tests\TestCase\IntegrationTestCase;
+
 /**
  * Integration test for cBoardMessage class
  * Tests message data loading against the real test database
@@ -8,12 +17,6 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Integration\Model;
-
-use PXMBoard\Tests\TestCase\IntegrationTestCase;
-
 class cBoardMessageTest extends IntegrationTestCase
 {
     /**
@@ -33,7 +36,7 @@ class cBoardMessageTest extends IntegrationTestCase
             'm_userid'  => $iUserId,
         ]);
 
-        $objMessage = new \cBoardMessage();
+        $objMessage = new cBoardMessage();
         $bResult = $objMessage->loadDataById($iMessageId, $iBoardId);
 
         $this->assertTrue($bResult);
@@ -50,7 +53,7 @@ class cBoardMessageTest extends IntegrationTestCase
     {
         $iBoardId = $this->insertBoard();
 
-        $objMessage = new \cBoardMessage();
+        $objMessage = new cBoardMessage();
         $bResult = $objMessage->loadDataById(999999, $iBoardId);
 
         $this->assertFalse($bResult);
@@ -71,12 +74,12 @@ class cBoardMessageTest extends IntegrationTestCase
             'm_userid' => $iUserId,
         ]);
 
-        $objMessage = new \cBoardMessage();
+        $objMessage = new cBoardMessage();
         $objMessage->loadDataById($iMessageId, $iBoardId);
 
         $objStatus = $objMessage->getStatus();
-        $this->assertInstanceOf(\eMessageStatus::class, $objStatus);
-        $this->assertSame(\eMessageStatus::PUBLISHED, $objStatus);
+        $this->assertInstanceOf(eMessageStatus::class, $objStatus);
+        $this->assertSame(eMessageStatus::PUBLISHED, $objStatus);
     }
 
     /**
@@ -96,7 +99,7 @@ class cBoardMessageTest extends IntegrationTestCase
             'm_userid'  => $iUserId,
         ]);
 
-        $objMessage = new \cBoardMessage();
+        $objMessage = new cBoardMessage();
         $objMessage->loadDataById($iMessageId, $iBoardId);
 
         $this->assertTrue($objMessage->getStatus()->isDraft());

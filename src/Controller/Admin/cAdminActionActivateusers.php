@@ -1,9 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cTemplate.php');
-require_once(SRCDIR . '/Enum/eUserStatus.php');
-require_once(SRCDIR . '/Model/cUser.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Enum\eUserStatus;
+use PXMBoard\Model\cTemplate;
+use PXMBoard\Model\cUser;
+
 /**
  * handles the user activation
  *

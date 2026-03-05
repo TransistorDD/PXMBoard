@@ -1,6 +1,7 @@
 <?php
 
-require_once(SRCDIR . '/Database/cDB.php');
+namespace PXMBoard\Database;
+
 /**
  * abstraction layer for DB handling (MySql)
  *
@@ -24,7 +25,7 @@ class cDBMySql extends cDB
     {
         try {
             $this->m_resDBLink = @mysqli_connect($sHostName, $sUserName, $sPassword, $sDBName);
-        } catch (mysqli_sql_exception $e) {
+        } catch (\mysqli_sql_exception $e) {
             $this->_handleError('DB-Verbindung fehlgeschlagen: ' . $e->getMessage());
         }
         return true;

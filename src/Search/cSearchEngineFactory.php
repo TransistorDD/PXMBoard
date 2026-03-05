@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Exception/cSearchEngineException.php');
+namespace PXMBoard\Search;
+
+use PXMBoard\Exception\cSearchEngineException;
+
 /**
  * Factory class for search engine abstraction (singleton pattern)
  *
@@ -67,11 +70,9 @@ class cSearchEngineFactory
     private static function getSearchEngineObject(string $sEngineType, array $arrConfig): ?cSearchEngine
     {
         if (preg_match('/^[a-zA-Z]+$/', $sEngineType)) {
-            $sClassName = 'cSearchEngine' . $sEngineType;
-            $sFilePath = SRCDIR . '/Search/' . $sClassName . '.php';
+            $sClassName = __NAMESPACE__ . '\\cSearchEngine' . $sEngineType;
 
-            if (file_exists($sFilePath)) {
-                require_once($sFilePath);
+            if (class_exists($sClassName)) {
                 $objEngine = new $sClassName($arrConfig);
                 return $objEngine;
             }

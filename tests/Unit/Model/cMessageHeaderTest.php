@@ -1,4 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Unit\Model;
+
+use PHPUnit\Framework\TestCase;
+use PXMBoard\Model\cMessageHeader;
+use PXMBoard\Model\cUser;
+
 /**
  * Unit test for cMessageHeader class
  *
@@ -7,20 +16,14 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Unit\Model;
-
-use PHPUnit\Framework\TestCase;
-
 class cMessageHeaderTest extends TestCase
 {
-    private \cMessageHeader $messageHeader;
+    private cMessageHeader $messageHeader;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->messageHeader = new \cMessageHeader();
+        $this->messageHeader = new cMessageHeader();
     }
 
     /**
@@ -169,7 +172,7 @@ class cMessageHeaderTest extends TestCase
     {
         $objAuthor = $this->messageHeader->getAuthor();
 
-        $this->assertInstanceOf(\cUser::class, $objAuthor);
+        $this->assertInstanceOf(cUser::class, $objAuthor);
     }
 
     /**

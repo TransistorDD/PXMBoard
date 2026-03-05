@@ -1,5 +1,7 @@
 <?php
 
+namespace PXMBoard\Search;
+
 /**
  * Standardized search result set
  *

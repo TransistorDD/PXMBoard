@@ -1,5 +1,7 @@
 <?php
 
+namespace PXMBoard\Enum;
+
 /**
  * Private message status enumeration
  *

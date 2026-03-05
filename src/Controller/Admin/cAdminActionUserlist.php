@@ -1,8 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cUserAdminList.php');
-require_once(SRCDIR . '/Enum/eUserStatus.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eUserStatus;
+use PXMBoard\Model\cUserAdminList;
+
 /**
  * displays a list of users
  *

@@ -1,9 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cProfileConfig.php');
-require_once(SRCDIR . '/Model/cUserAdmin.php');
-require_once(SRCDIR . '/Enum/eUserStatus.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Enum\eUserStatus;
+use PXMBoard\Model\cProfileConfig;
+use PXMBoard\Model\cUserAdmin;
+
 /**
  * save the user data
  *
@@ -71,7 +73,7 @@ class cAdminActionUsersave extends cAdminAction
                 try {
                     $eStatus = eUserStatus::from($iStatus);
                     $objUser->setStatus($eStatus);
-                } catch (ValueError $e) {
+                } catch (\ValueError $e) {
                     // Invalid status, default to ACTIVE
                     $objUser->setStatus(eUserStatus::ACTIVE);
                 }

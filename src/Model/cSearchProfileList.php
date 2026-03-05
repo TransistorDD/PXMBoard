@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cSearchProfile.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * searchprofilelist handling
  *

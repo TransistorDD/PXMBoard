@@ -1,6 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Model/cScrollList.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Search\cSearchEngineFactory;
+
 /**
  * Message search list handling
  *
@@ -76,8 +80,6 @@ class cMessageSearchList extends cScrollList
      */
     protected function _doPreQuery(): void
     {
-        require_once(SRCDIR . '/Search/cSearchEngineFactory.php');
-
         // Get search engine instance
         $objSearchEngine = cSearchEngineFactory::getInstance();
 

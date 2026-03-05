@@ -1,4 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Integration\Action;
+
+use PXMBoard\Tests\TestCase\PxmTestCase;
+use PXMBoard\Validation\cInputHandler;
+
 /**
  * Integration test for basic action infrastructure
  * Tests superglobal helpers and cInputHandler integration
@@ -8,12 +16,6 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Integration\Action;
-
-use PXMBoard\Tests\TestCase\PxmTestCase;
-
 class ActionBaseTest extends PxmTestCase
 {
     /**
@@ -47,8 +49,8 @@ class ActionBaseTest extends PxmTestCase
     {
         $this->setPostData(['username' => 'testuser']);
 
-        $objInputHandler = new \cInputHandler();
-        $sUsername = $objInputHandler->getStringFormVar('username', 'username', TRUE, FALSE);
+        $objInputHandler = new cInputHandler();
+        $sUsername = $objInputHandler->getStringFormVar('username', 'username', true, false);
 
         $this->assertSame('testuser', $sUsername);
     }
@@ -62,8 +64,8 @@ class ActionBaseTest extends PxmTestCase
     {
         $this->setGetData(['page' => '5']);
 
-        $objInputHandler = new \cInputHandler();
-        $iPage = $objInputHandler->getIntFormVar('page', FALSE, TRUE);
+        $objInputHandler = new cInputHandler();
+        $iPage = $objInputHandler->getIntFormVar('page', false, true);
 
         $this->assertSame(5, $iPage);
     }

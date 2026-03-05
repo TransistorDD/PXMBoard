@@ -1,7 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Model/cUser.php');
-require_once(SRCDIR . '/Enum/eMessageStatus.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eMessageStatus;
+use PXMBoard\Parser\cParser;
+
 /**
  * messageheader handling
  *

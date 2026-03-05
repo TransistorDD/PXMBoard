@@ -1,27 +1,27 @@
 <?php
-/**
- * Base test case for PXMBoard integration tests with real database
- *
- * Provides transaction-based test isolation and fixture helper methods.
- * Each test runs inside a transaction that is rolled back in tearDown(),
- * leaving the test database in a clean state without TRUNCATE or DELETE.
- *
- * @link      https://github.com/TransistorDD/PXMBoard
- * @author    Torsten Rentsch <forum@torsten-rentsch.de>
- * @copyright 2001-2026 Torsten Rentsch
- * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
- */
+
 declare(strict_types=1);
 
 namespace PXMBoard\Tests\TestCase;
 
+use PXMBoard\Database\cDBFactory;
+
 /**
  * Integration test base class with real database and transaction rollback.
+ * 
+ * Provides transaction-based test isolation and fixture helper methods.
+ * Each test runs inside a transaction that is rolled back in tearDown(),
+ * leaving the test database in a clean state without TRUNCATE or DELETE.
  *
  * Hierarchy:
  *   PxmTestCase (superglobal helpers, no DB)
  *     └── IntegrationTestCase (real DB, transaction rollback, fixture helpers)
  *           └── ActionTestCase (cConfig configured for real test skins)
+ * 
+ * @link      https://github.com/TransistorDD/PXMBoard
+ * @author    Torsten Rentsch <forum@torsten-rentsch.de>
+ * @copyright 2001-2026 Torsten Rentsch
+ * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
 abstract class IntegrationTestCase extends PxmTestCase
 {
@@ -34,7 +34,7 @@ abstract class IntegrationTestCase extends PxmTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        \cDBFactory::getInstance()->executeQuery('START TRANSACTION');
+        cDBFactory::getInstance()->executeQuery('START TRANSACTION');
     }
 
     /**
@@ -44,7 +44,7 @@ abstract class IntegrationTestCase extends PxmTestCase
      */
     protected function tearDown(): void
     {
-        \cDBFactory::getInstance()->executeQuery('ROLLBACK');
+        cDBFactory::getInstance()->executeQuery('ROLLBACK');
         parent::tearDown();
     }
 
@@ -60,7 +60,7 @@ abstract class IntegrationTestCase extends PxmTestCase
      */
     protected function insertBoard(array $arrData = []): int
     {
-        $objDb = \cDBFactory::getInstance();
+        $objDb = cDBFactory::getInstance();
         $arrDefaults = [
             'b_name'           => 'Test Board',
             'b_description'    => 'Test board description',
@@ -101,7 +101,7 @@ abstract class IntegrationTestCase extends PxmTestCase
      */
     protected function insertUser(array $arrData = []): int
     {
-        $objDb = \cDBFactory::getInstance();
+        $objDb = cDBFactory::getInstance();
         $arrDefaults = [
             'u_username'             => 'testuser_' . uniqid(),
             'u_password'             => password_hash('testpassword', PASSWORD_DEFAULT),
@@ -163,7 +163,7 @@ abstract class IntegrationTestCase extends PxmTestCase
      */
     protected function insertThread(int $iBoardId, array $arrData = []): int
     {
-        $objDb = \cDBFactory::getInstance();
+        $objDb = cDBFactory::getInstance();
         $arrDefaults = [
             't_boardid'      => $iBoardId,
             't_active'       => 1,
@@ -199,7 +199,7 @@ abstract class IntegrationTestCase extends PxmTestCase
      */
     protected function insertMessage(int $iThreadId, array $arrData = []): int
     {
-        $objDb = \cDBFactory::getInstance();
+        $objDb = cDBFactory::getInstance();
         $arrDefaults = [
             'm_threadid'        => $iThreadId,
             'm_parentid'        => 0,

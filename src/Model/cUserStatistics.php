@@ -1,6 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Model/cUser.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eUserStatus;
+
 /**
  * user statistics
  *

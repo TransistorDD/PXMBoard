@@ -1,8 +1,12 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cUserPermissions.php');
-require_once(SRCDIR . '/Enum/eUserStatus.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eSuccessKeys;
+use PXMBoard\Enum\eUserStatus;
+use PXMBoard\Model\cUserPermissions;
+
 /**
  * Ajax-Action: Toggle user status (active <-> disabled)
  *

@@ -1,4 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Unit\Model;
+
+use PHPUnit\Framework\TestCase;
+use PXMBoard\Model\cUserLoginTicket;
+
 /**
  * Unit test for cUserLoginTicket class
  *
@@ -7,20 +15,14 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Unit\Model;
-
-use PHPUnit\Framework\TestCase;
-
 class cUserLoginTicketTest extends TestCase
 {
-    private \cUserLoginTicket $ticket;
+    private cUserLoginTicket $ticket;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->ticket = new \cUserLoginTicket();
+        $this->ticket = new cUserLoginTicket();
     }
 
     /**
@@ -30,7 +32,7 @@ class cUserLoginTicketTest extends TestCase
      */
     public function test_getDeviceInfo_withWindows10Chrome_returnsCorrectInfo(): void
     {
-        $sUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+        $sUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
         // Use reflection to set protected property
         $reflection = new \ReflectionClass($this->ticket);
@@ -50,7 +52,7 @@ class cUserLoginTicketTest extends TestCase
      */
     public function test_getDeviceInfo_withMacOsSafari_returnsCorrectInfo(): void
     {
-        $sUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15";
+        $sUserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15';
 
         $reflection = new \ReflectionClass($this->ticket);
         $property = $reflection->getProperty('m_sUserAgent');
@@ -71,7 +73,7 @@ class cUserLoginTicketTest extends TestCase
      */
     public function test_getDeviceInfo_withAndroidChrome_detectsAsLinux(): void
     {
-        $sUserAgent = "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.144 Mobile Safari/537.36";
+        $sUserAgent = 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.144 Mobile Safari/537.36';
 
         $reflection = new \ReflectionClass($this->ticket);
         $property = $reflection->getProperty('m_sUserAgent');
@@ -91,7 +93,7 @@ class cUserLoginTicketTest extends TestCase
      */
     public function test_getDeviceInfo_withIosSafari_returnsCorrectInfo(): void
     {
-        $sUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";
+        $sUserAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 
         $reflection = new \ReflectionClass($this->ticket);
         $property = $reflection->getProperty('m_sUserAgent');
@@ -110,7 +112,7 @@ class cUserLoginTicketTest extends TestCase
      */
     public function test_getDeviceInfo_withEdge_returnsCorrectInfo(): void
     {
-        $sUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0";
+        $sUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0';
 
         $reflection = new \ReflectionClass($this->ticket);
         $property = $reflection->getProperty('m_sUserAgent');
@@ -129,7 +131,7 @@ class cUserLoginTicketTest extends TestCase
      */
     public function test_getDeviceInfo_withFirefox_returnsCorrectInfo(): void
     {
-        $sUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0";
+        $sUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0';
 
         $reflection = new \ReflectionClass($this->ticket);
         $property = $reflection->getProperty('m_sUserAgent');

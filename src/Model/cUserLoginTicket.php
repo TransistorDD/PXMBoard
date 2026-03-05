@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Database/cDBFactory.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * User login ticket (for multi-device persistent login)
  *

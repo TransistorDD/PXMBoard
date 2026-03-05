@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cUserPermissions.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * user configuration handling
  *

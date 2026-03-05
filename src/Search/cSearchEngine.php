@@ -1,6 +1,7 @@
 <?php
 
-require_once(SRCDIR . '/Search/cSearchResultSet.php');
+namespace PXMBoard\Search;
+
 /**
  * Abstraction layer for search engine handling (interface)
  *

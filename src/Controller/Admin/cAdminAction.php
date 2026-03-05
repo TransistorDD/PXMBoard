@@ -1,6 +1,12 @@
 <?php
 
-require_once(SRCDIR . '/Controller/cBaseAction.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Controller\cBaseAction;
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Model\cConfig;
+
 /**
  * base class for the board admin actions
  *

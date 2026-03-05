@@ -1,6 +1,7 @@
 <?php
 
-require_once(SRCDIR . '/Database/cDB.php');
+namespace PXMBoard\Database;
+
 /**
  * abstraction layer for DB handling (PostgreSql)
  *

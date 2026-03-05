@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cTemplate.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * handles the templates of the system
  *

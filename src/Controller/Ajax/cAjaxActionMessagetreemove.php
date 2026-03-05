@@ -1,5 +1,16 @@
 <?php
 
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eSuccessKeys;
+use PXMBoard\Exception\cCircularReferenceException;
+use PXMBoard\Exception\cInvalidBoardException;
+use PXMBoard\Exception\cInvalidParentException;
+use PXMBoard\Exception\cMessageMoveException;
+use PXMBoard\Exception\cSelfReferenceException;
+use PXMBoard\Model\cBoardMessage;
+
 /**
  * Ajax-Action: Move a message subtree to a different parent
  *
@@ -8,10 +19,6 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cBoardMessage.php');
-
 class cAjaxActionMessagetreemove extends cAjaxAction
 {
     /**

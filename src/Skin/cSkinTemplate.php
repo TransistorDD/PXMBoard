@@ -1,5 +1,7 @@
 <?php
 
+namespace PXMBoard\Skin;
+
 /**
  * abstraction layer for output (interface)
  *

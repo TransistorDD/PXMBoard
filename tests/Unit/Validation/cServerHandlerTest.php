@@ -1,25 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Unit\Validation;
+
+use PHPUnit\Framework\TestCase;
+use PXMBoard\Validation\cServerHandler;
+
 /**
  * Unit test for cServerHandler class
  *
  * @author Torsten Rentsch <forum@torsten-rentsch.de>
  * @copyright Torsten Rentsch 2001 - 2026
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Unit\Validation;
-
-use PHPUnit\Framework\TestCase;
-
 class cServerHandlerTest extends TestCase
 {
-    private \cServerHandler $handler;
+    private cServerHandler $handler;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->handler = new \cServerHandler();
+        $this->handler = new cServerHandler();
     }
 
     protected function tearDown(): void

@@ -1,9 +1,16 @@
 <?php
 
-require_once SRCDIR.'/Model/cMessage.php';
-require_once SRCDIR.'/Enum/eMessageStatus.php';
-require_once SRCDIR.'/Enum/eErrorKeys.php';
-require_once SRCDIR.'/Exception/cMessageMoveException.php';
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Exception\cCircularReferenceException;
+use PXMBoard\Exception\cInvalidBoardException;
+use PXMBoard\Exception\cInvalidParentException;
+use PXMBoard\Exception\cSelfReferenceException;
+use PXMBoard\Parser\cParser;
+use PXMBoard\Search\cSearchEngineFactory;
+
 /**
  * boardmessage handling
  *
@@ -157,7 +164,6 @@ class cBoardMessage extends cMessage
                                         cDBFactory::getInstance()->executeQuery("UPDATE pxm_board SET b_lastmsgtstmp=$this->m_iMessageTimestamp WHERE b_id=$this->m_iBoardId");
 
                                         // Index message in search engine
-                                        require_once SRCDIR.'/Search/cSearchEngineFactory.php';
                                         cSearchEngineFactory::getInstance()->indexMessage(
                                             $this->m_iId,
                                             $this->m_iThreadId,
@@ -218,7 +224,6 @@ class cBoardMessage extends cMessage
                                             }
 
                                             // Index message in search engine
-                                            require_once SRCDIR.'/Search/cSearchEngineFactory.php';
                                             cSearchEngineFactory::getInstance()->indexMessage(
                                                 $this->m_iId,
                                                 $this->m_iThreadId,
@@ -274,7 +279,6 @@ class cBoardMessage extends cMessage
                                                                             " WHERE m_id=$this->m_iId")) {
                     if ($objResultSet->getAffectedRows() > 0) {
                         // Update search engine index if something changed
-                        require_once SRCDIR.'/Search/cSearchEngineFactory.php';
                         cSearchEngineFactory::getInstance()->indexMessage(
                             $this->m_iId,
                             $this->m_iThreadId,
@@ -316,7 +320,6 @@ class cBoardMessage extends cMessage
             cDBFactory::getInstance()->executeQuery("UPDATE pxm_message SET m_parentid=$iParentId WHERE m_parentid=$this->m_iId");
 
             // Remove message from search engine index
-            require_once SRCDIR.'/Search/cSearchEngineFactory.php';
             cSearchEngineFactory::getInstance()->removeMessage($this->m_iId);
 
             if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS count,MAX(m_tstmp) AS maxd,MAX(m_id) AS maxid FROM pxm_message WHERE m_threadid=$this->m_iThreadId")) {
@@ -603,7 +606,7 @@ class cBoardMessage extends cMessage
             $sQuery = 'UPDATE pxm_message SET m_parentid='.intval($iNewParentId).
                       ' WHERE m_id='.intval($this->m_iId);
             if (! $objDb->executeQuery($sQuery)) {
-                throw new Exception('Failed to update parent ID');
+                throw new \Exception('Failed to update parent ID');
             }
 
             // 2. Update thread ID for entire subtree (if moving to different thread)
@@ -612,7 +615,7 @@ class cBoardMessage extends cMessage
                 $sQuery = 'UPDATE pxm_message SET m_threadid='.intval($iNewThreadId).
                           ' WHERE m_id IN ('.$sIds.')';
                 if (! $objDb->executeQuery($sQuery)) {
-                    throw new Exception('Failed to update thread IDs');
+                    throw new \Exception('Failed to update thread IDs');
                 }
 
                 // 3. Update message count in old thread (decrease)
@@ -635,7 +638,7 @@ class cBoardMessage extends cMessage
 
             return true;
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Rollback on error
             $objDb->executeQuery('ROLLBACK');
 

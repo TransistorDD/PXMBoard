@@ -1,6 +1,7 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
+namespace PXMBoard\Controller\Admin;
+
 /**
  * displays the intro page for the admintool
  *

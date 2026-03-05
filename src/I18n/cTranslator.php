@@ -1,5 +1,7 @@
 <?php
 
+namespace PXMBoard\I18n;
+
 /**
  * Static translator for i18n string resolution
  *

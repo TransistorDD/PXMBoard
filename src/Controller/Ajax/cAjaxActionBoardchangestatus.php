@@ -1,8 +1,12 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cBoard.php');
-require_once(SRCDIR . '/Enum/eBoardStatus.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Enum\eBoardStatus;
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eSuccessKeys;
+use PXMBoard\Model\cBoard;
+
 /**
  * Ajax-Action: Change board status
  *
@@ -40,7 +44,7 @@ class cAjaxActionBoardchangestatus extends cAjaxAction
         // Validate status value
         try {
             $eNewStatus = eBoardStatus::from($iNewStatus);
-        } catch (ValueError $e) {
+        } catch (\ValueError $e) {
             $this->_setJsonError(eErrorKeys::INVALID_MODE, 400);
             return;
         }

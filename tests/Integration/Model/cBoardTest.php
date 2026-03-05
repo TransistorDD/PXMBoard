@@ -1,4 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Integration\Model;
+
+use PXMBoard\Enum\eBoardStatus;
+use PXMBoard\Model\cBoard;
+use PXMBoard\Tests\TestCase\IntegrationTestCase;
+
 /**
  * Integration test for cBoard class
  * Tests board data loading against the real test database
@@ -8,12 +17,6 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Integration\Model;
-
-use PXMBoard\Tests\TestCase\IntegrationTestCase;
-
 class cBoardTest extends IntegrationTestCase
 {
     /**
@@ -29,7 +32,7 @@ class cBoardTest extends IntegrationTestCase
             'b_status'      => 1,
         ]);
 
-        $objBoard = new \cBoard();
+        $objBoard = new cBoard();
         $bResult = $objBoard->loadDataById($iBoardId);
 
         $this->assertTrue($bResult);
@@ -44,7 +47,7 @@ class cBoardTest extends IntegrationTestCase
      */
     public function test_loadDataById_withInvalidId_returnsFalse(): void
     {
-        $objBoard = new \cBoard();
+        $objBoard = new cBoard();
         $bResult = $objBoard->loadDataById(999999);
 
         $this->assertFalse($bResult);
@@ -59,11 +62,11 @@ class cBoardTest extends IntegrationTestCase
     {
         $iBoardId = $this->insertBoard(['b_status' => 1]);
 
-        $objBoard = new \cBoard();
+        $objBoard = new cBoard();
         $objBoard->loadDataById($iBoardId);
 
         $objStatus = $objBoard->getStatus();
-        $this->assertInstanceOf(\eBoardStatus::class, $objStatus);
-        $this->assertSame(\eBoardStatus::PUBLIC, $objStatus);
+        $this->assertInstanceOf(eBoardStatus::class, $objStatus);
+        $this->assertSame(eBoardStatus::PUBLIC, $objStatus);
     }
 }

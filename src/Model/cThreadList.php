@@ -1,7 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Model/cScrollList.php');
-require_once(SRCDIR . '/Model/cThreadHeader.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eMessageStatus;
+
 /**
  * threadlist handling
  *
@@ -63,7 +66,6 @@ class cThreadList extends cScrollList
      */
     protected function _getQuery(): string
     {
-        require_once(SRCDIR . '/Enum/eMessageStatus.php');
         $objDb = cDBFactory::getInstance();
 
         // For logged-in users: Add read status via LEFT JOIN (more efficient than EXISTS subqueries)

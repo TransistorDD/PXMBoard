@@ -1,9 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Database/cDBFactory.php');
-require_once(SRCDIR . '/Enum/eNotificationType.php');
-require_once(SRCDIR . '/Enum/eNotificationStatus.php');
-require_once(SRCDIR . '/Model/cUser.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eNotificationStatus;
+use PXMBoard\Enum\eNotificationType;
+
 /**
  * User notification
  *

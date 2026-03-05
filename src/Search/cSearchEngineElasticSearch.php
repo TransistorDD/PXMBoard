@@ -1,7 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Search/cSearchEngine.php');
-require_once(SRCDIR . '/Enum/eMessageStatus.php');
+namespace PXMBoard\Search;
+
+use PXMBoard\Enum\eMessageStatus;
+
 /**
  * ElasticSearch search engine implementation
  *
@@ -35,12 +37,12 @@ class cSearchEngineElasticSearch extends cSearchEngine
     {
         // Check if Elasticsearch client is available
         if (!class_exists('Elastic\Elasticsearch\ClientBuilder')) {
-            throw new RuntimeException('Elasticsearch PHP client not found. Install with: composer require elasticsearch/elasticsearch');
+            throw new \RuntimeException('Elasticsearch PHP client not found. Install with: composer require elasticsearch/elasticsearch');
         }
 
         // Validate configuration
         if (!isset($arrConfig['host']) || !isset($arrConfig['index'])) {
-            throw new RuntimeException('ElasticSearch configuration requires "host" and "index" keys');
+            throw new \RuntimeException('ElasticSearch configuration requires "host" and "index" keys');
         }
 
         $this->m_sIndexName = $arrConfig['index'];
@@ -123,7 +125,7 @@ class cSearchEngineElasticSearch extends cSearchEngine
 
             return new cSearchResultSet($arrResults, count($arrResults));
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Log error and return empty result set
             error_log('ElasticSearch search error: ' . $e->getMessage());
             return new cSearchResultSet([], 0);
@@ -177,7 +179,7 @@ class cSearchEngineElasticSearch extends cSearchEngine
         try {
             $this->m_objClient->index($arrParams);
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('ElasticSearch indexing error: ' . $e->getMessage());
             return false;
         }
@@ -199,7 +201,7 @@ class cSearchEngineElasticSearch extends cSearchEngine
         try {
             $this->m_objClient->delete($arrParams);
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Document might not exist - not necessarily an error
             if (strpos($e->getMessage(), 'document_missing_exception') === false) {
                 error_log('ElasticSearch delete error: ' . $e->getMessage());
@@ -252,7 +254,7 @@ class cSearchEngineElasticSearch extends cSearchEngine
                     if (!isset($response['errors']) || !$response['errors']) {
                         $iSuccessCount += count($arrParams['body']) / 2;
                     }
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     error_log('ElasticSearch bulk indexing error: ' . $e->getMessage());
                 }
                 $arrParams = ['body' => []];
@@ -266,7 +268,7 @@ class cSearchEngineElasticSearch extends cSearchEngine
                 if (!isset($response['errors']) || !$response['errors']) {
                     $iSuccessCount += count($arrParams['body']) / 2;
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 error_log('ElasticSearch bulk indexing error: ' . $e->getMessage());
             }
         }
@@ -284,7 +286,7 @@ class cSearchEngineElasticSearch extends cSearchEngine
         try {
             $response = $this->m_objClient->ping();
             return isset($response['acknowledged']) || $response === true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
     }
@@ -498,7 +500,7 @@ class cSearchEngineElasticSearch extends cSearchEngine
 
             $this->m_objClient->indices()->create($arrParams);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('ElasticSearch index creation error: ' . $e->getMessage());
         }
     }

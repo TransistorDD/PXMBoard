@@ -1,4 +1,7 @@
 <?php
+
+namespace PXMBoard\Validation;
+
 /**
  * handles file uploads
  *

@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Parser/cParser.php');
+namespace PXMBoard\Parser;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * PXM markup to HTML parser
  *
@@ -344,7 +347,6 @@ class cPxmParser extends cParser
             $arrUserIds = array_slice($arrUserIds, 0, 10);
 
             if (!empty($arrUserIds)) {
-                require_once(SRCDIR . '/Database/cDBFactory.php');
                 $objDb = cDBFactory::getInstance();
 
                 $sIds = implode(',', $arrUserIds);

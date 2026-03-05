@@ -1,8 +1,12 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cBoardMessage.php');
-require_once(SRCDIR . '/Model/cThread.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eSuccessKeys;
+use PXMBoard\Model\cBoardMessage;
+use PXMBoard\Model\cThread;
+
 /**
  * Ajax-Action: Extract a message subtree as a new thread
  *

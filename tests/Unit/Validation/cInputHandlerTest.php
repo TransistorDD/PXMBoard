@@ -1,24 +1,26 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Unit\Validation;
+
+use PHPUnit\Framework\TestCase;
+use PXMBoard\Validation\cInputHandler;
+
 /**
  * Unit test for cInputHandler class
  *
  * @author Torsten Rentsch <forum@torsten-rentsch.de>
  * @copyright Torsten Rentsch 2001 - 2026
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Unit\Validation;
-
-use PHPUnit\Framework\TestCase;
-
 class cInputHandlerTest extends TestCase
 {
-    private \cInputHandler $handler;
+    private cInputHandler $handler;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->handler = new \cInputHandler();
+        $this->handler = new cInputHandler();
         // Clear superglobals
         $_POST = [];
         $_GET = [];

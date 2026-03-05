@@ -1,8 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Search/cSearchEngine.php');
-require_once(SRCDIR . '/Database/cDBFactory.php');
-require_once(SRCDIR . '/Enum/eMessageStatus.php');
+namespace PXMBoard\Search;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eMessageStatus;
+
 /**
  * MySQL FULLTEXT search engine implementation
  *

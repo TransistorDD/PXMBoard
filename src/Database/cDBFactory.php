@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Exception/cDatabaseException.php');
+namespace PXMBoard\Database;
+
+use PXMBoard\Exception\cDatabaseException;
+
 /**
  * factory class for db abstraction (singleton pattern)
  *
@@ -76,8 +79,7 @@ class cDBFactory
     {
         $objDb = null;
         if (preg_match('/^[a-zA-Z]+$/', $sDbType)) {
-            $sDbType = 'cDB'.$sDbType;
-            require_once(SRCDIR.'/Database/'.$sDbType.'.php');
+            $sDbType = __NAMESPACE__ . '\\cDB' . $sDbType;
             $objDb = new $sDbType();
             return $objDb;
         }

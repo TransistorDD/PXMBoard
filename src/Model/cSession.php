@@ -1,5 +1,7 @@
 <?php
 
+namespace PXMBoard\Model;
+
 /**
  * session and cookie support
  *

@@ -1,15 +1,17 @@
 <?php
 
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eSuccessKeys;
+use PXMBoard\Model\cThread;
+
 /**
  * Ajax-Action: Delete a message tree (automatically handles thread vs subthread)
  *
  * @author Torsten Rentsch <forum@torsten-rentsch.de>
  * @copyright Torsten Rentsch 2001 - 2026
  */
-
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cThread.php');
-
 class cAjaxActionMessagetreedelete extends cAjaxAction
 {
     /**

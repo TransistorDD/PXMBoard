@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cMessageHeader.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Parser\cParser;
+
 /**
  * message handling
  *

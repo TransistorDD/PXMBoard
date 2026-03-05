@@ -2,12 +2,19 @@
 
 declare(strict_types=1);
 
-require_once(SRCDIR . '/Model/cUserConfig.php');
-require_once(SRCDIR . '/I18n/cTranslator.php');
-require_once(SRCDIR . '/Enum/eUserStatus.php');
-require_once(SRCDIR . '/Enum/eErrorKeys.php');
-require_once(SRCDIR . '/Validation/cInputHandler.php');
-require_once(SRCDIR . '/Validation/cServerHandler.php');
+namespace PXMBoard\Controller;
+
+use PXMBoard\Enum\eBoardStatus;
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eUserStatus;
+use PXMBoard\Model\cBoard;
+use PXMBoard\Model\cBoardList;
+use PXMBoard\Model\cConfig;
+use PXMBoard\Model\cSkin;
+use PXMBoard\Model\cUserConfig;
+use PXMBoard\Parser\cParser;
+use PXMBoard\Validation\cInputHandler;
+use PXMBoard\Validation\cServerHandler;
 
 /**
  * Abstract base class for all board actions.
@@ -327,9 +334,6 @@ abstract class cBaseAction
      */
     protected function _getBoardListArray(): array
     {
-        require_once(SRCDIR . '/Model/cBoardList.php');
-        require_once(SRCDIR . '/Parser/cParser.php');
-
         $objParser = new cParser();
         $objBoardList = new cBoardList();
         $objBoardList->loadBasicData();
@@ -370,7 +374,6 @@ abstract class cBaseAction
      */
     protected function _loadActiveBoard(int $iBoardId): void
     {
-        require_once(SRCDIR . '/Model/cBoard.php');
         $objBoard = new cBoard();
         if ($objBoard->loadDataById($iBoardId)) {
             $this->m_objActiveBoard = $objBoard;

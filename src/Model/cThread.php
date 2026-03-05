@@ -1,6 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Model/cMessageHeader.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eMessageStatus;
+
 /**
  * thread handling
  *
@@ -344,8 +348,6 @@ class cThread
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, int $iCurrentUserId = 0): array
     {
-        require_once(SRCDIR . '/Enum/eMessageStatus.php');
-
         if ($this->m_iId > 0) {
             $sStatusFilter = '(m_status='.eMessageStatus::PUBLISHED->value.' OR (m_status='.eMessageStatus::DRAFT->value.' AND m_userid='.$iCurrentUserId.'))';
             if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT m_id,m_parentid,m_subject,m_tstmp,m_userid,m_username,m_userhighlight,m_status FROM pxm_message WHERE m_threadid=$this->m_iId AND ".$sStatusFilter.' ORDER BY m_tstmp DESC')) {

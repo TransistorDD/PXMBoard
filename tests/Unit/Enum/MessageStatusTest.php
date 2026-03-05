@@ -1,4 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Unit\Enum;
+
+use PHPUnit\Framework\TestCase;
+use PXMBoard\Enum\eMessageStatus;
+use PXMBoard\I18n\cTranslator;
+
 /**
  * Unit tests for MessageStatus Enum
  * Tests message status values and methods
@@ -8,12 +17,6 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Unit\Enum;
-
-use PHPUnit\Framework\TestCase;
-
 class MessageStatusTest extends TestCase
 {
     /**
@@ -23,7 +26,7 @@ class MessageStatusTest extends TestCase
      */
     protected function setUp(): void
     {
-        \cTranslator::load('de');
+        cTranslator::load('de');
     }
 
 
@@ -34,7 +37,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_draftValue_isZero(): void
     {
-        $this->assertSame(0, \eMessageStatus::DRAFT->value);
+        $this->assertSame(0, eMessageStatus::DRAFT->value);
     }
 
     /**
@@ -44,7 +47,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_publishedValue_isOne(): void
     {
-        $this->assertSame(1, \eMessageStatus::PUBLISHED->value);
+        $this->assertSame(1, eMessageStatus::PUBLISHED->value);
     }
 
     /**
@@ -54,7 +57,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_deletedValue_isTwo(): void
     {
-        $this->assertSame(2, \eMessageStatus::DELETED->value);
+        $this->assertSame(2, eMessageStatus::DELETED->value);
     }
 
     /**
@@ -64,7 +67,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_isDraft_forDraft_returnsTrue(): void
     {
-        $this->assertTrue(\eMessageStatus::DRAFT->isDraft());
+        $this->assertTrue(eMessageStatus::DRAFT->isDraft());
     }
 
     /**
@@ -74,7 +77,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_isDraft_forPublished_returnsFalse(): void
     {
-        $this->assertFalse(\eMessageStatus::PUBLISHED->isDraft());
+        $this->assertFalse(eMessageStatus::PUBLISHED->isDraft());
     }
 
     /**
@@ -84,7 +87,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_isPubliclyVisible_forPublished_returnsTrue(): void
     {
-        $this->assertTrue(\eMessageStatus::PUBLISHED->isPubliclyVisible());
+        $this->assertTrue(eMessageStatus::PUBLISHED->isPubliclyVisible());
     }
 
     /**
@@ -94,7 +97,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_isPubliclyVisible_forDraft_returnsFalse(): void
     {
-        $this->assertFalse(\eMessageStatus::DRAFT->isPubliclyVisible());
+        $this->assertFalse(eMessageStatus::DRAFT->isPubliclyVisible());
     }
 
     /**
@@ -104,7 +107,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_isDeleted_forDeleted_returnsTrue(): void
     {
-        $this->assertTrue(\eMessageStatus::DELETED->isDeleted());
+        $this->assertTrue(eMessageStatus::DELETED->isDeleted());
     }
 
     /**
@@ -114,7 +117,7 @@ class MessageStatusTest extends TestCase
      */
     public function test_isDeleted_forPublished_returnsFalse(): void
     {
-        $this->assertFalse(\eMessageStatus::PUBLISHED->isDeleted());
+        $this->assertFalse(eMessageStatus::PUBLISHED->isDeleted());
     }
 
     /**
@@ -124,8 +127,8 @@ class MessageStatusTest extends TestCase
      */
     public function test_from_withValidInt_returnsEnum(): void
     {
-        $status = \eMessageStatus::from(1);
-        $this->assertSame(\eMessageStatus::PUBLISHED, $status);
+        $status = eMessageStatus::from(1);
+        $this->assertSame(eMessageStatus::PUBLISHED, $status);
     }
 
     /**
@@ -135,8 +138,8 @@ class MessageStatusTest extends TestCase
      */
     public function test_label_returnGermanLabel(): void
     {
-        $this->assertSame('Entwurf', \eMessageStatus::DRAFT->getLabel());
-        $this->assertSame('Veröffentlicht', \eMessageStatus::PUBLISHED->getLabel());
-        $this->assertSame('Gelöscht', \eMessageStatus::DELETED->getLabel());
+        $this->assertSame('Entwurf', eMessageStatus::DRAFT->getLabel());
+        $this->assertSame('Veröffentlicht', eMessageStatus::PUBLISHED->getLabel());
+        $this->assertSame('Gelöscht', eMessageStatus::DELETED->getLabel());
     }
 }

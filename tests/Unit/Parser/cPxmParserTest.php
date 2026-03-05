@@ -1,5 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Unit\Parser;
+
+use PHPUnit\Framework\TestCase;
+use PXMBoard\Parser\cPxmParser;
+
 /**
  * Unit tests for cPxmParser
  * Tests PXM markup to HTML conversion
@@ -7,16 +14,10 @@
  * @author Torsten Rentsch <forum@torsten-rentsch.de>
  * @copyright Torsten Rentsch 2001 - 2026
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Unit\Parser;
-
-use PHPUnit\Framework\TestCase;
-
 class cPxmParserTest extends TestCase
 {
     /**
-     * @var \cPxmParser parser instance
+     * @var cPxmParser parser instance
      */
     private $parser;
 
@@ -28,7 +29,7 @@ class cPxmParserTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->parser = new \cPxmParser();
+        $this->parser = new cPxmParser();
     }
 
     /**
@@ -209,10 +210,9 @@ class cPxmParserTest extends TestCase
         // This simulates the _preloadMentions() behavior without requiring database
         $reflection = new \ReflectionClass($this->parser);
         $property = $reflection->getProperty('m_arrMentionCache');
-        $property->setAccessible(true);
 
         // Create a subclass that overrides _preloadMentions to prevent DB access
-        $parser = new class () extends \cPxmParser {
+        $parser = new class () extends cPxmParser {
             protected function _preloadMentions($sText): void
             {
                 // Override to prevent database access
@@ -239,7 +239,7 @@ class cPxmParserTest extends TestCase
     public function test_parse_withDeletedUserMention_returnsDeletedMessage(): void
     {
         // Create a subclass that overrides _preloadMentions to prevent DB access
-        $parser = new class () extends \cPxmParser {
+        $parser = new class () extends cPxmParser {
             protected function _preloadMentions($sText): void
             {
                 // Override to prevent database access

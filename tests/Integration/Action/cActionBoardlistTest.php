@@ -1,4 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Integration\Action;
+
+use PXMBoard\Controller\Board\cActionBoardlist;
+use PXMBoard\Tests\TestCase\ActionTestCase;
+
 /**
  * Integration test for cActionBoardlist
  *
@@ -9,12 +17,6 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Integration\Action;
-
-use PXMBoard\Tests\TestCase\ActionTestCase;
-
 class cActionBoardlistTest extends ActionTestCase
 {
     /**
@@ -25,7 +27,7 @@ class cActionBoardlistTest extends ActionTestCase
      */
     public function test_validateBasePermissionsAndConditions_returnsTrue(): void
     {
-        $objAction = new \cActionBoardlist($this->objConfig);
+        $objAction = new cActionBoardlist($this->objConfig);
 
         $this->assertTrue($objAction->validateBasePermissionsAndConditions());
     }
@@ -39,7 +41,7 @@ class cActionBoardlistTest extends ActionTestCase
     {
         $this->insertBoard(['b_name' => 'Integration Test Board']);
 
-        $objAction = new \cActionBoardlist($this->objConfig);
+        $objAction = new cActionBoardlist($this->objConfig);
         $objAction->performAction();
 
         $this->assertNotEmpty($objAction->getOutput());
@@ -54,7 +56,7 @@ class cActionBoardlistTest extends ActionTestCase
     {
         $this->insertBoard(['b_name' => 'Unique Board ABCXYZ123']);
 
-        $objAction = new \cActionBoardlist($this->objConfig);
+        $objAction = new cActionBoardlist($this->objConfig);
         $objAction->performAction();
         $sOutput = $objAction->getOutput();
 
@@ -68,7 +70,7 @@ class cActionBoardlistTest extends ActionTestCase
      */
     public function test_getOutput_containsNewestMessagesSection(): void
     {
-        $objAction = new \cActionBoardlist($this->objConfig);
+        $objAction = new cActionBoardlist($this->objConfig);
         $objAction->performAction();
         $sOutput = $objAction->getOutput();
 
@@ -84,7 +86,7 @@ class cActionBoardlistTest extends ActionTestCase
     {
         $this->insertUser(['u_username' => 'newest_member_test']);
 
-        $objAction = new \cActionBoardlist($this->objConfig);
+        $objAction = new cActionBoardlist($this->objConfig);
         $objAction->performAction();
         $sOutput = $objAction->getOutput();
 
@@ -98,7 +100,7 @@ class cActionBoardlistTest extends ActionTestCase
      */
     public function test_getOutput_withoutActiveUser_rendersLoginForm(): void
     {
-        $objAction = new \cActionBoardlist($this->objConfig, 0);
+        $objAction = new cActionBoardlist($this->objConfig, 0);
         $objAction->performAction();
         $sOutput = $objAction->getOutput();
 

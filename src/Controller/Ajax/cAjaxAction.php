@@ -1,7 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Controller/cBaseAction.php');
-require_once(SRCDIR . '/Enum/eSuccessKeys.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Controller\cBaseAction;
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eSuccessKeys;
+
 /**
  * Base class for AJAX actions with JSON response
  *
@@ -37,20 +41,20 @@ abstract class cAjaxAction extends cBaseAction
     protected function _mapErrorToHttpStatus(eErrorKeys $error): int
     {
         return match ($error) {
-            eErrorKeys::NOT_LOGGED_IN                => 401,
+            eErrorKeys::NOT_LOGGED_IN            => 401,
             eErrorKeys::NOT_AUTHORIZED,
             eErrorKeys::BOARD_CLOSED,
             eErrorKeys::BOARD_READONLY,
-            eErrorKeys::CSRF_TOKEN_INVALID           => 403,
+            eErrorKeys::CSRF_TOKEN_INVALID       => 403,
             eErrorKeys::INVALID_BOARD_ID,
             eErrorKeys::BOARD_ID_MISSING,
             eErrorKeys::INVALID_MESSAGE_ID,
             eErrorKeys::INVALID_THREAD_ID,
             eErrorKeys::INVALID_USER_ID,
-            eErrorKeys::ALREADY_LOGGED_IN            => 400,
+            eErrorKeys::ALREADY_LOGGED_IN        => 400,
             eErrorKeys::COULD_NOT_INSERT_DATA,
             eErrorKeys::COULD_NOT_UPDATE_DATA,
-            eErrorKeys::COULD_NOT_DELETE_DATA        => 500,
+            eErrorKeys::COULD_NOT_DELETE_DATA    => 500,
             default                              => 400,
         };
     }

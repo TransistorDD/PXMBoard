@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cUser.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * user profile handling
  *
