@@ -1,5 +1,5 @@
 {*
-  Message Edit Form Template (Fragment) - HTMX Skin
+  Message Edit Form Template (Fragment) - PXM Skin
 
   Loads into #message-container via hx-target.
   Supports draft mode (publish/save/delete) and normal edit mode.

@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * Notification list
@@ -51,7 +51,7 @@ class cNotificationList extends cScrollList
                   'WHERE n_userid='.intval($this->m_iUserId);
 
         if (!empty($this->m_sStatus)) {
-            $sQuery .= ' AND n_status='.cDBFactory::getInstance()->quote($this->m_sStatus);
+            $sQuery .= ' AND n_status='.cDB::getInstance()->quote($this->m_sStatus);
         }
 
         $sQuery .= ' ORDER BY n_created_timestamp DESC';
@@ -92,7 +92,7 @@ class cNotificationList extends cScrollList
      */
     public static function markAllAsRead(int $iUserId): bool
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
 
         $iTimestamp = time();
 
@@ -130,7 +130,7 @@ class cNotificationList extends cScrollList
         $sQuery = 'DELETE FROM pxm_notification '.
                   'WHERE n_created_timestamp < '.intval($iCutoffTimestamp);
 
-        if ($objResult = cDBFactory::getInstance()->executeQuery($sQuery)) {
+        if ($objResult = cDB::getInstance()->executeQuery($sQuery)) {
             return $objResult->getAffectedRows();
         }
         return 0;

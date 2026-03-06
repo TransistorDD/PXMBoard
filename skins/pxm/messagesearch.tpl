@@ -74,7 +74,7 @@
 	<div class="px-4 py-2 rounded-t-lg font-semibold text-sm" style="background-color: var(--color-surface-secondary); color: var(--color-content-secondary);">Das interessiert unsere Nutzer</div>
 	<div class="rounded-b-lg shadow" style="border: 1px solid var(--color-border-default); background-color: var(--color-surface-primary);">
 {foreach from=$searchprofiles.searchprofile item=searchprofile}
-		<div class="px-4 py-2" style="border-top: 1px solid var(--color-border-light);">
+		<div class="px-4 py-2 text-sm" style="border-top: 1px solid var(--color-border-light);">
 			<a href="pxmboard.php?mode=messagesearch&brdid={$config.board.id}&searchid={$searchprofile.id}"
 			   hx-get="pxmboard.php?mode=messagesearch&brdid={$config.board.id}&searchid={$searchprofile.id}"
 			   hx-target="#threadlist-container"

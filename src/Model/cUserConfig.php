@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * user configuration handling
@@ -50,12 +50,12 @@ class cUserConfig extends cUserPermissions
     {
         $bReturn = false;
 
-        if (cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_visible='.intval($this->m_bIsVisible).','.
+        if (cDB::getInstance()->executeQuery('UPDATE pxm_user SET u_visible='.intval($this->m_bIsVisible).','.
                                                     'u_skinid='.$this->m_iSkinId.','.
-                                                    'u_threadlistsort='.cDBFactory::getInstance()->quote($this->m_sThreadListSortMode).','.
+                                                    'u_threadlistsort='.cDB::getInstance()->quote($this->m_sThreadListSortMode).','.
                                                     'u_timeoffset='.$this->m_iTimeOffset.','.
                                                     'u_embed_external='.intval($this->m_bEmbedExternal).','.
-                                                    'u_privatemail='.cDBFactory::getInstance()->quote($this->m_sPrivateMail).','.
+                                                    'u_privatemail='.cDB::getInstance()->quote($this->m_sPrivateMail).','.
                                                     'u_privatenotification='.intval($this->m_bPrivateMessageNotification).' '.
                                 'WHERE u_id='.$this->m_iId)) {
             $bReturn = true;

@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * handles the templates of the system
@@ -23,7 +23,7 @@ class cTemplateList
     {
         $arrTemplates = [];
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT te_id,te_message,te_name,te_description FROM pxm_template ORDER BY te_id ASC')) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT te_id,te_message,te_name,te_description FROM pxm_template ORDER BY te_id ASC')) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
 
                 $objTemplate = new cTemplate();

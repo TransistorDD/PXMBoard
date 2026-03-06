@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eMessageStatus;
 
 /**
@@ -38,7 +38,7 @@ class cThread
         $bReturn = false;
 
         if ($iThreadId > 0) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT t_boardid,'.
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT t_boardid,'.
                                                         't_id,'.
                                                         't_active,'.
                                                         't_fixed,'.
@@ -105,7 +105,7 @@ class cThread
      */
     public function updateIsActive(bool $bIsActive): bool
     {
-        if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_thread SET t_active='.intval($bIsActive)." WHERE t_id=$this->m_iId")) {
+        if (!cDB::getInstance()->executeQuery('UPDATE pxm_thread SET t_active='.intval($bIsActive)." WHERE t_id=$this->m_iId")) {
             return false;
         }
         $this->m_bIsActive = $bIsActive ? true : false;
@@ -130,7 +130,7 @@ class cThread
      */
     public function updateIsFixed(bool $bIsFixed): bool
     {
-        if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_thread SET t_fixed='.intval($bIsFixed)." WHERE t_id=$this->m_iId")) {
+        if (!cDB::getInstance()->executeQuery('UPDATE pxm_thread SET t_fixed='.intval($bIsFixed)." WHERE t_id=$this->m_iId")) {
             return false;
         }
         $this->m_bIsFixed = $bIsFixed ? true : false;
@@ -144,8 +144,8 @@ class cThread
      */
     public function deleteData(): bool
     {
-        if (cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_threadid=$this->m_iId")
-            && cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_id=$this->m_iId")) {
+        if (cDB::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_threadid=$this->m_iId")
+            && cDB::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_id=$this->m_iId")) {
 
             return true;
         }
@@ -175,7 +175,7 @@ class cThread
 
             $this->deleteSubThreadRecursive($iMessageId);
 
-            cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_message WHERE m_id='.$iMessageId);
+            cDB::getInstance()->executeQuery('DELETE FROM pxm_message WHERE m_id='.$iMessageId);
 
             $this->updateThreadInformation($this->m_iId);
             $bReturn = true;
@@ -230,10 +230,10 @@ class cThread
         $this->m_arrThreadMessages = $this->getThreadMessageIdArray();
 
         if (isset($this->m_arrThreadMessages[0]) && !in_array($iMessageId, $this->m_arrThreadMessages[0])) {// root message not allowed
-            if (cDBFactory::getInstance()->executeQuery("INSERT INTO pxm_thread (t_boardid,t_active,t_lastmsgtstmp) VALUES ($this->m_iBoardId,1,0)")) {
-                if (($iNewThreadId = cDBFactory::getInstance()->getInsertId('pxm_thread', 't_id')) > 0) {
+            if (cDB::getInstance()->executeQuery("INSERT INTO pxm_thread (t_boardid,t_active,t_lastmsgtstmp) VALUES ($this->m_iBoardId,1,0)")) {
+                if (($iNewThreadId = cDB::getInstance()->getInsertId('pxm_thread', 't_id')) > 0) {
 
-                    cDBFactory::getInstance()->executeQuery('UPDATE pxm_message SET m_threadid='.intval($iNewThreadId).',m_parentid=0 WHERE m_id='.$iMessageId);
+                    cDB::getInstance()->executeQuery('UPDATE pxm_message SET m_threadid='.intval($iNewThreadId).',m_parentid=0 WHERE m_id='.$iMessageId);
 
                     $this->moveSubThreadRecursive($iMessageId, $iNewThreadId);
 
@@ -257,7 +257,7 @@ class cThread
     public function getThreadMessageIdArray(): array
     {
         $arrThreadMessageIds = [];
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT m_id,m_parentid FROM pxm_message WHERE m_threadid=$this->m_iId")) {
+        if ($objResultSet = cDB::getInstance()->executeQuery("SELECT m_id,m_parentid FROM pxm_message WHERE m_threadid=$this->m_iId")) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $arrThreadMessageIds[(int) $objResultRow->m_parentid][] = (int) $objResultRow->m_id;
             }
@@ -277,7 +277,7 @@ class cThread
             foreach ($this->m_arrThreadMessages[$iMessageId] as $iSubMessageId) {
                 $this->deleteSubThreadRecursive($iSubMessageId);
             }
-            cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_threadid=$this->m_iId AND m_parentid=".$iMessageId);
+            cDB::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_threadid=$this->m_iId AND m_parentid=".$iMessageId);
         }
         return true;
     }
@@ -295,7 +295,7 @@ class cThread
             foreach ($this->m_arrThreadMessages[$iMessageId] as $iSubMessageId) {
                 $this->moveSubThreadRecursive($iSubMessageId, $iNewThreadId);
             }
-            cDBFactory::getInstance()->executeQuery("UPDATE pxm_message SET m_threadid=$iNewThreadId WHERE m_threadid=$this->m_iId AND m_parentid=".$iMessageId);
+            cDB::getInstance()->executeQuery("UPDATE pxm_message SET m_threadid=$iNewThreadId WHERE m_threadid=$this->m_iId AND m_parentid=".$iMessageId);
         }
         return true;
     }
@@ -308,9 +308,9 @@ class cThread
      */
     private function updateThreadInformation(int $iThreadId): bool
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS count,MAX(m_tstmp) AS maxd,MAX(m_id) AS maxid FROM pxm_message WHERE m_threadid=$iThreadId")) {
+        if ($objResultSet = cDB::getInstance()->executeQuery("SELECT count(*) AS count,MAX(m_tstmp) AS maxd,MAX(m_id) AS maxid FROM pxm_message WHERE m_threadid=$iThreadId")) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                cDBFactory::getInstance()->executeQuery("UPDATE pxm_thread SET t_msgquantity=$objResultRow->count-1,t_lastmsgid=$objResultRow->maxid,t_lastmsgtstmp=$objResultRow->maxd WHERE t_id=$iThreadId");
+                cDB::getInstance()->executeQuery("UPDATE pxm_thread SET t_msgquantity=$objResultRow->count-1,t_lastmsgid=$objResultRow->maxid,t_lastmsgtstmp=$objResultRow->maxd WHERE t_id=$iThreadId");
                 return true;
             }
         }
@@ -328,7 +328,7 @@ class cThread
         $bReturn = false;
 
         if ($iDestinationBoardId > 0) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery("UPDATE pxm_thread SET t_boardid=$iDestinationBoardId WHERE t_id=$this->m_iId")) {
+            if ($objResultSet = cDB::getInstance()->executeQuery("UPDATE pxm_thread SET t_boardid=$iDestinationBoardId WHERE t_id=$this->m_iId")) {
                 if ($objResultSet->getAffectedRows() > 0) {
                     $bReturn = true;
                 }
@@ -360,7 +360,7 @@ class cThread
                 $sQuery = "SELECT m_id,m_parentid,m_subject,m_tstmp,m_userid,m_username,m_userhighlight,m_status FROM pxm_message WHERE m_threadid=$this->m_iId AND ".$sStatusFilter." ORDER BY m_tstmp DESC";
             }
 
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery($sQuery)) {
+            if ($objResultSet = cDB::getInstance()->executeQuery($sQuery)) {
 
                 $objParser = null;	// message parser not needed
 
@@ -391,7 +391,7 @@ class cThread
                     unset($objResultSet);
 
                     // increment thread view count
-                    cDBFactory::getInstance()->executeQuery("UPDATE pxm_thread SET t_views=t_views+1 WHERE t_id=$this->m_iId");
+                    cDB::getInstance()->executeQuery("UPDATE pxm_thread SET t_views=t_views+1 WHERE t_id=$this->m_iId");
                     ++$this->m_iViews;
                     return ['id'	=>	$this->m_iId,
                             'active' =>	$this->m_bIsActive,

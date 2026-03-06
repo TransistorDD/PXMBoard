@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eNotificationStatus;
 use PXMBoard\Enum\eNotificationType;
 
@@ -51,7 +51,7 @@ class cNotification
         int $iRelatedMessageId = 0,
         int $iRelatedPmId = 0
     ): bool {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
         $iTimestamp = time();
 
         if (($iUserId <= 0) || empty($sTitle)) {
@@ -93,7 +93,7 @@ class cNotification
      */
     public function loadDataById(int $iId): bool
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
 
         if ($iId <= 0) {
             return false;
@@ -132,7 +132,7 @@ class cNotification
      */
     public function markAsRead(): bool
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
 
         if ($this->m_iId <= 0) {
             return false;

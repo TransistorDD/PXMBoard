@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\ePrivateMessageStatus;
 
 /**
@@ -54,10 +54,10 @@ class cPrivateInboxList extends cPrivateMessageList
     public function deleteData(): bool
     {
         // set the message to deleted if we are the recipient
-        cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_tostate='.ePrivateMessageStatus::DELETED->value." WHERE p_touserid=$this->m_iUserId");
+        cDB::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_tostate='.ePrivateMessageStatus::DELETED->value." WHERE p_touserid=$this->m_iUserId");
 
         // remove all deleted messages from db
-        cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_priv_message WHERE p_tostate='.ePrivateMessageStatus::DELETED->value.' AND p_fromstate='.ePrivateMessageStatus::DELETED->value);
+        cDB::getInstance()->executeQuery('DELETE FROM pxm_priv_message WHERE p_tostate='.ePrivateMessageStatus::DELETED->value.' AND p_fromstate='.ePrivateMessageStatus::DELETED->value);
 
         return true;
     }
@@ -69,7 +69,7 @@ class cPrivateInboxList extends cPrivateMessageList
      */
     public function countUnread(): int
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS msgcount FROM pxm_priv_message WHERE p_touserid=$this->m_iUserId AND p_tostate=".ePrivateMessageStatus::UNREAD->value)) {
+        if ($objResultSet = cDB::getInstance()->executeQuery("SELECT count(*) AS msgcount FROM pxm_priv_message WHERE p_touserid=$this->m_iUserId AND p_tostate=".ePrivateMessageStatus::UNREAD->value)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 return (int) $objResultRow->msgcount;
             }

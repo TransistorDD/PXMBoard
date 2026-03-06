@@ -1,5 +1,5 @@
 {*
-  Inline Errors Partial - HTMX Skin
+  Inline Errors Partial - PXM Skin
 
   Iterates $error array and renders styled error divs with danger border/text.
 

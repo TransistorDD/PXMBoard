@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * handles the forbidden mails
@@ -23,7 +23,7 @@ class cForbiddenMailList
     {
         $arrForbiddenMails = [];
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT fm_adress FROM pxm_forbiddenmail')) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT fm_adress FROM pxm_forbiddenmail')) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 if (strlen($objResultRow->fm_adress) > 0) {
                     $arrForbiddenMails[] = $objResultRow->fm_adress;
@@ -42,10 +42,10 @@ class cForbiddenMailList
      */
     public function updateList(array $arrForbiddenMails): bool
     {
-        if (cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_forbiddenmail')) {
+        if (cDB::getInstance()->executeQuery('DELETE FROM pxm_forbiddenmail')) {
             foreach ($arrForbiddenMails as $sForbiddenMail) {
                 if (strlen($sForbiddenMail) > 0) {
-                    cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_forbiddenmail (fm_adress) VALUES ('.cDBFactory::getInstance()->quote($sForbiddenMail).')');
+                    cDB::getInstance()->executeQuery('INSERT INTO pxm_forbiddenmail (fm_adress) VALUES ('.cDB::getInstance()->quote($sForbiddenMail).')');
                 }
             }
         }

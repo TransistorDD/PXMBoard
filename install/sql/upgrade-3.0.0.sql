@@ -189,7 +189,7 @@ FROM pxm_user
 WHERE u_ticket != '' AND u_ticket IS NOT NULL;
 
 -- Remove legacy u_ticket column (no backward compatibility needed)
-ALTER TABLE `pxm_user` DROP COLUMN `u_ticket`;
+ALTER TABLE `pxm_user` DROP COLUMN IF EXISTS `u_ticket`;
 
 -- ============================================================================
 -- REMOVE BANNER FUNCTIONALITY
@@ -406,6 +406,14 @@ ALTER TABLE `pxm_search`
   ADD INDEX `idx_ratelimit` (`se_ipaddress`, `se_tstmp`);
 
 -- ============================================================================
+-- Store the group_by_thread preference as part of the search profile so that
+-- pagination does not lose the setting.
+-- ============================================================================
+
+ALTER TABLE `pxm_search`
+  ADD COLUMN `se_group_by_thread` BOOLEAN NOT NULL DEFAULT TRUE AFTER `se_ipaddress`;
+
+-- ============================================================================
 -- SCHEMA CLEANUP: Remove deprecated parser columns
 -- ============================================================================
 -- Remove b_parsestyle and b_parseurl from pxm_board (no longer used),
@@ -415,18 +423,18 @@ ALTER TABLE `pxm_search`
 -- rename u_parseimg to u_embed_external.
 
 ALTER TABLE `pxm_board`
-  DROP COLUMN `b_parsestyle`,
-  DROP COLUMN `b_parseurl`,
+  DROP COLUMN IF EXISTS `b_parsestyle`,
+  DROP COLUMN IF EXISTS `b_parseurl`,
   CHANGE COLUMN `b_parseimg` `b_embed_external` BOOLEAN NOT NULL DEFAULT TRUE
     COMMENT 'Einbettung externer Inhalte (Bilder, YouTube, Twitch)';
 
 ALTER TABLE `pxm_configuration`
-  DROP COLUMN `c_parseurl`,
-  DROP COLUMN `c_parsestyle`;
+  DROP COLUMN IF EXISTS `c_parseurl`,
+  DROP COLUMN IF EXISTS `c_parsestyle`;
 
 ALTER TABLE `pxm_user`
-  DROP COLUMN `u_replacetext`,
-  DROP COLUMN `u_showsignatures`,
+  DROP COLUMN IF EXISTS `u_replacetext`,
+  DROP COLUMN IF EXISTS `u_showsignatures`,
   CHANGE COLUMN `u_parseimg` `u_embed_external` BOOLEAN NOT NULL DEFAULT FALSE
     COMMENT 'Einbettung externer Inhalte (Bilder, YouTube, Twitch)';
 
@@ -455,7 +463,7 @@ ALTER TABLE `pxm_configuration`
 -- - pxm_configuration: c_banner, c_guestpost, c_countviews, c_quotechar, c_parseurl, c_parsestyle, c_msgperpage columns dropped
 -- - pxm_error: table dropped (replaced by eError PHP enum)
 -- - pxm_skin: names updated, quoteprefix/quotesuffix removed (CSS-based quote styling), frame_top/frame_bottom removed
--- - pxm_search: se_ipaddress added with idx_ratelimit index for search rate limiting
+-- - pxm_search: se_ipaddress added with idx_ratelimit index for search rate limiting, se_group_by_thread added
 -- - Renamed u_nickname to u_username, m_usernickname to m_username, se_nickname to se_username
 -- - pxm_board: b_active replaced with b_status (1=PUBLIC, 2=MEMBERS_ONLY, 3=READONLY_PUBLIC, 4=READONLY_MEMBERS, 5=CLOSED), idx_board_status added, b_parsestyle and b_parseurl removed, b_parseimg renamed to b_embed_external
 --

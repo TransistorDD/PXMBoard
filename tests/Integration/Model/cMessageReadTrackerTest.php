@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 namespace PXMBoard\Tests\Integration\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Model\cMessageReadTracker;
 use PXMBoard\Tests\TestCase\IntegrationTestCase;
 
@@ -104,7 +104,7 @@ class cMessageReadTrackerTest extends IntegrationTestCase
 
         // Insert a read record with an old timestamp directly (90 days ago)
         $iOldTimestamp = time() - (90 * 86400);
-        cDBFactory::getInstance()->executeQuery(
+        cDB::getInstance()->executeQuery(
             'INSERT INTO pxm_message_read (mr_userid, mr_messageid, mr_timestamp) VALUES ('
             . $iUserId . ',' . $iMessageId . ',' . $iOldTimestamp . ')'
         );

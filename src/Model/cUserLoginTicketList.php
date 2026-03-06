@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * User login ticket list
@@ -22,7 +22,7 @@ class cUserLoginTicketList
      */
     public static function getTicketsForUser(int $iUserId): array
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
         $arrTickets = [];
 
         $sQuery = 'SELECT ult_id, ult_userid, ult_token, ult_useragent, ult_ipaddress, '.
@@ -49,7 +49,7 @@ class cUserLoginTicketList
     public static function deleteInactiveTickets(int $iDaysOld = 180): int
     {
         $intAffectedRows = 0;
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
         $iCutoffTimestamp = time() - ($iDaysOld * 86400);
 
         $sQuery = 'DELETE FROM pxm_user_login_ticket '.
@@ -71,7 +71,7 @@ class cUserLoginTicketList
     public static function deleteAllTicketsForUser(int $iUserId): int
     {
         $intAffectedRows = 0;
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
 
         $sQuery = 'DELETE FROM pxm_user_login_ticket '.
                   'WHERE ult_userid='.$iUserId;

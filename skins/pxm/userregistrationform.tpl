@@ -1,5 +1,5 @@
 {*
-  User Registration Form Template (Partial) - HTMX Skin
+  User Registration Form Template (Partial) - PXM Skin
 
   New user registration form with required account fields and optional
   profile information.

@@ -1,5 +1,5 @@
 {*
-  Private Message Form Template (Partial) - HTMX Skin
+  Private Message Form Template (Partial) - PXM Skin
 
   Compose or reply to a private message with TipTap editor.
   Uses standard form POST for submission (not HTMX).

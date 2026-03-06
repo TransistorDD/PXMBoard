@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * message notification subscription list handling
@@ -77,7 +77,7 @@ class cMessageNotificationList extends cScrollList
      */
     public function countNotifications(): int
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS notifcount FROM pxm_message_notification WHERE mn_userid=$this->m_iUserId")) {
+        if ($objResultSet = cDB::getInstance()->executeQuery("SELECT count(*) AS notifcount FROM pxm_message_notification WHERE mn_userid=$this->m_iUserId")) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 return (int) $objResultRow->notifcount;
             }

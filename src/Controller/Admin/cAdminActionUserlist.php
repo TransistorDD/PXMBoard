@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Controller\Admin;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eUserStatus;
 use PXMBoard\Model\cUserAdminList;
 
@@ -124,7 +124,7 @@ class cAdminActionUserlist extends cAdminAction
         }
         $this->m_sOutput .= "</td></tr></tfoot>\n</table>";
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT u_status,count(*) AS usercount FROM pxm_user GROUP BY u_status ORDER BY u_status ASC')) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT u_status,count(*) AS usercount FROM pxm_user GROUP BY u_status ORDER BY u_status ASC')) {
             $this->m_sOutput .= "<table class=\"pxm-table\">\n";
             $this->m_sOutput .= '<thead><tr><th>user status</th><th>count</th></tr></thead>';
             $iUserCount = 0;

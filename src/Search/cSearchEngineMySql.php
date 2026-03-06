@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Search;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eMessageStatus;
 
 /**
@@ -24,7 +24,7 @@ class cSearchEngineMySql extends cSearchEngine
     public function __construct(array $arrConfig)
     {
         // MySQL search engine doesn't need additional configuration
-        // It uses the existing database connection from cDBFactory
+        // It uses the existing database connection from cDB
     }
 
     /**
@@ -53,7 +53,7 @@ class cSearchEngineMySql extends cSearchEngine
         int $iLimit = 500
     ): cSearchResultSet {
 
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
         $arrResults = [];
 
         // Build MATCH score and filter expressions
@@ -212,12 +212,12 @@ class cSearchEngineMySql extends cSearchEngine
      */
     public function isAvailable(): bool
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
 
         // Check if composite FULLTEXT index exists on pxm_message
         $sQuery = "SHOW INDEX FROM pxm_message WHERE Index_type='FULLTEXT' AND Key_name='m_search'";
         if ($objResultSet = $objDb->executeQuery($sQuery)) {
-            $bFound = $objResultSet->getNextResultRowObject() !== null;
+            $bFound = $objResultSet->getNextResultRowObject() !== false;
             $objResultSet->freeResult();
             return $bFound;
         }

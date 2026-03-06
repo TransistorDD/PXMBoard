@@ -1,5 +1,5 @@
 {*
-  TipTap Editor Partial - HTMX Skin
+  TipTap Editor Partial - PXM Skin
 
   Reusable rich text editor with Alpine.js integration.
   Toolbar: Bold, Italic, Underline, Strike, Link, Image, YouTube, Twitch,

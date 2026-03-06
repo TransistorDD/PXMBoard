@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eMessageStatus;
 use PXMBoard\Parser\cParser;
 
@@ -43,7 +43,7 @@ class cMessageHeader
     {
         $bReturn = false;
         if ($iMessageId > 0) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT '.
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT '.
                                                              $this->_getDbAttributes().
                                                              ' FROM '.
                                                              $this->_getDbTables().

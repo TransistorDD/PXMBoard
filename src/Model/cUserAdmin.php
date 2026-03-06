@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * admin user handling
@@ -77,16 +77,16 @@ class cUserAdmin extends cUserProfile
             if (is_integer($mData)) {
                 $sAddUpdateQuery .= 'u_profile_'.$sFieldName.'='.$this->m_arrAddData[$sFieldName].',';
             } else {
-                $sAddUpdateQuery .= 'u_profile_'.$sFieldName.'='.cDBFactory::getInstance()->quote($this->m_arrAddData[$sFieldName]).',';
+                $sAddUpdateQuery .= 'u_profile_'.$sFieldName.'='.cDB::getInstance()->quote($this->m_arrAddData[$sFieldName]).',';
             }
         }
 
-        if (cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET '.
-                                                                          'u_lastname='.cDBFactory::getInstance()->quote($this->m_sLastName).','.
-                                                                          'u_city='.cDBFactory::getInstance()->quote($this->m_sCity).','.
-                                                                          'u_publicmail='.cDBFactory::getInstance()->quote($this->m_sPublicMail).','.
-                                                                          'u_privatemail='.cDBFactory::getInstance()->quote($this->m_sPrivateMail).','.
-                                                                          'u_signature='.cDBFactory::getInstance()->quote($this->m_sSignature).','.
+        if (cDB::getInstance()->executeQuery('UPDATE pxm_user SET '.
+                                                                          'u_lastname='.cDB::getInstance()->quote($this->m_sLastName).','.
+                                                                          'u_city='.cDB::getInstance()->quote($this->m_sCity).','.
+                                                                          'u_publicmail='.cDB::getInstance()->quote($this->m_sPublicMail).','.
+                                                                          'u_privatemail='.cDB::getInstance()->quote($this->m_sPrivateMail).','.
+                                                                          'u_signature='.cDB::getInstance()->quote($this->m_sSignature).','.
                                                                           $sAddUpdateQuery.
                                                                           'u_highlight='.intval($this->m_bHighlight).','.
                                                                           'u_status='.$this->m_eStatus->value.','.
@@ -95,7 +95,7 @@ class cUserAdmin extends cUserProfile
                                                                           'u_admin='.intval($this->m_bIsAdmin).','.
                                                                           'u_visible='.intval($this->m_bIsVisible).','.
                                                                           'u_skinid='.intval($this->m_iSkinId).','.
-                                                                          'u_threadlistsort='.cDBFactory::getInstance()->quote($this->m_sThreadListSortMode).','.
+                                                                          'u_threadlistsort='.cDB::getInstance()->quote($this->m_sThreadListSortMode).','.
                                                                           'u_timeoffset='.intval($this->m_iTimeOffset).','.
                                                                           'u_embed_external='.intval($this->m_bEmbedExternal).','.
                                                                           'u_privatenotification='.intval($this->m_bPrivateMessageNotification).
@@ -114,7 +114,7 @@ class cUserAdmin extends cUserProfile
     {
         $this->m_arrModeratedBoards = [];
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT b_id,b_name FROM pxm_moderator,pxm_board WHERE mod_boardid=b_id AND mod_userid=$this->m_iId")) {
+        if ($objResultSet = cDB::getInstance()->executeQuery("SELECT b_id,b_name FROM pxm_moderator,pxm_board WHERE mod_boardid=b_id AND mod_userid=$this->m_iId")) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
 
                 $objBoard = new cBoard();
@@ -137,9 +137,9 @@ class cUserAdmin extends cUserProfile
      */
     public function updateModData(): bool
     {
-        if (cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_moderator WHERE mod_userid=$this->m_iId")) {
+        if (cDB::getInstance()->executeQuery("DELETE FROM pxm_moderator WHERE mod_userid=$this->m_iId")) {
             foreach ($this->m_arrModeratedBoards as $objBoard) {
-                cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_moderator (mod_boardid,mod_userid) VALUES ('.$objBoard->getId().",$this->m_iId)");
+                cDB::getInstance()->executeQuery('INSERT INTO pxm_moderator (mod_boardid,mod_userid) VALUES ('.$objBoard->getId().",$this->m_iId)");
             }
         } else {
             return false;
@@ -250,11 +250,7 @@ class cUserAdmin extends cUserProfile
      */
     public function setSkinId(int $iSkinId): void
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT s_id FROM pxm_skin WHERE s_id='.$iSkinId." AND s_fieldname='name'")) {
-            if ($objResultSet->getNumRows() > 0) {
-                $this->m_iSkinId = $iSkinId;
-            }
-        }
+        $this->m_iSkinId = $iSkinId;
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eBoardStatus;
 
 /**
@@ -25,7 +25,7 @@ class cBoardList
      */
     public function loadData(): bool
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT b_id,b_name,b_description,b_position,b_lastmsgtstmp,b_status FROM pxm_board ORDER BY b_position ASC')) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT b_id,b_name,b_description,b_position,b_lastmsgtstmp,b_status FROM pxm_board ORDER BY b_position ASC')) {
 
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
 
@@ -56,7 +56,7 @@ class cBoardList
      */
     public function loadBasicData(): bool
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT b_id,b_name,b_position,b_status FROM pxm_board ORDER BY b_position ASC')) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT b_id,b_name,b_position,b_status FROM pxm_board ORDER BY b_position ASC')) {
 
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
 
@@ -85,7 +85,7 @@ class cBoardList
     public function openBoards(array $arrBoardIds): bool
     {
         if (sizeof($arrBoardIds) > 0) {
-            if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_board SET b_status=1 WHERE b_id IN ('.implode(',', $arrBoardIds).')')) {
+            if (!cDB::getInstance()->executeQuery('UPDATE pxm_board SET b_status=1 WHERE b_id IN ('.implode(',', $arrBoardIds).')')) {
                 return false;
             }
         }
@@ -101,11 +101,11 @@ class cBoardList
     {
         $arrClosedBoards = [];
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT b_id FROM pxm_board WHERE b_status!=5')) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT b_id FROM pxm_board WHERE b_status!=5')) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $arrClosedBoards[] = $objResultRow->b_id;
             }
-            cDBFactory::getInstance()->executeQuery('UPDATE pxm_board SET b_status=5');
+            cDB::getInstance()->executeQuery('UPDATE pxm_board SET b_status=5');
         }
         return $arrClosedBoards;
     }

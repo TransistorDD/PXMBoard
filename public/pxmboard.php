@@ -28,7 +28,7 @@ $sSessionName     = $arrConfig['session_name'] ?? 'brdsid';
 
 require_once(BASEDIR . '/vendor/autoload.php');
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Validation\cInputHandler;
 use PXMBoard\Validation\cServerHandler;
 use PXMBoard\Model\cConfig;
@@ -44,7 +44,7 @@ use PXMBoard\Controller\Board\cActionError;
 
 // establish db connection via singleton
 try {
-    cDBFactory::getInstance($arrDatabase);
+    cDB::getInstance($arrDatabase);
 } catch (cDatabaseException $e) {
     die('Database error: ' . htmlspecialchars($e->getMessage()));
 }

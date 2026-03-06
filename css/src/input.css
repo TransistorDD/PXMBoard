@@ -14,7 +14,7 @@ button:focus:not(:focus-visible) {
 }
 
 /* ======================================================================
-   THEME: Semantic color tokens for HTMX Skin
+   THEME: Semantic color tokens for PXM Skin
    All colors are role-based, no color names as identifiers.
    ====================================================================== */
 @theme {

@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eMessageStatus;
 
 /**
@@ -66,7 +66,7 @@ class cThreadList extends cScrollList
      */
     protected function _getQuery(): string
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
 
         // For logged-in users: Add read status via LEFT JOIN (more efficient than EXISTS subqueries)
         $sReadJoin = '';

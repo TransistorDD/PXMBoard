@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * searchprofilelist handling
@@ -24,7 +24,7 @@ class cSearchProfileList
      */
     public function loadData(): bool
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT se_id,se_userid,se_message,se_username,se_days,se_tstmp FROM pxm_search ORDER BY se_tstmp DESC', 10)) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT se_id,se_userid,se_message,se_username,se_days,se_tstmp FROM pxm_search ORDER BY se_tstmp DESC', 10)) {
 
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
 
@@ -69,7 +69,7 @@ class cSearchProfileList
      */
     public function getLastProfileTimestamp(): int
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT MAX(se_tstmp) as lasttstmp FROM pxm_search')) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT MAX(se_tstmp) as lasttstmp FROM pxm_search')) {
 
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 return $objResultRow->lasttstmp;

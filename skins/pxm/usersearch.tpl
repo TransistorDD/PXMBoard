@@ -1,5 +1,5 @@
 {*
-  User Search Template (Partial) - HTMX Skin
+  User Search Template (Partial) - PXM Skin
 
   Search form for finding users by username.
   If results exist ($user array), they are displayed below the form.

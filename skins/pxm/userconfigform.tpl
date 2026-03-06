@@ -1,5 +1,5 @@
 {*
-  User Configuration Form Template (Partial) - HTMX Skin
+  User Configuration Form Template (Partial) - PXM Skin
 
   User settings form with grouped sections: Display, Email/Notifications,
   and Signature editor.

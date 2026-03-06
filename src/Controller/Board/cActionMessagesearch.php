@@ -41,10 +41,8 @@ class cActionMessagesearch extends cPublicAction
         }
 
         $iIdUser = 0;
-        $iLastOnline = 0;
         if ($objActiveUser = $this->getActiveUser()) {
             $iIdUser = $objActiveUser->getId();
-            $iLastOnline = $objActiveUser->getLastOnlineTimestamp();
         }
 
         // init search data
@@ -56,10 +54,8 @@ class cActionMessagesearch extends cPublicAction
             $objSearch->setBoardIds($this->m_objInputHandler->getArrFormVar('sbrdid', true, true, true, 'intval'));
             $objSearch->setSearchDays($this->m_objInputHandler->getIntFormVar('days', true, true, true));
             $objSearch->setTimestamp($this->m_objConfig->getAccessTimestamp());
+            $objSearch->setGroupByThread($this->m_objInputHandler->getIntFormVar('group_by_thread', true, true, true) == 1);
         }
-
-        // Read group_by_thread parameter
-        $bGroupByThread = $this->m_objInputHandler->getIntFormVar('group_by_thread', true, true, true) == 1;
 
         $objSearchProfileList = new cSearchProfileList();
 
@@ -68,7 +64,8 @@ class cActionMessagesearch extends cPublicAction
             // display the search form
             $this->_initSearchForm($iIdBoard, $objSearchProfileList);
         } else {
-            // Check rate limiting (applies to all searches, including saved profiles)
+            // Check rate limiting - works for new searches only, not for paging and not for executing a previously executed search (recent searches in UI)
+            // TODO Cache search results for an appropriate time (paging & recent searches)
             $sIpAddress = $this->m_objServerHandler->getRemoteAddr();
             $iCurrentTime = $this->m_objConfig->getAccessTimestamp();
 
@@ -87,15 +84,14 @@ class cActionMessagesearch extends cPublicAction
             $objMessageSearchList = new cMessageSearchList($objSearch, $this->m_objConfig->getTimeOffset() * 3600, $this->m_objConfig->getDateFormat(), $iIdUser);
 
             // execute search
-            $objMessageSearchList->loadData($this->m_objInputHandler->getIntFormVar('page', true, true, true), $this->m_objConfig->getMessageHeaderPerPage(), $bGroupByThread);
+            $objMessageSearchList->loadData($this->m_objInputHandler->getIntFormVar('page', true, true, true), $this->m_objConfig->getMessageHeaderPerPage(), $objSearch->getGroupByThread());
 
-            if ($objMessageSearchList->getItemCount() <= 500) {
-                // always insert a new profile into search table
-                $objSearch->setId(0);
+            if ($objMessageSearchList->getItemCount() > 500) {
+                $objError = eErrorKeys::RESULT_SET_TOO_LARGE;				// too many results
+            } elseif ($objSearch->getId() === 0) {
+                // insert a new profile into search table
                 $objSearch->setIpAddress($sIpAddress);
                 $objSearch->insertData();
-            } else {
-                $objError = eErrorKeys::RESULT_SET_TOO_LARGE;				// too many results
             }
             if (is_object($objError)) {
                 // display the search form
@@ -108,7 +104,6 @@ class cActionMessagesearch extends cPublicAction
                                                                           'curid'		=> $objMessageSearchList->getCurPageId(),
                                                                           'count'		=> $objMessageSearchList->getPageCount(),
                                                                           'items'		=> $objMessageSearchList->getItemCount(),
-                                                                          'group_by_thread' => $bGroupByThread,
                                                                           'searchprofile' => $objSearch->getDataArray(
                                                                               $this->m_objConfig->getTimeOffset(),
                                                                               $this->m_objConfig->getDateFormat()
