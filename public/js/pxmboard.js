@@ -27,6 +27,20 @@
     e.detail.headers['X-CSRF-Token'] = getCsrfToken();
   });
 
+  // // DEBUG: trace all htmx request lifecycle events
+  // ['htmx:beforeRequest', 'htmx:afterRequest', 'htmx:sendAbort', 'htmx:beforeSwap', 'htmx:afterSwap', 'htmx:abort'].forEach(function (evt) {
+  //   document.addEventListener(evt, function (e) {
+  //     var elt = e.detail.elt;
+  //     var target = e.detail.target;
+  //     console.log('[' + evt + ']',
+  //       'elt:', elt ? (elt.id || elt.tagName + (elt.className ? '.' + elt.className.split(' ')[0] : '')) : 'null',
+  //       'target:', target ? (target.id || target.tagName) : 'null',
+  //       'url:', e.detail.requestConfig ? e.detail.requestConfig.path : (e.detail.path || '?'),
+  //       'detail:', e.detail
+  //     );
+  //   });
+  // });
+
   // ====================================================================
   // THEME MANAGEMENT
   // ====================================================================
@@ -887,8 +901,8 @@
   var _highlightedRow = null;
 
   /**
-   * Select a message in the thread tree (set highlight).
-   * Exposed globally so onclick handlers in templates can call it.
+   * Select a message in the thread tree (set highlight + mark as read).
+   * Called from onclick handlers in thread.tpl.
    * @param {number} msgId - the message id to highlight
    */
   window.selectMessage = function (msgId) {
@@ -899,6 +913,7 @@
   /**
    * Update thread tree highlighting based on currentMsgId.
    * O(1): removes class from cached previous row, adds to new row.
+   * Also adds 'is-read' so CSS hides the "(neu)" badge.
    */
   function updateThreadHighlight() {
     // Remove old highlight (O(1) via cached reference)
@@ -910,9 +925,11 @@
     if (currentMsgId > 0) {
       var container = document.getElementById('thread-container');
       if (!container) return;
-      var row = container.querySelector('.htmx-thread-msg-row[data-msgid="' + currentMsgId + '"]');
+      var row = container.querySelector('.htmx-thread-msg-row[data-msgid="' + currentMsgId + '"]')
+             || container.querySelector('.htmx-thread-root-header[data-msgid="' + currentMsgId + '"]');
       if (row) {
         row.classList.add('htmx-msg-selected');
+        row.classList.add('is-read');
         _highlightedRow = row;
         row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }

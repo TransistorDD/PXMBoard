@@ -42,13 +42,11 @@ class cActionMessage extends cPublicAction
             if ($objBoardMessage->loadDataById($iMessageId, $objActiveBoard->getId())) {
 
                 // Track read status for logged-in users
-                if ($objActiveUser = $this->getActiveUser()) {
-                    if ($objActiveUser->getId() > 0) {
-                        cMessageReadTracker::markAsRead(
-                            $objActiveUser->getId(),
-                            $objBoardMessage->getId()
-                        );
-                    }
+                if (($objActiveUser = $this->getActiveUser()) && $objActiveUser->getId() > 0) {
+                    cMessageReadTracker::markAsRead(
+                        $objActiveUser->getId(),
+                        $objBoardMessage->getId()
+                    );
                 }
 
                 // Get read count

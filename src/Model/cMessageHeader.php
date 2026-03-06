@@ -333,9 +333,7 @@ class cMessageHeader
         return ['id'		=>	$this->m_iId,
                 'subject'	=>	$this->getSubject($sSubjectQuotePrefix),
                 'date'		=>	(($this->m_iMessageTimestamp > 0) ? date($sDateFormat, ($this->m_iMessageTimestamp + $iTimeOffset)) : 0),
-                'new'		=>	$this->m_bIsRead !== null
-                    ? ($this->m_bIsRead ? 0 : 1)
-                    : (($iLastOnlineTimestamp > $this->m_iMessageTimestamp) ? 0 : 1),
+                'new'		=>	$this->m_bIsRead !== null ? ($this->m_bIsRead ? 0 : 1) : (($iLastOnlineTimestamp > $this->m_iMessageTimestamp) ? 0 : 1),
                 'status'	=>	$this->m_eStatus->value,
                 'user'		=>	$this->m_objAuthor->getDataArray($iTimeOffset, $sDateFormat, $objParser)];
     }

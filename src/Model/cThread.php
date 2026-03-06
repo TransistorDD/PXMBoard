@@ -351,7 +351,7 @@ class cThread
         if ($this->m_iId > 0) {
             $sStatusFilter = '(m_status='.eMessageStatus::PUBLISHED->value.' OR (m_status='.eMessageStatus::DRAFT->value.' AND m_userid='.$iCurrentUserId.'))';
             if ($iCurrentUserId > 0) {
-                $sQuery = "SELECT m_id,m_parentid,m_subject,m_tstmp,m_userid,m_username,m_userhighlight,m_status".
+                $sQuery = "SELECT m_id,m_parentid,m_subject,m_tstmp,m_userid,m_username,m_userhighlight,m_status,".
                     "(mr.mr_messageid IS NOT NULL) AS is_read ".
                     "FROM pxm_message ".
                     "LEFT JOIN pxm_message_read mr ON mr.mr_messageid = m_id AND mr.mr_userid = ".$iCurrentUserId." ".

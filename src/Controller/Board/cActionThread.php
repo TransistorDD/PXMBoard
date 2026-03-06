@@ -2,6 +2,7 @@
 
 namespace PXMBoard\Controller\Board;
 
+use PXMBoard\Model\cMessageReadTracker;
 use PXMBoard\Model\cThread;
 
 /**
@@ -52,10 +53,12 @@ class cActionThread extends cPublicAction
                 $iCurrentUserId
             )]);
 
-            if ($iCurrentUserId > 0) {
-                require_once(SRCDIR . '/Model/cMessageReadTracker.php');
-                cMessageReadTracker::markThreadAsRead($iCurrentUserId, $objThread->getId());
-            }
+//            if ($iCurrentUserId > 0) {
+//                cMessageReadTracker::markAsRead(
+//                    $iCurrentUserId,
+////                    $objThread->getId()
+//                );
+//            }
         }
     }
 }

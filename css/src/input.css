@@ -316,8 +316,18 @@ button:focus:not(:focus-visible) {
     color: var(--color-content-secondary);
   }
 
-  .htmx-thread-msg-row a:visited {
+  .htmx-thread-msg-row a:visited,
+  .htmx-thread-msg-row.is-read,
+  .htmx-thread-root-header.is-read {
     color: var(--color-content-secondary);
+  }
+  .htmx-thread-msg-row.is-read .htmx-msg-meta .text-accent-danger,
+  .htmx-thread-root-header.is-read .htmx-msg-meta .text-accent-danger {
+    display: none;
+  }
+  .htmx-thread-msg-row.is-read > span.font-semibold,
+  .htmx-thread-root-header.is-read > span.font-semibold {
+    font-weight: normal;
   }
 
   /* --- Thread Tree --- */

@@ -25,7 +25,7 @@ class cBoardMessage extends cMessage
     protected int $m_iThreadId = 0;				    // thread id
     protected bool $m_bThreadIsActive = true;		// thread status
     protected bool $m_bNotifyOnReply = false;		// notify author on reply
-    protected bool $m_bIsRead = false;				// is message read (for logged-in users)?
+    protected ?bool $m_bIsRead = null;				// is message read (for logged-in users)?
 
     protected cMessageHeader $m_objReplyMsg;		// reply to message
 
@@ -458,17 +458,17 @@ class cBoardMessage extends cMessage
      */
     public function isRead(): bool
     {
-        return $this->m_bIsRead;
+        return (bool)$this->m_bIsRead;
     }
 
     /**
      * set message read status
      *
-     * @param  ?bool  $bIsRead  is message read
+     * @param  bool  $bIsRead  is message read
      */
     public function setIsRead(?bool $bIsRead): void
     {
-        $this->m_bIsRead = (bool)$bIsRead;
+        $this->m_bIsRead = $bIsRead;
     }
 
     /**
