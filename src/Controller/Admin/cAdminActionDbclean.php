@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Controller\Admin;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Model\cBoardList;
 use PXMBoard\Model\cMessageReadTracker;
 use PXMBoard\Model\cNotificationList;
@@ -49,16 +49,16 @@ class cAdminActionDbclean extends cAdminAction
         // delete moderators with invalid boardid or userid ///////////////////////////
 
         if ($this->m_objInputHandler->getIntFormVar('nomod', true, true, true) > 0) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT DISTINCT mod_userid FROM pxm_moderator LEFT JOIN pxm_user ON mod_userid=u_id WHERE u_id IS null')) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT DISTINCT mod_userid FROM pxm_moderator LEFT JOIN pxm_user ON mod_userid=u_id WHERE u_id IS null')) {
                 while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                    cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_moderator WHERE mod_userid=$objResultRow->mod_userid");
+                    cDB::getInstance()->executeQuery("DELETE FROM pxm_moderator WHERE mod_userid=$objResultRow->mod_userid");
                 }
                 $this->m_sOutput .= $this->_getAlert('moderatores with invalid userid deleted', 'success');
             }
 
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT DISTINCT mod_boardid FROM pxm_moderator LEFT JOIN pxm_board ON mod_boardid=b_id WHERE b_id IS null')) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT DISTINCT mod_boardid FROM pxm_moderator LEFT JOIN pxm_board ON mod_boardid=b_id WHERE b_id IS null')) {
                 while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                    cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_moderator WHERE mod_boardid=$objResultRow->mod_boardid");
+                    cDB::getInstance()->executeQuery("DELETE FROM pxm_moderator WHERE mod_boardid=$objResultRow->mod_boardid");
                 }
                 $this->m_sOutput .= $this->_getAlert('moderatores with invalid boardid deleted', 'success');
             }
@@ -67,10 +67,10 @@ class cAdminActionDbclean extends cAdminAction
         // delete threads with invalid boardid ////////////////////////////////////////
 
         if ($this->m_objInputHandler->getIntFormVar('nobrd', true, true, true) > 0) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT t_id FROM pxm_thread LEFT JOIN pxm_board ON t_boardid=b_id WHERE b_id IS null')) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT t_id FROM pxm_thread LEFT JOIN pxm_board ON t_boardid=b_id WHERE b_id IS null')) {
                 while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                    cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_threadid=$objResultRow->t_id");
-                    cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_id=$objResultRow->t_id");
+                    cDB::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_threadid=$objResultRow->t_id");
+                    cDB::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_id=$objResultRow->t_id");
                 }
                 $this->m_sOutput .= $this->_getAlert('threads with invalid boardid deleted', 'success');
             }
@@ -79,9 +79,9 @@ class cAdminActionDbclean extends cAdminAction
         // delete messages with invalid users /////////////////////////////////////////
 
         if ($bDeleteNoUserMsgs > 0) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT m_id FROM pxm_message LEFT JOIN pxm_user ON m_userid=u_id WHERE m_userid>0 AND u_id IS null')) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT m_id FROM pxm_message LEFT JOIN pxm_user ON m_userid=u_id WHERE m_userid>0 AND u_id IS null')) {
                 while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                    cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_id=$objResultRow->m_id");
+                    cDB::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_id=$objResultRow->m_id");
                 }
                 $this->m_sOutput .= $this->_getAlert('threads with invalid userid deleted', 'success');
             }
@@ -90,9 +90,9 @@ class cAdminActionDbclean extends cAdminAction
         // delete empty threads ///////////////////////////////////////////////////////
 
         if ($this->m_objInputHandler->getIntFormVar('nomsg', true, true, true) > 0) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT t_id FROM pxm_thread LEFT JOIN pxm_message ON t_id=m_threadid WHERE m_threadid IS null AND t_lastmsgtstmp<'.($iAccessTime - 300))) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT t_id FROM pxm_thread LEFT JOIN pxm_message ON t_id=m_threadid WHERE m_threadid IS null AND t_lastmsgtstmp<'.($iAccessTime - 300))) {
                 while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                    cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_id=$objResultRow->t_id");
+                    cDB::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_id=$objResultRow->t_id");
                 }
                 $this->m_sOutput .= $this->_getAlert('empty threads deleted', 'success');
             }
@@ -104,15 +104,15 @@ class cAdminActionDbclean extends cAdminAction
 
             // restore threads with more or less than 1 root message //////////////////////
 
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT m_threadid,COUNT(*) AS cou FROM pxm_message WHERE m_parentid=0 GROUP BY m_threadid HAVING COUNT(*)!=1')) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT m_threadid,COUNT(*) AS cou FROM pxm_message WHERE m_parentid=0 GROUP BY m_threadid HAVING COUNT(*)!=1')) {
                 while ($objResultRow = $objResultSet->getNextResultRowObject()) {
                     if ($objResultRow->cou !== 1) {
-                        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT m_id FROM pxm_message WHERE m_threadid=$objResultRow->m_threadid ORDER BY m_tstmp ASC")) {
+                        if ($objResultSet = cDB::getInstance()->executeQuery("SELECT m_id FROM pxm_message WHERE m_threadid=$objResultRow->m_threadid ORDER BY m_tstmp ASC")) {
                             if ($objResultRow2 = $objResultSet->getNextResultRowObject()) {
                                 if ($objResultRow->cou < 1) {
-                                    cDBFactory::getInstance()->executeQuery("UPDATE pxm_message SET m_parentid=0 WHERE m_id=$objResultRow2->m_id");
+                                    cDB::getInstance()->executeQuery("UPDATE pxm_message SET m_parentid=0 WHERE m_id=$objResultRow2->m_id");
                                 } else {
-                                    cDBFactory::getInstance()->executeQuery("UPDATE pxm_message SET m_parentid=$objResultRow2->m_id WHERE m_id!=$objResultRow2->m_id AND m_parentid=0 AND m_threadid=$objResultRow->m_threadid");
+                                    cDB::getInstance()->executeQuery("UPDATE pxm_message SET m_parentid=$objResultRow2->m_id WHERE m_id!=$objResultRow2->m_id AND m_parentid=0 AND m_threadid=$objResultRow->m_threadid");
                                 }
                             }
                         }
@@ -122,20 +122,20 @@ class cAdminActionDbclean extends cAdminAction
 
             // restore messages without thread ////////////////////////////////////////////
 
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT DISTINCT m_threadid FROM pxm_message LEFT JOIN pxm_thread ON m_threadid=t_id WHERE t_id IS null AND m_parentid=0 AND m_tstmp<'.($iAccessTime - 300))) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT DISTINCT m_threadid FROM pxm_message LEFT JOIN pxm_thread ON m_threadid=t_id WHERE t_id IS null AND m_parentid=0 AND m_tstmp<'.($iAccessTime - 300))) {
                 while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                    cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_thread VALUES()');
-                    cDBFactory::getInstance()->executeQuery('UPDATE pxm_message SET m_threadid='.cDBFactory::getInstance()->getInsertID('pxm_thread', 't_id')." WHERE m_threadid=$objResultRow->m_threadid");
+                    cDB::getInstance()->executeQuery('INSERT INTO pxm_thread VALUES()');
+                    cDB::getInstance()->executeQuery('UPDATE pxm_message SET m_threadid='.cDB::getInstance()->getInsertId('pxm_thread', 't_id')." WHERE m_threadid=$objResultRow->m_threadid");
                 }
             }
 
             // restore messages without parentmessage /////////////////////////////////////
 
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT DISTINCT m1.m_threadid AS threadid,m1.m_parentid AS parentid FROM pxm_message AS m1 LEFT JOIN pxm_message AS m2 ON m1.m_parentid=m2.m_id WHERE m2.m_id IS null AND m1.m_parentid>0')) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT DISTINCT m1.m_threadid AS threadid,m1.m_parentid AS parentid FROM pxm_message AS m1 LEFT JOIN pxm_message AS m2 ON m1.m_parentid=m2.m_id WHERE m2.m_id IS null AND m1.m_parentid>0')) {
                 while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                    if (cDBFactory::getInstance()->executeQuery("SELECT m_id FROM pxm_message WHERE m_threadid=$objResultRow->threadid AND m_parentid=0")) {
+                    if (cDB::getInstance()->executeQuery("SELECT m_id FROM pxm_message WHERE m_threadid=$objResultRow->threadid AND m_parentid=0")) {
                         if ($objResultRow2 = $objResultSet->getNextResultRowObject()) {
-                            cDBFactory::getInstance()->executeQuery("UPDATE pxm_message SET m_parentid=$objResultRow2->m_id WHERE m_parentid=$objResultRow->parentid");
+                            cDB::getInstance()->executeQuery("UPDATE pxm_message SET m_parentid=$objResultRow2->m_id WHERE m_parentid=$objResultRow->parentid");
                         }
                     }
                 }
@@ -143,7 +143,7 @@ class cAdminActionDbclean extends cAdminAction
 
             // update last msgid and date /////////////////////////////////////////////////
 
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT t_id,t_lastmsgid,t_lastmsgtstmp,m_id,m_tstmp FROM pxm_message,pxm_thread WHERE m_threadid=t_id ORDER BY t_id,m_tstmp DESC')) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT t_id,t_lastmsgid,t_lastmsgtstmp,m_id,m_tstmp FROM pxm_message,pxm_thread WHERE m_threadid=t_id ORDER BY t_id,m_tstmp DESC')) {
 
                 $iThreadId = -1;
 
@@ -152,23 +152,23 @@ class cAdminActionDbclean extends cAdminAction
                         $iThreadId = $objResultRow->t_id;
 
                         if (($objResultRow->t_lastmsgid != $objResultRow->m_id) || ($objResultRow->t_lastmsgtstmp != $objResultRow->m_tstmp)) {
-                            cDBFactory::getInstance()->executeQuery("UPDATE pxm_thread SET t_lastmsgid=$objResultRow->m_id,t_lastmsgtstmp=$objResultRow->m_tstmp WHERE t_id=$objResultRow->t_id");
+                            cDB::getInstance()->executeQuery("UPDATE pxm_thread SET t_lastmsgid=$objResultRow->m_id,t_lastmsgtstmp=$objResultRow->m_tstmp WHERE t_id=$objResultRow->t_id");
                         }
                     }
                 }
             }
 
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT t_boardid,MAX(t_lastmsgtstmp) AS bmsgdate FROM pxm_thread GROUP BY t_boardid')) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT t_boardid,MAX(t_lastmsgtstmp) AS bmsgdate FROM pxm_thread GROUP BY t_boardid')) {
                 while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                    cDBFactory::getInstance()->executeQuery("UPDATE pxm_board SET b_lastmsgtstmp=$objResultRow->bmsgdate WHERE b_id=$objResultRow->t_boardid");
+                    cDB::getInstance()->executeQuery("UPDATE pxm_board SET b_lastmsgtstmp=$objResultRow->bmsgdate WHERE b_id=$objResultRow->t_boardid");
                 }
             }
 
             // update msg quantity /////////////////////////////////////////////////////////
 
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT m_threadid,COUNT(*) AS cou FROM pxm_message GROUP BY m_threadid')) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT m_threadid,COUNT(*) AS cou FROM pxm_message GROUP BY m_threadid')) {
                 while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                    cDBFactory::getInstance()->executeQuery('UPDATE pxm_thread SET t_msgquantity='.($objResultRow->cou - 1)." WHERE t_id=$objResultRow->m_threadid");
+                    cDB::getInstance()->executeQuery('UPDATE pxm_thread SET t_msgquantity='.($objResultRow->cou - 1)." WHERE t_id=$objResultRow->m_threadid");
                 }
                 $this->m_sOutput .= $this->_getAlert('messages and threads restored', 'success');
             }
@@ -204,7 +204,7 @@ class cAdminActionDbclean extends cAdminAction
                             'AND n_created_timestamp < '.$iAutoAgeTimestamp;
 
             $iAgedCount = 0;
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery($sQueryAge)) {
+            if ($objResultSet = cDB::getInstance()->executeQuery($sQueryAge)) {
                 $iAgedCount = $objResultSet->getAffectedRows();
             }
 
@@ -215,7 +215,7 @@ class cAdminActionDbclean extends cAdminAction
             // Recalculate all unread counts (safety measure)
             $sQueryUsers = 'SELECT u_id FROM pxm_user WHERE u_notification_unread_count > 0';
             $iRecalculated = 0;
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery($sQueryUsers)) {
+            if ($objResultSet = cDB::getInstance()->executeQuery($sQueryUsers)) {
                 while ($objResultRow = $objResultSet->getNextResultRowObject()) {
                     $objUser = new cUser();
                     if ($objUser->loadDataById($objResultRow->u_id)) {
@@ -235,7 +235,7 @@ class cAdminActionDbclean extends cAdminAction
             // Recalculate all unread private message counts (safety measure)
             $sQueryUsers = 'SELECT u_id FROM pxm_user WHERE u_priv_message_unread_count > 0';
             $iRecalculated = 0;
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery($sQueryUsers)) {
+            if ($objResultSet = cDB::getInstance()->executeQuery($sQueryUsers)) {
                 while ($objResultRow = $objResultSet->getNextResultRowObject()) {
                     $objUser = new cUser();
                     if ($objUser->loadDataById($objResultRow->u_id)) {

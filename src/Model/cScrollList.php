@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * scrolllist handling
@@ -51,7 +51,7 @@ class cScrollList
 
         $sQuery = $this->_getQuery();
 
-        if (!empty($sQuery) && ($objResultSet = cDBFactory::getInstance()->executeQuery($sQuery, $iResultRowLimit + 1, $iCurPageId * $iResultRowLimit))) {
+        if (!empty($sQuery) && ($objResultSet = cDB::getInstance()->executeQuery($sQuery, $iResultRowLimit + 1, $iCurPageId * $iResultRowLimit))) {
 
             $this->m_arrResultList = [];
             for ($x = 0; $x < $iResultRowLimit; $x++) {

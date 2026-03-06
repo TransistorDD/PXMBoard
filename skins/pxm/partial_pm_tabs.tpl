@@ -1,5 +1,5 @@
 {*
-  PM Tabs Partial - HTMX Skin
+  PM Tabs Partial - PXM Skin
 
   Inbox/Outbox tabs for private messages.
   Active tab highlighted. Navigates within the modal body.

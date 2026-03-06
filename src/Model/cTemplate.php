@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * Template handling (text templates for emails and application messages)
@@ -30,7 +30,7 @@ class cTemplate
         $bReturn = false;
 
         if ($iTemplateId > 0) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT te_id,'.
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT te_id,'.
                                                             'te_message,'.
                                                             'te_name,'.
                                                             'te_description'.
@@ -60,7 +60,7 @@ class cTemplate
     {
         $bReturn = false;
         if ($this->m_iId > 0) {
-            if (cDBFactory::getInstance()->executeQuery('UPDATE pxm_template SET te_message='.cDBFactory::getInstance()->quote($this->m_sMessage)." WHERE te_id=$this->m_iId")) {
+            if (cDB::getInstance()->executeQuery('UPDATE pxm_template SET te_message='.cDB::getInstance()->quote($this->m_sMessage)." WHERE te_id=$this->m_iId")) {
                 $bReturn = true;
             }
         }

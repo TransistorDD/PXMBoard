@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * user profile handling
@@ -81,14 +81,14 @@ class cUserProfile extends cUser
             if (is_integer($mData)) {
                 $sAddUpdateQuery .= 'u_profile_'.$sFieldName.'='.$mData.',';
             } else {
-                $sAddUpdateQuery .= 'u_profile_'.$sFieldName.'='.cDBFactory::getInstance()->quote($mData).',';
+                $sAddUpdateQuery .= 'u_profile_'.$sFieldName.'='.cDB::getInstance()->quote($mData).',';
             }
         }
 
-        if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET '.
-                                                 'u_lastname='.cDBFactory::getInstance()->quote($this->m_sLastName).','.
-                                                 'u_city='.cDBFactory::getInstance()->quote($this->m_sCity).','.
-                                                 'u_publicmail='.cDBFactory::getInstance()->quote($this->m_sPublicMail).','.
+        if (!cDB::getInstance()->executeQuery('UPDATE pxm_user SET '.
+                                                 'u_lastname='.cDB::getInstance()->quote($this->m_sLastName).','.
+                                                 'u_city='.cDB::getInstance()->quote($this->m_sCity).','.
+                                                 'u_publicmail='.cDB::getInstance()->quote($this->m_sPublicMail).','.
                                                  $sAddUpdateQuery.
                                                  'u_profilechangedtstmp='.$this->m_iLastUpdateTimestap.
                             ' WHERE u_id='.$this->m_iId)) {

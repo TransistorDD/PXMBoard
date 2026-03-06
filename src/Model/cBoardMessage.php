@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eErrorKeys;
 use PXMBoard\Exception\cCircularReferenceException;
 use PXMBoard\Exception\cInvalidBoardException;
@@ -69,14 +69,14 @@ class cBoardMessage extends cMessage
         $this->m_bThreadIsActive = $objResultRow->t_active ? true : false;
 
         // author data
-        $this->m_objAuthor->setFirstName($objResultRow->u_firstname);
-        $this->m_objAuthor->setLastName($objResultRow->u_lastname);
-        $this->m_objAuthor->setCity($objResultRow->u_city);
-        $this->m_objAuthor->setImageFileName($objResultRow->u_imgfile);
-        $this->m_objAuthor->setRegistrationTimestamp($objResultRow->u_registrationtstmp);
-        $this->m_objAuthor->setLastOnlineTimestamp($objResultRow->u_lastonlinetstmp);
-        $this->m_objAuthor->setMessageQuantity($objResultRow->u_msgquantity);
-        $this->m_objAuthor->setSignature($objResultRow->u_signature);
+        $this->m_objAuthor->setFirstName((string) ($objResultRow->u_firstname ?? ''));
+        $this->m_objAuthor->setLastName((string) ($objResultRow->u_lastname ?? ''));
+        $this->m_objAuthor->setCity((string) ($objResultRow->u_city ?? ''));
+        $this->m_objAuthor->setImageFileName((string) ($objResultRow->u_imgfile ?? ''));
+        $this->m_objAuthor->setRegistrationTimestamp((int) ($objResultRow->u_registrationtstmp ?? 0));
+        $this->m_objAuthor->setLastOnlineTimestamp((int) ($objResultRow->u_lastonlinetstmp ?? 0));
+        $this->m_objAuthor->setMessageQuantity((int) ($objResultRow->u_msgquantity ?? 0));
+        $this->m_objAuthor->setSignature((string) ($objResultRow->u_signature ?? ''));
 
         $this->m_objReplyMsg = new cMessageHeader();
         $this->m_objReplyMsg->loadDataById($objResultRow->m_parentid);
@@ -132,36 +132,36 @@ class cBoardMessage extends cMessage
 
         if (! empty($this->m_sSubject)) {
             // dupcheck
-            $objResultSet = cDBFactory::getInstance()->executeQuery('SELECT COUNT(*) AS msgcount FROM pxm_message'.
+            $objResultSet = cDB::getInstance()->executeQuery('SELECT COUNT(*) AS msgcount FROM pxm_message'.
                                                                 " WHERE   m_parentid=$iParentId".
                                                                     ' AND m_userid='.$this->m_objAuthor->getId().
                                                                     ' AND m_tstmp>'.($this->m_iMessageTimestamp - 259200).
-                                                                    ' AND m_subject='.cDBFactory::getInstance()->quote($this->m_sSubject));
+                                                                    ' AND m_subject='.cDB::getInstance()->quote($this->m_sSubject));
             if ($objResultSet && $objResultRow = $objResultSet->getNextResultRowObject()) {
                 if (((int) $objResultRow->msgcount) < 1) {
                     if ($iParentId < 1) {							// new thread
-                        if (cDBFactory::getInstance()->executeQuery("INSERT INTO pxm_thread (t_boardid,t_active,t_lastmsgtstmp) VALUES ($this->m_iBoardId,1,$this->m_iMessageTimestamp)")) {
-                            if (($this->m_iThreadId = cDBFactory::getInstance()->getInsertId('pxm_thread', 't_id')) > 0) {
-                                if ($objResultSet = cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_message (m_threadid,m_parentid,m_userid,m_username,m_usermail,m_userhighlight,m_subject,m_body,m_tstmp,m_ip,m_notify_on_reply,m_status)'.
+                        if (cDB::getInstance()->executeQuery("INSERT INTO pxm_thread (t_boardid,t_active,t_lastmsgtstmp) VALUES ($this->m_iBoardId,1,$this->m_iMessageTimestamp)")) {
+                            if (($this->m_iThreadId = cDB::getInstance()->getInsertId('pxm_thread', 't_id')) > 0) {
+                                if ($objResultSet = cDB::getInstance()->executeQuery('INSERT INTO pxm_message (m_threadid,m_parentid,m_userid,m_username,m_usermail,m_userhighlight,m_subject,m_body,m_tstmp,m_ip,m_notify_on_reply,m_status)'.
                                                                                        " VALUES ($this->m_iThreadId,".
                                                                                                  '0,'.
                                                                                                  $this->m_objAuthor->getId().','.
-                                                                                                 cDBFactory::getInstance()->quote($this->m_objAuthor->getUserName()).','.
-                                                                                                 cDBFactory::getInstance()->quote($this->m_objAuthor->getPublicMail()).','.
+                                                                                                 cDB::getInstance()->quote($this->m_objAuthor->getUserName()).','.
+                                                                                                 cDB::getInstance()->quote($this->m_objAuthor->getPublicMail()).','.
                                                                                                  intval($this->m_objAuthor->highlightUser()).','.
-                                                                                                 cDBFactory::getInstance()->quote($this->m_sSubject).','.
-                                                                                                 cDBFactory::getInstance()->quote($this->m_sBody).','.
+                                                                                                 cDB::getInstance()->quote($this->m_sSubject).','.
+                                                                                                 cDB::getInstance()->quote($this->m_sBody).','.
                                                                                                  $this->m_iMessageTimestamp.','.
-                                                                                                 cDBFactory::getInstance()->quote($this->m_sIp).','.
+                                                                                                 cDB::getInstance()->quote($this->m_sIp).','.
                                                                                                  intval($this->m_bNotifyOnReply).','.
                                                                                                  $this->m_eStatus->value.')')) {
 
                                     if ($objResultSet->getAffectedRows() > 0) {
 
-                                        $this->m_iId = (int) cDBFactory::getInstance()->getInsertId('pxm_message', 'm_id');
+                                        $this->m_iId = (int) cDB::getInstance()->getInsertId('pxm_message', 'm_id');
 
                                         // update board list
-                                        cDBFactory::getInstance()->executeQuery("UPDATE pxm_board SET b_lastmsgtstmp=$this->m_iMessageTimestamp WHERE b_id=$this->m_iBoardId");
+                                        cDB::getInstance()->executeQuery("UPDATE pxm_board SET b_lastmsgtstmp=$this->m_iMessageTimestamp WHERE b_id=$this->m_iBoardId");
 
                                         // Index message in search engine
                                         cSearchEngineFactory::getInstance()->indexMessage(
@@ -180,47 +180,47 @@ class cBoardMessage extends cMessage
                                         // success
                                         $eError = null;
                                     } else {
-                                        cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_id=$this->m_iThreadId");
+                                        cDB::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_id=$this->m_iThreadId");
                                     }
                                 } else {
-                                    cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_id=$this->m_iThreadId");
+                                    cDB::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_id=$this->m_iThreadId");
                                 }
                             }
                         }
                     } else {						// reply
-                        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT m_threadid,t_active FROM pxm_thread,pxm_message WHERE t_id=m_threadid AND t_boardid=$this->m_iBoardId AND m_id=$iParentId")) {
+                        if ($objResultSet = cDB::getInstance()->executeQuery("SELECT m_threadid,t_active FROM pxm_thread,pxm_message WHERE t_id=m_threadid AND t_boardid=$this->m_iBoardId AND m_id=$iParentId")) {
                             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                                 $objResultSet->freeResult();
                                 if ($objResultRow->t_active == 1) {
 
                                     $this->m_iThreadId = (int) $objResultRow->m_threadid;
 
-                                    if ($objResultSet = cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_message (m_threadid,m_parentid,m_userid,m_username,m_usermail,m_userhighlight,m_subject,m_body,m_tstmp,m_ip,m_notify_on_reply,m_status)'.
+                                    if ($objResultSet = cDB::getInstance()->executeQuery('INSERT INTO pxm_message (m_threadid,m_parentid,m_userid,m_username,m_usermail,m_userhighlight,m_subject,m_body,m_tstmp,m_ip,m_notify_on_reply,m_status)'.
                                                                                        " VALUES ($this->m_iThreadId,".
                                                                                                  $iParentId.','.
                                                                                                  $this->m_objAuthor->getId().','.
-                                                                                                 cDBFactory::getInstance()->quote($this->m_objAuthor->getUserName()).','.
-                                                                                                 cDBFactory::getInstance()->quote($this->m_objAuthor->getPublicMail()).','.
+                                                                                                 cDB::getInstance()->quote($this->m_objAuthor->getUserName()).','.
+                                                                                                 cDB::getInstance()->quote($this->m_objAuthor->getPublicMail()).','.
                                                                                                  intval($this->m_objAuthor->highlightUser()).','.
-                                                                                                 cDBFactory::getInstance()->quote($this->m_sSubject).','.
-                                                                                                 cDBFactory::getInstance()->quote($this->m_sBody).','.
+                                                                                                 cDB::getInstance()->quote($this->m_sSubject).','.
+                                                                                                 cDB::getInstance()->quote($this->m_sBody).','.
                                                                                                  $this->m_iMessageTimestamp.','.
-                                                                                                 cDBFactory::getInstance()->quote($this->m_sIp).','.
+                                                                                                 cDB::getInstance()->quote($this->m_sIp).','.
                                                                                                  intval($this->m_bNotifyOnReply).','.
                                                                                                  $this->m_eStatus->value.')')) {
                                         if ($objResultSet->getAffectedRows() > 0) {
 
-                                            $this->m_iId = (int) cDBFactory::getInstance()->getInsertId('pxm_message', 'm_id');
+                                            $this->m_iId = (int) cDB::getInstance()->getInsertId('pxm_message', 'm_id');
 
                                             // update thread list
-                                            cDBFactory::getInstance()->executeQuery("UPDATE pxm_thread SET t_lastmsgtstmp=$this->m_iMessageTimestamp,t_lastmsgid=$this->m_iId,t_msgquantity=t_msgquantity+1 WHERE t_id=$this->m_iThreadId");
+                                            cDB::getInstance()->executeQuery("UPDATE pxm_thread SET t_lastmsgtstmp=$this->m_iMessageTimestamp,t_lastmsgid=$this->m_iId,t_msgquantity=t_msgquantity+1 WHERE t_id=$this->m_iThreadId");
 
                                             // update board list
-                                            cDBFactory::getInstance()->executeQuery("UPDATE pxm_board SET b_lastmsgtstmp=$this->m_iMessageTimestamp WHERE b_id=$this->m_iBoardId");
+                                            cDB::getInstance()->executeQuery("UPDATE pxm_board SET b_lastmsgtstmp=$this->m_iMessageTimestamp WHERE b_id=$this->m_iBoardId");
 
                                             // close the thread when the messagelimit is reached
                                             if ($iAutoClose > 0) {
-                                                cDBFactory::getInstance()->executeQuery("UPDATE pxm_thread SET t_active=0 WHERE t_id=$this->m_iThreadId AND t_msgquantity>=$iAutoClose");
+                                                cDB::getInstance()->executeQuery("UPDATE pxm_thread SET t_active=0 WHERE t_id=$this->m_iThreadId AND t_msgquantity>=$iAutoClose");
                                             }
 
                                             // Index message in search engine
@@ -271,8 +271,8 @@ class cBoardMessage extends cMessage
 
         if (! empty($this->m_sSubject)) {
             if ($this->m_iId > 0) {
-                if ($objResultSet = cDBFactory::getInstance()->executeQuery('UPDATE pxm_message SET m_subject='.cDBFactory::getInstance()->quote($this->m_sSubject).','.
-                                                                                'm_body='.cDBFactory::getInstance()->quote($this->m_sBody).','.
+                if ($objResultSet = cDB::getInstance()->executeQuery('UPDATE pxm_message SET m_subject='.cDB::getInstance()->quote($this->m_sSubject).','.
+                                                                                'm_body='.cDB::getInstance()->quote($this->m_sBody).','.
                                                                                 'm_notify_on_reply='.intval($this->m_bNotifyOnReply).','.
                                                                                 'm_status='.$this->m_eStatus->value.','.
                                                                                 'm_tstmp='.$this->m_iMessageTimestamp.
@@ -314,17 +314,17 @@ class cBoardMessage extends cMessage
         $iParentId = $this->m_objReplyMsg->getId();
         if ($this->m_iId > 0 && $iParentId > 0) {
             // remove message
-            cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_id=$this->m_iId");
+            cDB::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_id=$this->m_iId");
 
             // change parent message for replys to this message
-            cDBFactory::getInstance()->executeQuery("UPDATE pxm_message SET m_parentid=$iParentId WHERE m_parentid=$this->m_iId");
+            cDB::getInstance()->executeQuery("UPDATE pxm_message SET m_parentid=$iParentId WHERE m_parentid=$this->m_iId");
 
             // Remove message from search engine index
             cSearchEngineFactory::getInstance()->removeMessage($this->m_iId);
 
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS count,MAX(m_tstmp) AS maxd,MAX(m_id) AS maxid FROM pxm_message WHERE m_threadid=$this->m_iThreadId")) {
+            if ($objResultSet = cDB::getInstance()->executeQuery("SELECT count(*) AS count,MAX(m_tstmp) AS maxd,MAX(m_id) AS maxid FROM pxm_message WHERE m_threadid=$this->m_iThreadId")) {
                 if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                    cDBFactory::getInstance()->executeQuery("UPDATE pxm_thread SET t_msgquantity=$objResultRow->count-1,t_lastmsgid=$objResultRow->maxid,t_lastmsgtstmp=$objResultRow->maxd WHERE t_id=$this->m_iThreadId");
+                    cDB::getInstance()->executeQuery("UPDATE pxm_thread SET t_msgquantity=$objResultRow->count-1,t_lastmsgid=$objResultRow->maxid,t_lastmsgtstmp=$objResultRow->maxd WHERE t_id=$this->m_iThreadId");
                 }
             }
         } else {
@@ -342,7 +342,7 @@ class cBoardMessage extends cMessage
     public function getReplyQuantity(): int
     {
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS count FROM pxm_message WHERE m_threadid=$this->m_iThreadId AND m_parentid=$this->m_iId")) {
+        if ($objResultSet = cDB::getInstance()->executeQuery("SELECT count(*) AS count FROM pxm_message WHERE m_threadid=$this->m_iThreadId AND m_parentid=$this->m_iId")) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 return $objResultRow->count;
             }
@@ -480,7 +480,7 @@ class cBoardMessage extends cMessage
     public function updateNotifyOnReply(bool $bNotifyOnReply): bool
     {
 
-        if (! cDBFactory::getInstance()->executeQuery('UPDATE pxm_message SET m_notify_on_reply='.intval($bNotifyOnReply)." WHERE m_id=$this->m_iId")) {
+        if (! cDB::getInstance()->executeQuery('UPDATE pxm_message SET m_notify_on_reply='.intval($bNotifyOnReply)." WHERE m_id=$this->m_iId")) {
             return false;
         }
         $this->m_bNotifyOnReply = $bNotifyOnReply ? true : false;
@@ -534,7 +534,7 @@ class cBoardMessage extends cMessage
 					)
 					SELECT m_id FROM subtree';
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery($sQuery)) {
+        if ($objResultSet = cDB::getInstance()->executeQuery($sQuery)) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $arrIds[] = (int) $objResultRow->m_id;
             }
@@ -558,7 +558,7 @@ class cBoardMessage extends cMessage
      */
     public function moveToParent(int $iNewParentId): bool
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
 
         // Validate parent ID
         if ($iNewParentId <= 0) {
@@ -660,7 +660,7 @@ class cBoardMessage extends cMessage
 
         $sQuery = 'SELECT COUNT(*) AS count FROM pxm_message_notification '.
                   'WHERE mn_messageid='.intval($this->m_iId).' AND mn_userid='.intval($iUserId);
-        $objResultSet = cDBFactory::getInstance()->executeQuery($sQuery);
+        $objResultSet = cDB::getInstance()->executeQuery($sQuery);
 
         if ($objRow = $objResultSet->getNextResultRowObject()) {
             return $objRow->count > 0;
@@ -694,7 +694,7 @@ class cBoardMessage extends cMessage
                       'WHERE mn_messageid='.intval($this->m_iId).' AND mn_userid='.intval($iUserId);
         }
 
-        cDBFactory::getInstance()->executeQuery($sQuery);
+        cDB::getInstance()->executeQuery($sQuery);
 
         return true;
     }
@@ -712,7 +712,7 @@ class cBoardMessage extends cMessage
 
         $sQuery = 'SELECT mn_userid FROM pxm_message_notification '.
                   'WHERE mn_messageid='.intval($this->m_iId);
-        $objResultSet = cDBFactory::getInstance()->executeQuery($sQuery);
+        $objResultSet = cDB::getInstance()->executeQuery($sQuery);
 
         $arrUserIds = [];
         while ($objRow = $objResultSet->getNextResultRowObject()) {

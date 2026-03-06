@@ -5,6 +5,7 @@ phpunit.xml
 
 # Local deployment (shell scripts, not project source)
 *.sh
+!build-release.sh
 deploy/
 
 # AI guidelines (not committed)

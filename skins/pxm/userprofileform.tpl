@@ -1,5 +1,5 @@
 {*
-  User Profile Edit Form Template (Partial) - HTMX Skin
+  User Profile Edit Form Template (Partial) - PXM Skin
 
   Form for editing own profile with personal info, contact details,
   and profile image upload.

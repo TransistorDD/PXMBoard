@@ -1,5 +1,5 @@
 {*
-  User Profile Template (Partial) - HTMX Skin
+  User Profile Template (Partial) - PXM Skin
 
   Displays a user's public profile with avatar, personal info, contact
   details and admin/moderator actions. Loaded into modal dialog.

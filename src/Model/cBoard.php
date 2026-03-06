@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eBoardStatus;
 
 /**
@@ -40,7 +40,7 @@ class cBoard
     {
         $bReturn = false;
         if ($iBoardId > 0) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT b_id,'.
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT b_id,'.
                                                                       'b_name,'.
                                                                       'b_description,'.
                                                                       'b_position,'.
@@ -92,7 +92,7 @@ class cBoard
     {
         $this->m_arrModerators = [];
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT u_id,u_username,u_publicmail,u_highlight FROM pxm_moderator,pxm_user WHERE mod_userid=u_id AND mod_boardid=$this->m_iId")) {
+        if ($objResultSet = cDB::getInstance()->executeQuery("SELECT u_id,u_username,u_publicmail,u_highlight FROM pxm_moderator,pxm_user WHERE mod_userid=u_id AND mod_boardid=$this->m_iId")) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
 
                 $objUser = new cUser();
@@ -117,9 +117,9 @@ class cBoard
      */
     public function updateModData(): bool
     {
-        if (cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_moderator WHERE mod_boardid=$this->m_iId")) {
+        if (cDB::getInstance()->executeQuery("DELETE FROM pxm_moderator WHERE mod_boardid=$this->m_iId")) {
             foreach ($this->m_arrModerators as $objUser) {
-                cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_moderator (mod_userid,mod_boardid) VALUES (' . $objUser->getId() . ",$this->m_iId)");
+                cDB::getInstance()->executeQuery('INSERT INTO pxm_moderator (mod_userid,mod_boardid) VALUES (' . $objUser->getId() . ",$this->m_iId)");
             }
         } else {
             return false;
@@ -134,11 +134,11 @@ class cBoard
      */
     public function insertData(): bool
     {
-        if (cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_board (b_name,b_description,b_status,b_timespan,b_threadlistsort,b_embed_external,b_replacetext) '
-                                         .'VALUES ('.cDBFactory::getInstance()->quote($this->m_sName).','.cDBFactory::getInstance()->quote($this->m_sDescription).','.intval($this->m_eStatus->value).",$this->m_iThreadListTimeSpan,"
-                                                 .cDBFactory::getInstance()->quote($this->m_sThreadListSortMode).','.intval($this->m_bEmbedExternal).','.intval($this->m_bDoTextReplacements).')')) {
-            $this->m_iId = cDBFactory::getInstance()->getInsertId('pxm_board', 'b_id');
-            cDBFactory::getInstance()->executeQuery('UPDATE pxm_board SET b_position=b_id WHERE b_id='.$this->m_iId);
+        if (cDB::getInstance()->executeQuery('INSERT INTO pxm_board (b_name,b_description,b_status,b_timespan,b_threadlistsort,b_embed_external,b_replacetext) '
+                                         .'VALUES ('.cDB::getInstance()->quote($this->m_sName).','.cDB::getInstance()->quote($this->m_sDescription).','.intval($this->m_eStatus->value).",$this->m_iThreadListTimeSpan,"
+                                                 .cDB::getInstance()->quote($this->m_sThreadListSortMode).','.intval($this->m_bEmbedExternal).','.intval($this->m_bDoTextReplacements).')')) {
+            $this->m_iId = cDB::getInstance()->getInsertId('pxm_board', 'b_id');
+            cDB::getInstance()->executeQuery('UPDATE pxm_board SET b_position=b_id WHERE b_id='.$this->m_iId);
         } else {
             return false;
         }
@@ -155,12 +155,12 @@ class cBoard
         $bReturn = false;
 
         if ($this->m_iId > 0) {
-            if (cDBFactory::getInstance()->executeQuery('UPDATE pxm_board SET b_name='.cDBFactory::getInstance()->quote($this->m_sName).','
-                                                        .'b_description='.cDBFactory::getInstance()->quote($this->m_sDescription).','
+            if (cDB::getInstance()->executeQuery('UPDATE pxm_board SET b_name='.cDB::getInstance()->quote($this->m_sName).','
+                                                        .'b_description='.cDB::getInstance()->quote($this->m_sDescription).','
                                                         ."b_position=$this->m_iPosition,"
                                                         .'b_status='.intval($this->m_eStatus->value).','
                                                         ."b_timespan=$this->m_iThreadListTimeSpan,"
-                                                        .'b_threadlistsort='.cDBFactory::getInstance()->quote($this->m_sThreadListSortMode).','
+                                                        .'b_threadlistsort='.cDB::getInstance()->quote($this->m_sThreadListSortMode).','
                                                         .'b_embed_external='.intval($this->m_bEmbedExternal).','
                                                         .'b_replacetext='.intval($this->m_bDoTextReplacements)." WHERE b_id=$this->m_iId")) {
                 $bReturn = true;
@@ -177,13 +177,13 @@ class cBoard
     public function deleteData(): bool
     {
         if ($this->m_iId > 0) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT t_id FROM pxm_thread WHERE t_boardid=$this->m_iId")) {
+            if ($objResultSet = cDB::getInstance()->executeQuery("SELECT t_id FROM pxm_thread WHERE t_boardid=$this->m_iId")) {
                 while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                    cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_threadid=$objResultRow->t_id");
+                    cDB::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_threadid=$objResultRow->t_id");
                 }
-                cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_boardid=$this->m_iId");
-                cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_moderator WHERE mod_boardid=$this->m_iId");
-                cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_board WHERE b_id=$this->m_iId");
+                cDB::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_boardid=$this->m_iId");
+                cDB::getInstance()->executeQuery("DELETE FROM pxm_moderator WHERE mod_boardid=$this->m_iId");
+                cDB::getInstance()->executeQuery("DELETE FROM pxm_board WHERE b_id=$this->m_iId");
             }
         } else {
             return false;
@@ -285,12 +285,12 @@ class cBoard
     {
         if ($iPosition > 0 && $this->m_iPosition != $iPosition) {
             if ($this->m_iPosition > $iPosition) {
-                cDBFactory::getInstance()->executeQuery("UPDATE pxm_board SET b_position = b_position+1 WHERE b_position >= $iPosition AND b_position < $this->m_iPosition");
+                cDB::getInstance()->executeQuery("UPDATE pxm_board SET b_position = b_position+1 WHERE b_position >= $iPosition AND b_position < $this->m_iPosition");
             } else {
-                cDBFactory::getInstance()->executeQuery("UPDATE pxm_board SET b_position = b_position-1 WHERE b_position <= $iPosition AND b_position > $this->m_iPosition");
+                cDB::getInstance()->executeQuery("UPDATE pxm_board SET b_position = b_position-1 WHERE b_position <= $iPosition AND b_position > $this->m_iPosition");
             }
             $this->m_iPosition = $iPosition;
-            cDBFactory::getInstance()->executeQuery("UPDATE pxm_board SET b_position = $this->m_iPosition WHERE b_id = $this->m_iId");
+            cDB::getInstance()->executeQuery("UPDATE pxm_board SET b_position = $this->m_iPosition WHERE b_id = $this->m_iId");
         }
     }
 
@@ -323,7 +323,7 @@ class cBoard
      */
     public function updateStatus(eBoardStatus $eStatus): bool
     {
-        if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_board SET b_status='.intval($eStatus->value)." WHERE b_id=$this->m_iId")) {
+        if (!cDB::getInstance()->executeQuery('UPDATE pxm_board SET b_status='.intval($eStatus->value)." WHERE b_id=$this->m_iId")) {
             return false;
         }
         $this->m_eStatus = $eStatus;

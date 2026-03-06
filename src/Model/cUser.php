@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\ePrivateMessageStatus;
 use PXMBoard\Enum\eUserStatus;
 
@@ -53,7 +53,7 @@ class cUser
         $bReturn = false;
 
         if ($iUserId > 0) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT '.$this->_getDbAttributes().' FROM pxm_user WHERE u_id='.$iUserId)) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT '.$this->_getDbAttributes().' FROM pxm_user WHERE u_id='.$iUserId)) {
                 if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                     $bReturn = $this->_setDataFromDb($objResultRow);
                 }
@@ -75,7 +75,7 @@ class cUser
         $bReturn = false;
 
         if (!empty($sUserName)) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT '.$this->_getDbAttributes().' FROM pxm_user WHERE u_username='.cDBFactory::getInstance()->quote($sUserName))) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT '.$this->_getDbAttributes().' FROM pxm_user WHERE u_username='.cDB::getInstance()->quote($sUserName))) {
                 if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                     $bReturn = $this->_setDataFromDb($objResultRow);
                 }
@@ -119,7 +119,7 @@ class cUser
         $bReturn = false;
 
         if (!empty($sPasswordKey)) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT '.$this->_getDbAttributes().' FROM pxm_user WHERE u_passwordkey='.cDBFactory::getInstance()->quote($sPasswordKey))) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT '.$this->_getDbAttributes().' FROM pxm_user WHERE u_passwordkey='.cDB::getInstance()->quote($sPasswordKey))) {
                 if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                     $bReturn = $this->_setDataFromDb($objResultRow);
                 }
@@ -182,17 +182,20 @@ class cUser
     {
         $bReturn = false;
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT u_id FROM pxm_user WHERE u_username='.cDBFactory::getInstance()->quote($this->m_sUserName).
-                                                          ($bUniqueRegistrationMail ? ' OR u_registrationmail='.cDBFactory::getInstance()->quote($this->m_sRegistrationMail) : ''))) {
-            if ($objResultSet->getNumRows() < 1) {
-                if (cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_user (u_username,u_password,u_privatemail,u_registrationmail,u_registrationtstmp,u_status) '.
-                                                  'VALUES ('.cDBFactory::getInstance()->quote($this->m_sUserName).','.
-                                                             cDBFactory::getInstance()->quote($this->m_sPassword).','.
-                                                             cDBFactory::getInstance()->quote($this->m_sPrivateMail).','.
-                                                             cDBFactory::getInstance()->quote($this->m_sRegistrationMail).','.
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT 1 FROM pxm_user WHERE u_username='.cDB::getInstance()->quote($this->m_sUserName).
+                                                          ($bUniqueRegistrationMail ? ' OR u_registrationmail='.cDB::getInstance()->quote($this->m_sRegistrationMail) : '').
+                                                          ' LIMIT 1')) {
+            $bUserExists = (bool) $objResultSet->getNextResultRowObject();
+            $objResultSet->freeResult();
+            if (!$bUserExists) {
+                if (cDB::getInstance()->executeQuery('INSERT INTO pxm_user (u_username,u_password,u_privatemail,u_registrationmail,u_registrationtstmp,u_status) '.
+                                                  'VALUES ('.cDB::getInstance()->quote($this->m_sUserName).','.
+                                                             cDB::getInstance()->quote($this->m_sPassword).','.
+                                                             cDB::getInstance()->quote($this->m_sPrivateMail).','.
+                                                             cDB::getInstance()->quote($this->m_sRegistrationMail).','.
                                                              $this->m_iRegistrationTimestamp.','.
                                                              $this->m_eStatus->value.')')) {
-                    $this->m_iId = cDBFactory::getInstance()->getInsertId('pxm_user', 'u_id');
+                    $this->m_iId = cDB::getInstance()->getInsertId('pxm_user', 'u_id');
                     $bReturn = true;
                 }
             }
@@ -210,7 +213,7 @@ class cUser
         $bReturn = false;
 
         if ($this->m_iId > 0) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_password='.cDBFactory::getInstance()->quote($this->m_sPassword).',u_status='.$this->m_eStatus->value.",u_passwordkey='' WHERE u_id=".$this->m_iId)) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('UPDATE pxm_user SET u_password='.cDB::getInstance()->quote($this->m_sPassword).',u_status='.$this->m_eStatus->value.",u_passwordkey='' WHERE u_id=".$this->m_iId)) {
                 if ($objResultSet->getAffectedRows() > 0) {
                     $bReturn = true;
                 }
@@ -228,7 +231,7 @@ class cUser
     {
         $bReturn = false;
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_user WHERE u_id='.$this->m_iId)) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('DELETE FROM pxm_user WHERE u_id='.$this->m_iId)) {
             if ($objResultSet->getAffectedRows() > 0) {
                 $bReturn = true;
             }
@@ -406,7 +409,7 @@ class cUser
 
         if (@move_uploaded_file($sSrcFileName, $sImageDir.$this->m_iId.'.'.$sImageType)) {
             $this->m_sImgFileName = (floor($this->m_iId / $iSplitImageDir) * $iSplitImageDir).'/'.$this->m_iId.'.'.$sImageType;
-            if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_imgfile='.cDBFactory::getInstance()->quote($this->m_sImgFileName).' WHERE u_id='.$this->m_iId)) {
+            if (!cDB::getInstance()->executeQuery('UPDATE pxm_user SET u_imgfile='.cDB::getInstance()->quote($this->m_sImgFileName).' WHERE u_id='.$this->m_iId)) {
                 return false;
             }
         } else {
@@ -426,7 +429,7 @@ class cUser
         if (!empty($this->m_sImgFileName)) {
             if (!file_exists($sImageDir.$this->m_sImgFileName) || @unlink($sImageDir.$this->m_sImgFileName)) {
                 $this->m_sImgFileName = '';
-                if (cDBFactory::getInstance()->executeQuery("UPDATE pxm_user SET u_imgfile='' WHERE u_id=".$this->m_iId)) {
+                if (cDB::getInstance()->executeQuery("UPDATE pxm_user SET u_imgfile='' WHERE u_id=".$this->m_iId)) {
                     return true;
                 }
             }
@@ -462,7 +465,7 @@ class cUser
      */
     public function incrementMessageQuantity(): void
     {
-        cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_msgquantity=u_msgquantity+1 WHERE u_id='.$this->m_iId);
+        cDB::getInstance()->executeQuery('UPDATE pxm_user SET u_msgquantity=u_msgquantity+1 WHERE u_id='.$this->m_iId);
         ++$this->m_iMessageQuantity;
     }
 
@@ -523,7 +526,7 @@ class cUser
 
             $sNewPasswordHash = password_hash($sNewPassword, PASSWORD_DEFAULT);
 
-            if (cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_password='.cDBFactory::getInstance()->quote($sNewPasswordHash).",u_passwordkey='' WHERE u_password=".cDBFactory::getInstance()->quote($this->m_sPassword).' AND u_id='.$this->m_iId)) {
+            if (cDB::getInstance()->executeQuery('UPDATE pxm_user SET u_password='.cDB::getInstance()->quote($sNewPasswordHash).",u_passwordkey='' WHERE u_password=".cDB::getInstance()->quote($this->m_sPassword).' AND u_id='.$this->m_iId)) {
                 $this->m_sPassword = $sNewPasswordHash;
 
                 // Delete all login tickets for security
@@ -563,7 +566,7 @@ class cUser
      */
     public function updateStatus(): bool
     {
-        if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_status='.$this->m_eStatus->value.' WHERE u_id='.$this->m_iId)) {
+        if (!cDB::getInstance()->executeQuery('UPDATE pxm_user SET u_status='.$this->m_eStatus->value.' WHERE u_id='.$this->m_iId)) {
             return false;
         }
         return true;
@@ -686,7 +689,7 @@ class cUser
     {
         $iLastOnlineTimestamp = $iLastOnlineTimestamp;
 
-        if (cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_lastonlinetstmp='.$iLastOnlineTimestamp.' WHERE u_id='.$this->m_iId)) {
+        if (cDB::getInstance()->executeQuery('UPDATE pxm_user SET u_lastonlinetstmp='.$iLastOnlineTimestamp.' WHERE u_id='.$this->m_iId)) {
             //TODO $this->m_iLastOnlineTimestamp = $iLastOnlineTimestamp;
         } else {
             return false;
@@ -801,7 +804,7 @@ class cUser
     {
         $sNewHash = password_hash($sPassword, PASSWORD_DEFAULT);
 
-        if (cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_password='.cDBFactory::getInstance()->quote($sNewHash).' WHERE u_id='.$this->m_iId)) {
+        if (cDB::getInstance()->executeQuery('UPDATE pxm_user SET u_password='.cDB::getInstance()->quote($sNewHash).' WHERE u_id='.$this->m_iId)) {
             $this->m_sPassword = $sNewHash;
             return true;
         }
@@ -828,7 +831,7 @@ class cUser
     public function createNewPasswordKey(): string
     {
         $sPasswordKey = bin2hex(random_bytes(16));
-        if (cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_passwordkey='.cDBFactory::getInstance()->quote($sPasswordKey).' WHERE u_id='.$this->m_iId)) {
+        if (cDB::getInstance()->executeQuery('UPDATE pxm_user SET u_passwordkey='.cDB::getInstance()->quote($sPasswordKey).' WHERE u_id='.$this->m_iId)) {
             return $sPasswordKey;
         }
         return '';
@@ -879,7 +882,7 @@ class cUser
     {
         ++$this->m_iNotificationUnreadCount;
 
-        $result = cDBFactory::getInstance()->executeQuery(
+        $result = cDB::getInstance()->executeQuery(
             'UPDATE pxm_user SET u_notification_unread_count = u_notification_unread_count + 1 '.
             'WHERE u_id='.$this->m_iId
         );
@@ -898,7 +901,7 @@ class cUser
             $this->m_iNotificationUnreadCount--;
         }
 
-        $objResult = cDBFactory::getInstance()->executeQuery(
+        $objResult = cDB::getInstance()->executeQuery(
             'UPDATE pxm_user SET u_notification_unread_count = GREATEST(0, u_notification_unread_count - 1) '.
             'WHERE u_id='.$this->m_iId
         );
@@ -918,7 +921,7 @@ class cUser
                        'WHERE n_userid='.$this->m_iId." AND n_status='unread'";
 
         $iCount = 0;
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery($sCountQuery)) {
+        if ($objResultSet = cDB::getInstance()->executeQuery($sCountQuery)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $iCount = (int) $objResultRow->count;
             }
@@ -927,7 +930,7 @@ class cUser
         // Update cache
         $this->m_iNotificationUnreadCount = $iCount;
 
-        $objResult = cDBFactory::getInstance()->executeQuery(
+        $objResult = cDB::getInstance()->executeQuery(
             'UPDATE pxm_user SET u_notification_unread_count='.intval($iCount).' '.
             'WHERE u_id='.$this->m_iId
         );
@@ -955,7 +958,7 @@ class cUser
     {
         ++$this->m_iPrivMessageUnreadCount;
 
-        $result = cDBFactory::getInstance()->executeQuery(
+        $result = cDB::getInstance()->executeQuery(
             'UPDATE pxm_user SET u_priv_message_unread_count = u_priv_message_unread_count + 1 '.
             'WHERE u_id='.$this->m_iId
         );
@@ -974,7 +977,7 @@ class cUser
             $this->m_iPrivMessageUnreadCount--;
         }
 
-        $result = cDBFactory::getInstance()->executeQuery(
+        $result = cDB::getInstance()->executeQuery(
             'UPDATE pxm_user SET u_priv_message_unread_count = IF(u_priv_message_unread_count > 0, u_priv_message_unread_count - 1, 0) '.
             'WHERE u_id='.$this->m_iId
         );
@@ -994,7 +997,7 @@ class cUser
                        'WHERE p_touserid='.$this->m_iId.' AND p_tostate='.ePrivateMessageStatus::UNREAD->value;
 
         $iCount = 0;
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery($sCountQuery)) {
+        if ($objResultSet = cDB::getInstance()->executeQuery($sCountQuery)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $iCount = (int) $objResultRow->count;
             }
@@ -1003,7 +1006,7 @@ class cUser
         // Update cache
         $this->m_iPrivMessageUnreadCount = $iCount;
 
-        $objResult = cDBFactory::getInstance()->executeQuery(
+        $objResult = cDB::getInstance()->executeQuery(
             'UPDATE pxm_user SET u_priv_message_unread_count='.intval($iCount).' '.
             'WHERE u_id='.$this->m_iId
         );

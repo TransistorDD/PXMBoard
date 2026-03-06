@@ -1,5 +1,5 @@
 {*
-  Users Online Template (Partial) - HTMX Skin
+  Users Online Template (Partial) - PXM Skin
 
   Shows a list of users currently online with their activity info.
 

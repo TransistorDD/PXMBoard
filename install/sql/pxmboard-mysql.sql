@@ -170,6 +170,7 @@ CREATE TABLE `pxm_search` (
 `se_boardids` VARCHAR( 255 ) NOT NULL ,
 `se_tstmp` INT UNSIGNED NOT NULL ,
 `se_ipaddress` VARCHAR( 45 ) NOT NULL ,
+`se_group_by_thread` BOOLEAN NOT NULL DEFAULT TRUE ,
 PRIMARY KEY ( `se_id` ) ,
 INDEX ( `se_tstmp` ) ,
 INDEX `idx_ratelimit` ( `se_ipaddress`, `se_tstmp` )

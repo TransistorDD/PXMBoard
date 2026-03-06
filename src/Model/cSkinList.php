@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * handles the skins
@@ -23,7 +23,7 @@ class cSkinList
     {
         $arrSkins = [];
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT s1.s_id,s1.s_fieldvalue AS s_name,s2.s_fieldvalue AS s_type FROM pxm_skin s1,pxm_skin s2 WHERE s1.s_id=s2.s_id AND s1.s_fieldname='name' AND s2.s_fieldname='type' ORDER BY s1.s_id")) {
+        if ($objResultSet = cDB::getInstance()->executeQuery("SELECT s1.s_id,s1.s_fieldvalue AS s_name,s2.s_fieldvalue AS s_type FROM pxm_skin s1,pxm_skin s2 WHERE s1.s_id=s2.s_id AND s1.s_fieldname='name' AND s2.s_fieldname='type' ORDER BY s1.s_id")) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
 
                 $objSkin = new cSkin();

@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eUserStatus;
 
 /**
@@ -22,7 +22,7 @@ class cUserStatistics
      */
     public function getMemberCount(): int
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT count(*) AS users FROM pxm_user')) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT count(*) AS users FROM pxm_user')) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 return $objResultRow->users;
             }
@@ -96,7 +96,7 @@ class cUserStatistics
     {
         $arrUsers = [];
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT u_id,u_username,u_city,u_publicmail,u_privatemail,u_registrationtstmp,u_msgquantity,u_highlight,u_highlight,u_status FROM pxm_user WHERE u_status='1' ORDER BY $sAttribute $sOrder", $iLimit)) {
+        if ($objResultSet = cDB::getInstance()->executeQuery("SELECT u_id,u_username,u_city,u_publicmail,u_privatemail,u_registrationtstmp,u_msgquantity,u_highlight,u_highlight,u_status FROM pxm_user WHERE u_status='1' ORDER BY $sAttribute $sOrder", $iLimit)) {
             $objUser = new cUser();
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $objUser->setId($objResultRow->u_id);

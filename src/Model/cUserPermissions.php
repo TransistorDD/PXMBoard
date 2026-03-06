@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eUserStatus;
 
 /**
@@ -48,7 +48,7 @@ class cUserPermissions extends cUser
     {
         $this->m_arrModBoards = [];
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT mod_boardid FROM pxm_moderator WHERE mod_userid='.$this->m_iId)) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT mod_boardid FROM pxm_moderator WHERE mod_userid='.$this->m_iId)) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $this->m_arrModBoards[] = (int) $objResultRow->mod_boardid;
             }
@@ -76,7 +76,7 @@ class cUserPermissions extends cUser
      */
     public function refreshRights(): void
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT u_status,u_post,u_edit,u_admin FROM pxm_user WHERE u_id='.$this->m_iId)) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT u_status,u_post,u_edit,u_admin FROM pxm_user WHERE u_id='.$this->m_iId)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $this->m_eStatus = eUserStatus::tryFrom($objResultRow->u_status) ?? eUserStatus::NOT_ACTIVATED;
                 $this->m_bPost = $objResultRow->u_post ? true : false;
@@ -184,7 +184,7 @@ class cUserPermissions extends cUser
      */
     public function updateData(): bool
     {
-        if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_status='.$this->m_eStatus->value.
+        if (!cDB::getInstance()->executeQuery('UPDATE pxm_user SET u_status='.$this->m_eStatus->value.
                                                              ',u_post='.intval($this->m_bPost).
                                                              ',u_edit='.intval($this->m_bEdit).
                                                              ',u_admin='.intval($this->m_bIsAdmin).

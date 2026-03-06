@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Parser;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * PXM markup to HTML parser
@@ -347,7 +347,7 @@ class cPxmParser extends cParser
             $arrUserIds = array_slice($arrUserIds, 0, 10);
 
             if (!empty($arrUserIds)) {
-                $objDb = cDBFactory::getInstance();
+                $objDb = cDB::getInstance();
 
                 $sIds = implode(',', $arrUserIds);
                 $sQuery = 'SELECT u_id, u_username FROM pxm_user WHERE u_id IN ('.$sIds.')';

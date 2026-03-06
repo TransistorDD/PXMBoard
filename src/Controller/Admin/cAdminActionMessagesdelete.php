@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Controller\Admin;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Model\cBoardList;
 
 /**
@@ -45,14 +45,14 @@ class cAdminActionMessagesdelete extends cAdminAction
 
                 $objBoardList = new cBoardList();
                 $arrClosedBoardIds = $objBoardList->closeAllBoards(); 	// close boards
-                if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT t_id FROM pxm_thread WHERE t_boardid IN ('.implode(',', $arrBoardIds).') AND t_fixed=0 AND t_lastmsgtstmp<'.($this->m_objConfig->getAccessTimestamp() - $iTimespan))) {
+                if ($objResultSet = cDB::getInstance()->executeQuery('SELECT t_id FROM pxm_thread WHERE t_boardid IN ('.implode(',', $arrBoardIds).') AND t_fixed=0 AND t_lastmsgtstmp<'.($this->m_objConfig->getAccessTimestamp() - $iTimespan))) {
                     $arrThreadIds = [];
                     while ($objResultRow = $objResultSet->getNextResultRowObject()) {
                         $arrThreadIds[] = (int) $objResultRow->t_id;
                     }
                     if (sizeof($arrThreadIds) > 0) {
-                        cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_message WHERE m_threadid IN ('.implode(',', $arrThreadIds).')');
-                        cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_thread WHERE t_id IN ('.implode(',', $arrThreadIds).')');
+                        cDB::getInstance()->executeQuery('DELETE FROM pxm_message WHERE m_threadid IN ('.implode(',', $arrThreadIds).')');
+                        cDB::getInstance()->executeQuery('DELETE FROM pxm_thread WHERE t_id IN ('.implode(',', $arrThreadIds).')');
                         $this->m_sOutput .= $this->_getAlert('threads and messages deleted', 'success');
                     } else {
                         $this->m_sOutput .= '<h2>no threads found</h2>';
@@ -62,7 +62,7 @@ class cAdminActionMessagesdelete extends cAdminAction
             }
 
             if ($this->m_objInputHandler->getIntFormVar('priv', true, true) > 0) {
-                cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_priv_message WHERE p_tstmp<'.($this->m_objConfig->getAccessTimestamp() - $iTimespan));
+                cDB::getInstance()->executeQuery('DELETE FROM pxm_priv_message WHERE p_tstmp<'.($this->m_objConfig->getAccessTimestamp() - $iTimespan));
                 $this->m_sOutput .= $this->_getAlert('private messages deleted', 'success');
             }
         } else {

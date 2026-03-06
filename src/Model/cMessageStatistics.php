@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * message statistics
@@ -21,7 +21,7 @@ class cMessageStatistics
      */
     public function getMessageCount(): int
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT count(*) AS messages FROM pxm_message')) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT count(*) AS messages FROM pxm_message')) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 return $objResultRow->messages;
             }
@@ -36,7 +36,7 @@ class cMessageStatistics
      */
     public function getPrivateMessageCount(): int
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT count(*) AS messages FROM pxm_priv_message')) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT count(*) AS messages FROM pxm_priv_message')) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 return $objResultRow->messages;
             }
@@ -78,7 +78,7 @@ class cMessageStatistics
     {
         $arrBoardMessages = [];
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT m_id,m_parentid,t_boardid,t_id,t_active,m_subject,m_tstmp,m_userid,m_username,m_usermail,m_userhighlight FROM pxm_board,pxm_thread,pxm_message WHERE b_id=t_boardid AND t_id=m_threadid AND b_status!=5 AND m_tstmp>'.intval($iTimeSpan)." ORDER BY $sAttribute $sOrder", $iLimit)) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT m_id,m_parentid,t_boardid,t_id,t_active,m_subject,m_tstmp,m_userid,m_username,m_usermail,m_userhighlight FROM pxm_board,pxm_thread,pxm_message WHERE b_id=t_boardid AND t_id=m_threadid AND b_status!=5 AND m_tstmp>'.intval($iTimeSpan)." ORDER BY $sAttribute $sOrder", $iLimit)) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
 
                 $objBoardMessage = new cBoardMessage();

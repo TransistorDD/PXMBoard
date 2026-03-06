@@ -1,5 +1,5 @@
 /**
- * HTMX Skin - Skin-specific JavaScript
+ * PXM Skin - Skin-specific JavaScript
  *
  * Handles:
  * - Layout mode toggle (Desktop/Stacked) with localStorage
@@ -1378,10 +1378,10 @@
   });
 
   // ====================================================================
-  // MESSAGE MOVE - HTMX SKIN DOM ADAPTER
+  // MESSAGE MOVE - PXM Skin DOM ADAPTER
   // ====================================================================
 
-  // Override MessageMove extractors to work with the htmx skin DOM structure.
+  // Override MessageMove extractors to work with the PXM Skin DOM structure.
   // These run after message-move.js has loaded (script order in layout_footer.tpl).
   if (typeof MessageMove !== 'undefined') {
     MessageMove._extractSubject = function () {

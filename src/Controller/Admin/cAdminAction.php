@@ -3,7 +3,7 @@
 namespace PXMBoard\Controller\Admin;
 
 use PXMBoard\Controller\cBaseAction;
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eErrorKeys;
 use PXMBoard\Model\cConfig;
 
@@ -120,7 +120,7 @@ abstract class cAdminAction extends cBaseAction
      */
     protected function _getSidebar(): string
     {
-        $bIsMySql = strcasecmp(cDBFactory::getInstance()->getDBType(), 'MySQL') === 0;
+        $bIsMySql = strcasecmp(cDB::getInstance()->getDBType(), 'MySQL') === 0;
 
         $s  = "<nav class=\"pxm-admin-sidebar\">\n";
         $s .= "<ul class=\"pxm-admin-nav\">\n";

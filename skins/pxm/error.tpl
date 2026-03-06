@@ -1,5 +1,5 @@
 {*
-  Error Template (Partial) - HTMX Skin
+  Error Template (Partial) - PXM Skin
 
   Always renders as inline fragment (no layout wrapper).
 

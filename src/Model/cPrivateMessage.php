@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eErrorKeys;
 use PXMBoard\Enum\ePrivateMessageStatus;
 use PXMBoard\Parser\cParser;
@@ -32,7 +32,7 @@ class cPrivateMessage extends cMessage
         $bReturn = false;
 
         if ($iMessageId > 0) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT p_id,'.
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT p_id,'.
                                                             'p_subject,'.
                                                             'p_body,'.
                                                             'p_tstmp,'.
@@ -150,16 +150,16 @@ class cPrivateMessage extends cMessage
 
         if ($this->m_iToUserId > 0 && $this->m_objAuthor->getId() > 0) {
             if (!empty($this->m_sSubject)) {
-                if ($objResultSet = cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_priv_message (p_touserid,p_fromuserid,p_subject,p_body,p_tstmp,p_ip)'.
+                if ($objResultSet = cDB::getInstance()->executeQuery('INSERT INTO pxm_priv_message (p_touserid,p_fromuserid,p_subject,p_body,p_tstmp,p_ip)'.
                                                                    " values ($this->m_iToUserId,".
                                                                              $this->m_objAuthor->getId().','.
-                                                                             cDBFactory::getInstance()->quote($this->m_sSubject).','.
-                                                                             cDBFactory::getInstance()->quote($this->m_sBody).','.
+                                                                             cDB::getInstance()->quote($this->m_sSubject).','.
+                                                                             cDB::getInstance()->quote($this->m_sBody).','.
                                                                              $this->m_iMessageTimestamp.','.
-                                                                             cDBFactory::getInstance()->quote($this->m_sIp).')')) {
+                                                                             cDB::getInstance()->quote($this->m_sIp).')')) {
                     if ($objResultSet->getAffectedRows() > 0) {
                         $eError = null;
-                        $this->m_iId = cDBFactory::getInstance()->getInsertID('pxm_priv_message', 'p_id');
+                        $this->m_iId = cDB::getInstance()->getInsertId('pxm_priv_message', 'p_id');
 
                         // Update unread count in pxm_user
                         $objUser = new cUser();
@@ -187,7 +187,7 @@ class cPrivateMessage extends cMessage
         $bReturn = false;
 
         // set the message to deleted if we are the recipient
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_tostate='.ePrivateMessageStatus::DELETED->value.
+        if ($objResultSet = cDB::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_tostate='.ePrivateMessageStatus::DELETED->value.
                                                            " WHERE p_touserid=$this->m_iToUserId AND p_id=$this->m_iId")) {
             if ($objResultSet->getAffectedRows() > 0) {
                 $bReturn = true;
@@ -203,7 +203,7 @@ class cPrivateMessage extends cMessage
         }
 
         // set the message to deleted if we are the author
-        if (!$bReturn && ($objResultSet = cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_fromstate='.ePrivateMessageStatus::DELETED->value.
+        if (!$bReturn && ($objResultSet = cDB::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_fromstate='.ePrivateMessageStatus::DELETED->value.
                                                                 ' WHERE p_fromuserid='.$this->m_objAuthor->getId()." AND p_id=$this->m_iId"))) {
             if ($objResultSet->getAffectedRows() > 0) {
                 $bReturn = true;
@@ -211,7 +211,7 @@ class cPrivateMessage extends cMessage
         }
 
         // remove all deleted messages from db
-        cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_priv_message WHERE p_tostate='.ePrivateMessageStatus::DELETED->value.' AND p_fromstate='.ePrivateMessageStatus::DELETED->value);
+        cDB::getInstance()->executeQuery('DELETE FROM pxm_priv_message WHERE p_tostate='.ePrivateMessageStatus::DELETED->value.' AND p_fromstate='.ePrivateMessageStatus::DELETED->value);
 
         return $bReturn;
     }
@@ -267,7 +267,7 @@ class cPrivateMessage extends cMessage
     {
         if ($this->m_eToState->isUnread()) {
 
-            cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_tostate='.ePrivateMessageStatus::READ->value." WHERE p_id=$this->m_iId");
+            cDB::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_tostate='.ePrivateMessageStatus::READ->value." WHERE p_id=$this->m_iId");
 
             // Update unread count in pxm_user
             $objUser = new cUser();

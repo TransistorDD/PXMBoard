@@ -15,7 +15,6 @@ declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use PXMBoard\Database\cDB;
-use PXMBoard\Database\cDBFactory;
 use PXMBoard\Exception\cDatabaseException;
 use PXMBoard\Search\cSearchEngineFactory;
 use PXMBoard\Exception\cSearchEngineException;
@@ -49,7 +48,7 @@ $arrTestDb = [
 ];
 
 try {
-    cDBFactory::getInstance($arrTestDb);
+    cDB::getInstance($arrTestDb);
 } catch (cDatabaseException $e) {
     echo "ERROR: Cannot connect to test database '{$sTestDbName}' on '{$sTestDbHost}'." . PHP_EOL;
     echo "       " . $e->getMessage() . PHP_EOL;
@@ -60,7 +59,7 @@ try {
 // -------------------------------------------------------------------------
 // Import schema if tables do not exist yet
 // -------------------------------------------------------------------------
-_importSchemaIfNeeded(cDBFactory::getInstance());
+_importSchemaIfNeeded(cDB::getInstance());
 
 // -------------------------------------------------------------------------
 // Initialize search engine (MySql FULLTEXT, uses the already initialized DB)
@@ -83,7 +82,7 @@ function _importSchemaIfNeeded(cDB $objDb): void
 {
     // Quick check: if pxm_configuration exists, schema is already present
     $objResult = $objDb->executeQuery("SHOW TABLES LIKE 'pxm_configuration'");
-    if ($objResult && $objResult->getNumRows() > 0) {
+    if ($objResult && $objResult->getNextResultRowObject()) {
         $objResult->freeResult();
         return;
     }

@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * User login ticket (for multi-device persistent login)
@@ -32,7 +32,7 @@ class cUserLoginTicket
      */
     public static function createTicket(int $iUserId, string $sUserAgent = '', string $sIpAddress = ''): string
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
         $iTimestamp = time();
 
         if ($iUserId <= 0) {
@@ -67,7 +67,7 @@ class cUserLoginTicket
      */
     public static function validateTicket(string $sToken): int
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
 
         if (empty($sToken)) {
             return 0;
@@ -103,7 +103,7 @@ class cUserLoginTicket
      */
     public function loadDataByToken(string $sToken): bool
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
 
         if (empty($sToken)) {
             return false;
@@ -134,7 +134,7 @@ class cUserLoginTicket
      */
     public function loadDataById(int $iId): bool
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
 
         if ($iId <= 0) {
             return false;
@@ -194,7 +194,7 @@ class cUserLoginTicket
      */
     public function deleteTicket(): bool
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
 
         if ($this->m_iId <= 0) {
             return false;

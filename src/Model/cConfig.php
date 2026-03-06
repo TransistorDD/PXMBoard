@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * configuration handling
@@ -73,7 +73,7 @@ class cConfig
      */
     private function _loadData(): bool
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT c_skinid,'.
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT c_skinid,'.
                                                         'c_quickpost,'.
                                                         'c_directregistration,'.
                                                         'c_uniquemail,'.
@@ -140,12 +140,12 @@ class cConfig
      */
     public function updateData(): bool
     {
-        if (cDBFactory::getInstance()->executeQuery("UPDATE pxm_configuration SET c_skinid=$this->m_iDefaultSkinId,".
+        if (cDB::getInstance()->executeQuery("UPDATE pxm_configuration SET c_skinid=$this->m_iDefaultSkinId,".
                                                                         'c_quickpost='.intval($this->m_bUseQuickPost).','.
                                                                         'c_directregistration='.intval($this->m_bUseDirectRegistration).','.
                                                                         'c_uniquemail='.intval($this->m_bUniqueRegistrationMails).','.
                                                                         'c_usesignatures='.intval($this->m_bUseSignatures).','.
-                                                                        'c_dateformat='.cDBFactory::getInstance()->quote($this->m_sDateFormat).','.
+                                                                        'c_dateformat='.cDB::getInstance()->quote($this->m_sDateFormat).','.
                                                                         "c_timeoffset=$this->m_iTimeOffset,".
                                                                         "c_onlinetime=$this->m_iOnlineTime,".
                                                                         "c_closethreads=$this->m_iThreadSizeLimit,".
@@ -153,13 +153,13 @@ class cConfig
                                                                         "c_msgheaderperpage=$this->m_iMessageHeaderPerPage,".
                                                                         "c_privatemsgperpage=$this->m_iPrivateMessagesPerPage,".
                                                                         "c_thrdperpage=$this->m_iThreadsPerPage,".
-                                                                        'c_quotesubject='.cDBFactory::getInstance()->quote($this->m_sQuoteSubject).','.
-                                                                        'c_mailwebmaster='.cDBFactory::getInstance()->quote($this->m_sMailWebmaster).','.
-                                                                        'c_skindir='.cDBFactory::getInstance()->quote($this->m_sSkinDir).','.
+                                                                        'c_quotesubject='.cDB::getInstance()->quote($this->m_sQuoteSubject).','.
+                                                                        'c_mailwebmaster='.cDB::getInstance()->quote($this->m_sMailWebmaster).','.
+                                                                        'c_skindir='.cDB::getInstance()->quote($this->m_sSkinDir).','.
                                                                         "c_maxprofilepicsize=$this->m_iMaxProfileImgSize,".
                                                                         "c_maxprofilepicwidth=$this->m_iMaxProfileImgWidth,".
                                                                         "c_maxprofilepicheight=$this->m_iMaxProfileImgHeight,".
-                                                                        'c_profileimgdir='.cDBFactory::getInstance()->quote($this->m_sProfileImgDir))) {
+                                                                        'c_profileimgdir='.cDB::getInstance()->quote($this->m_sProfileImgDir))) {
             return true;
         }
         return false;

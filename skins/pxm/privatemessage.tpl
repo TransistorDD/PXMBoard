@@ -1,5 +1,5 @@
 {*
-  Private Message View Template (Partial) - HTMX Skin
+  Private Message View Template (Partial) - PXM Skin
 
   Shows a single private message with sender info, body, and action buttons.
   Includes tab navigation and reply/delete actions via HTMX.

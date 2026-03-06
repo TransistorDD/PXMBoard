@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * handles the badwords
@@ -23,7 +23,7 @@ class cBadwordList
     {
         $arrBadwords = ['search' => [],'replace' => []];
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT bw_name,bw_replacement FROM pxm_badword')) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT bw_name,bw_replacement FROM pxm_badword')) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 if (strlen($objResultRow->bw_name) > 0) {
                     $arrBadwords['search'][] = $objResultRow->bw_name;
@@ -44,7 +44,7 @@ class cBadwordList
     public function updateList(array $arrBadwords): bool
     {
         if (isset($arrBadwords['search']) && isset($arrBadwords['replace'])) {
-            if (cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_badword')) {
+            if (cDB::getInstance()->executeQuery('DELETE FROM pxm_badword')) {
                 foreach ($arrBadwords['search'] as $iKey => $sBadwordSearch) {
                     if (strlen($sBadwordSearch) > 0) {
                         if (isset($arrBadwords['replace'][$iKey])) {
@@ -52,7 +52,7 @@ class cBadwordList
                         } else {
                             $sBadwordReplace = '';
                         }
-                        cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_badword (bw_name,bw_replacement) VALUES ('.cDBFactory::getInstance()->quote($sBadwordSearch).','.cDBFactory::getInstance()->quote($sBadwordReplace).')');
+                        cDB::getInstance()->executeQuery('INSERT INTO pxm_badword (bw_name,bw_replacement) VALUES ('.cDB::getInstance()->quote($sBadwordSearch).','.cDB::getInstance()->quote($sBadwordReplace).')');
                     }
                 }
             }

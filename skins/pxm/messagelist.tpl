@@ -1,5 +1,5 @@
 {*
-  Message List Template (Partial) - HTMX Skin
+  Message List Template (Partial) - PXM Skin
 
   Search results, loaded into #threadlist-container.
   Clicking a result loads thread+message via loadMessageSmart().
@@ -7,17 +7,23 @@
   Parameters:
   - $config.items: Total result count
   - $config.board.id: Board ID
-  - $config.group_by_thread: Whether results are grouped by thread
   - $config.searchprofile: Active search profile
   - $config.previd / $config.nextid: Pagination
   - $config.curid / $config.count: Current page / page count
   - $msg: Array of results (or threads when grouped)
 *}
 <div class="shadow rounded-lg overflow-hidden" style="background-color: var(--color-surface-primary);">
-	<div class="px-3 py-2 font-semibold text-sm" style="background-color: var(--color-surface-secondary); color: var(--color-content-secondary);">{$config.items} Gefundene Nachrichten</div>
+	<div class="px-3 py-2 font-semibold text-sm flex items-center justify-between" style="background-color: var(--color-surface-secondary); color: var(--color-content-secondary);">
+		<span>{$config.items} Gefundene Nachrichten</span>
+		<a href="pxmboard.php?mode=messagesearch&brdid={$config.board.id}"
+		   hx-get="pxmboard.php?mode=messagesearch&brdid={$config.board.id}"
+		   hx-target="#threadlist-container"
+		   hx-swap="innerHTML"
+		   class="font-normal hover:underline text-xs" style="color: var(--color-link);">&laquo; Zur&uuml;ck zur Suche</a>
+	</div>
 
 	<div style="border: 1px solid var(--color-border-default); border-top: 0;">
-{if $config.group_by_thread}
+{if $config.searchprofile.group_by_thread}
 	<div class="search-groups">
 	{foreach from=$msg item=thread}
 			<div>
@@ -88,6 +94,7 @@
 </div>
 
 <!-- Pagination -->
+{if $config.count > 1}
 <div class="text-center py-3 text-xs" style="color: var(--color-content-secondary);">
 {if isset($config.previd) && $config.previd != ''}
 		<a href="pxmboard.php?mode=messagesearch&brdid={$config.board.id}&searchid={$config.searchprofile.id}&page={$config.previd}"
@@ -95,10 +102,7 @@
 		   hx-target="#threadlist-container"
 		   hx-swap="innerHTML"
 		   class="hover:underline" style="color: var(--color-link);">&laquo; Zur&uuml;ck</a> |
-{else}
-		- |
 {/if}
-{if $config.count > 0}
 	{section name=page start=1 loop=$config.count}
 		{if $config.curid == $smarty.section.page.index}
 			<span class="font-bold underline">{$smarty.section.page.index}</span>
@@ -119,16 +123,13 @@
 		   hx-swap="innerHTML"
 		   class="hover:underline" style="color: var(--color-link);">{$config.count}</a>
 	{/if}
-	 |
-{/if}
 {if isset($config.nextid) && $config.nextid != ''}
-		<a href="pxmboard.php?mode=messagesearch&brdid={$config.board.id}&searchid={$config.searchprofile.id}&page={$config.nextid}"
+		 | <a href="pxmboard.php?mode=messagesearch&brdid={$config.board.id}&searchid={$config.searchprofile.id}&page={$config.nextid}"
 		   hx-get="pxmboard.php?mode=messagesearch&brdid={$config.board.id}&searchid={$config.searchprofile.id}&page={$config.nextid}"
 		   hx-target="#threadlist-container"
 		   hx-swap="innerHTML"
 		   class="hover:underline" style="color: var(--color-link);">Weiter &raquo;</a>
-{else}
-		-
 {/if}
 </div>
+{/if}
 {if $config.logedin == 1}<span id="badge-data" data-pm="{$config.user.priv_message_unread_count}" data-notif="{$config.user.notification_unread_count}" hidden></span>{/if}

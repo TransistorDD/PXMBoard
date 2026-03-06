@@ -1,5 +1,5 @@
 {*
-  Message Form Template (Fragment) - HTMX Skin
+  Message Form Template (Fragment) - PXM Skin
 
   Loads into #message-container via hx-target.
   Handles: new thread, reply, guest quickpost, drafts.

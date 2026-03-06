@@ -1,5 +1,5 @@
 {*
-  Change Password Form Template (Partial) - HTMX Skin
+  Change Password Form Template (Partial) - PXM Skin
 
   Form for changing the user's password. Requires current password (not present in pxm skin,
   but specified for htmx), new password, and confirmation.

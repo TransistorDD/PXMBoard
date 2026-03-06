@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\ePrivateMessageStatus;
 
 /**
@@ -54,10 +54,10 @@ class cPrivateOutboxList extends cPrivateMessageList
     public function deleteData(): bool
     {
         // set the message to deleted if we are the author
-        cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_fromstate='.ePrivateMessageStatus::DELETED->value." WHERE p_fromuserid=$this->m_iUserId");
+        cDB::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_fromstate='.ePrivateMessageStatus::DELETED->value." WHERE p_fromuserid=$this->m_iUserId");
 
         // remove all deleted messages from db
-        cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_priv_message WHERE p_tostate='.ePrivateMessageStatus::DELETED->value.' AND p_fromstate='.ePrivateMessageStatus::DELETED->value);
+        cDB::getInstance()->executeQuery('DELETE FROM pxm_priv_message WHERE p_tostate='.ePrivateMessageStatus::DELETED->value.' AND p_fromstate='.ePrivateMessageStatus::DELETED->value);
 
         return true;
     }

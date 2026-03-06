@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * handles the textreplacements (smilies etc)
@@ -23,7 +23,7 @@ class cTextreplacementList
     {
         $arrReplacements = ['search' => [],'replace' => []];
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT tr_name,tr_replacement FROM pxm_textreplacement')) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT tr_name,tr_replacement FROM pxm_textreplacement')) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 if (strlen($objResultRow->tr_name) > 0) {
                     $arrReplacements['search'][] = $objResultRow->tr_name;
@@ -44,7 +44,7 @@ class cTextreplacementList
     public function updateList(array $arrReplacements): bool
     {
         if (isset($arrReplacements['search']) && isset($arrReplacements['replace'])) {
-            if (cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_textreplacement')) {
+            if (cDB::getInstance()->executeQuery('DELETE FROM pxm_textreplacement')) {
                 foreach ($arrReplacements['search'] as $iKey => $sReplacementSearch) {
                     if (strlen($sReplacementSearch) > 0) {
                         if (isset($arrReplacements['replace'][$iKey])) {
@@ -52,7 +52,7 @@ class cTextreplacementList
                         } else {
                             $sReplacementReplace = '';
                         }
-                        cDBFactory::getInstance()->executeQuery('INSERT INTO pxm_textreplacement (tr_name,tr_replacement) VALUES ('.cDBFactory::getInstance()->quote($sReplacementSearch).','.cDBFactory::getInstance()->quote($sReplacementReplace).')');
+                        cDB::getInstance()->executeQuery('INSERT INTO pxm_textreplacement (tr_name,tr_replacement) VALUES ('.cDB::getInstance()->quote($sReplacementSearch).','.cDB::getInstance()->quote($sReplacementReplace).')');
                     }
                 }
             }

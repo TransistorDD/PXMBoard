@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PXMBoard\Tests\TestCase;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * Integration test base class with real database and transaction rollback.
@@ -34,7 +34,7 @@ abstract class IntegrationTestCase extends PxmTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        cDBFactory::getInstance()->executeQuery('START TRANSACTION');
+        cDB::getInstance()->executeQuery('START TRANSACTION');
     }
 
     /**
@@ -44,7 +44,7 @@ abstract class IntegrationTestCase extends PxmTestCase
      */
     protected function tearDown(): void
     {
-        cDBFactory::getInstance()->executeQuery('ROLLBACK');
+        cDB::getInstance()->executeQuery('ROLLBACK');
         parent::tearDown();
     }
 
@@ -60,7 +60,7 @@ abstract class IntegrationTestCase extends PxmTestCase
      */
     protected function insertBoard(array $arrData = []): int
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
         $arrDefaults = [
             'b_name'           => 'Test Board',
             'b_description'    => 'Test board description',
@@ -101,7 +101,7 @@ abstract class IntegrationTestCase extends PxmTestCase
      */
     protected function insertUser(array $arrData = []): int
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
         $arrDefaults = [
             'u_username'             => 'testuser_' . uniqid(),
             'u_password'             => password_hash('testpassword', PASSWORD_DEFAULT),
@@ -163,7 +163,7 @@ abstract class IntegrationTestCase extends PxmTestCase
      */
     protected function insertThread(int $iBoardId, array $arrData = []): int
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
         $arrDefaults = [
             't_boardid'      => $iBoardId,
             't_active'       => 1,
@@ -199,7 +199,7 @@ abstract class IntegrationTestCase extends PxmTestCase
      */
     protected function insertMessage(int $iThreadId, array $arrData = []): int
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
         $arrDefaults = [
             'm_threadid'        => $iThreadId,
             'm_parentid'        => 0,

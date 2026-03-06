@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Controller\Admin;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eUserStatus;
 use PXMBoard\Model\cTemplate;
 
@@ -52,7 +52,7 @@ class cAdminActionActivateusersform extends cAdminAction
             $this->m_sOutput .= '<table class="pxm-table"><thead><tr><th>username</th><th>first name</th><th>last name</th>';
             $this->m_sOutput .= "<th>private mail</th><th>date of registration</th><th>act</th><th>del</th><th>reason</th></tr></thead>\n";
 
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT u_id,u_username,u_registrationtstmp,u_firstname,u_lastname,u_privatemail FROM pxm_user WHERE u_status='.eUserStatus::NOT_ACTIVATED->value.' ORDER BY u_registrationtstmp DESC')) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT u_id,u_username,u_registrationtstmp,u_firstname,u_lastname,u_privatemail FROM pxm_user WHERE u_status='.eUserStatus::NOT_ACTIVATED->value.' ORDER BY u_registrationtstmp DESC')) {
                 $sDateFormat = $this->m_objConfig->getDateFormat();
                 $iTimeOffset = $this->m_objConfig->getTimeOffset() * 3600;
                 $this->m_sOutput .= '<tbody>';

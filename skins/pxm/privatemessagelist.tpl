@@ -1,5 +1,5 @@
 {*
-  Private Message List Template (Partial) - HTMX Skin
+  Private Message List Template (Partial) - PXM Skin
 
   Shows inbox/outbox listing of private messages with tab navigation.
   Includes delete, pagination, and HTMX navigation to individual PMs.

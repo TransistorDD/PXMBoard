@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Search\cSearchEngineFactory;
 
 /**
@@ -96,7 +96,7 @@ class cMessageSearchList extends cScrollList
         );
 
         // Create temporary table to store search results (maintains existing architecture)
-        cDBFactory::getInstance()->executeQuery('CREATE TEMPORARY TABLE pxm_tmp_search (
+        cDB::getInstance()->executeQuery('CREATE TEMPORARY TABLE pxm_tmp_search (
 			tmp_id INT PRIMARY KEY,
 			tmp_score DECIMAL(10,2),
 			tmp_tstmp INT,
@@ -115,7 +115,7 @@ class cMessageSearchList extends cScrollList
 
             $sInsertQuery = 'INSERT INTO pxm_tmp_search (tmp_id, tmp_score, tmp_tstmp) VALUES ' .
                             implode(',', $arrValues);
-            cDBFactory::getInstance()->executeQuery($sInsertQuery);
+            cDB::getInstance()->executeQuery($sInsertQuery);
         }
     }
 
@@ -147,7 +147,7 @@ class cMessageSearchList extends cScrollList
      */
     protected function _doPostQuery(): void
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT count(*) AS cou FROM pxm_tmp_search')) {
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT count(*) AS cou FROM pxm_tmp_search')) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $this->m_iItemCount = $objResultRow->cou;
             }
@@ -159,7 +159,7 @@ class cMessageSearchList extends cScrollList
             $this->_groupResultsByThread();
         }
 
-        cDBFactory::getInstance()->executeQuery('DROP TABLE pxm_tmp_search');
+        cDB::getInstance()->executeQuery('DROP TABLE pxm_tmp_search');
     }
 
     /**
@@ -207,7 +207,7 @@ class cMessageSearchList extends cScrollList
                   'FROM pxm_message '.
                   'WHERE m_parentid = 0 AND m_threadid IN ('.implode(',', $arrThreadIds).')';
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery($sQuery)) {
+        if ($objResultSet = cDB::getInstance()->executeQuery($sQuery)) {
             while ($objRow = $objResultSet->getNextResultRowObject()) {
                 $arrRootMessages[(int) $objRow->m_threadid] = [
                     'id'		=> $objRow->m_id,

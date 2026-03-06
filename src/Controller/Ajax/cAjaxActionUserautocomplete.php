@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Controller\Ajax;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eUserStatus;
 
 /**
@@ -43,7 +43,7 @@ class cAjaxActionUserautocomplete extends cAjaxAction
         }
 
         // Search for matching active users
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
 
         // Escape LIKE wildcards and special characters
         $sQueryEscaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $sQuery);

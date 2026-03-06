@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eMessageStatus;
 
 /**
@@ -79,7 +79,7 @@ class cMessageDraftList extends cScrollList
      */
     public function countDrafts(): int
     {
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS msgcount FROM pxm_message WHERE m_userid=$this->m_iUserId AND m_status=".eMessageStatus::DRAFT->value)) {
+        if ($objResultSet = cDB::getInstance()->executeQuery("SELECT count(*) AS msgcount FROM pxm_message WHERE m_userid=$this->m_iUserId AND m_status=".eMessageStatus::DRAFT->value)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 return (int) $objResultRow->msgcount;
             }

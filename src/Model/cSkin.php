@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * skin handling
@@ -33,21 +33,23 @@ class cSkin
         $bReturn = false;
 
         if ($iSkinId > 0) {
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT s_fieldname,s_fieldvalue FROM pxm_skin WHERE s_id='.$iSkinId)) {
-                if ($objResultSet->getNumRows() >= 3) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT s_fieldname,s_fieldvalue FROM pxm_skin WHERE s_id='.$iSkinId)) {
+                $iRowCount = 0;
+                while ($objResultRow = $objResultSet->getNextResultRowObject()) {
+                    $iRowCount++;
+                    switch ($objResultRow->s_fieldname) {
+                        case 'name':$this->m_sName = $objResultRow->s_fieldvalue;
+                            break;
+                        case 'dir':	$this->m_sDirectory = $objResultRow->s_fieldvalue;
+                            break;
+                        case 'type':$this->m_arrSupportedTemplateEngines = explode(',', $objResultRow->s_fieldvalue);
+                            break;
+                        default:	$this->m_arrAdditionalSkinValues[$objResultRow->s_fieldname] = $objResultRow->s_fieldvalue;
+                    }
+                }
+                if ($iRowCount >= 3) {
                     $bReturn = true;
                     $this->m_iId = $iSkinId;
-                    while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                        switch ($objResultRow->s_fieldname) {
-                            case 'name':	$this->m_sName = $objResultRow->s_fieldvalue;
-                                break;
-                            case 'dir':	$this->m_sDirectory = $objResultRow->s_fieldvalue;
-                                break;
-                            case 'type':	$this->m_arrSupportedTemplateEngines = explode(',', $objResultRow->s_fieldvalue);
-                                break;
-                            default:	$this->m_arrAdditionalSkinValues[$objResultRow->s_fieldname] = $objResultRow->s_fieldvalue;
-                        }
-                    }
                 }
                 $objResultSet->freeResult();
                 unset($objResultSet);
@@ -66,11 +68,11 @@ class cSkin
         $bReturn = false;
 
         if ($this->m_iId > 0) {
-            cDBFactory::getInstance()->executeQuery('UPDATE pxm_skin SET s_fieldvalue='.cDBFactory::getInstance()->quote($this->m_sName).' WHERE s_id='.$this->m_iId." AND s_fieldname='name'");
-            cDBFactory::getInstance()->executeQuery('UPDATE pxm_skin SET s_fieldvalue='.cDBFactory::getInstance()->quote($this->m_sDirectory).' WHERE s_id='.$this->m_iId." AND s_fieldname='dir'");
+            cDB::getInstance()->executeQuery('UPDATE pxm_skin SET s_fieldvalue='.cDB::getInstance()->quote($this->m_sName).' WHERE s_id='.$this->m_iId." AND s_fieldname='name'");
+            cDB::getInstance()->executeQuery('UPDATE pxm_skin SET s_fieldvalue='.cDB::getInstance()->quote($this->m_sDirectory).' WHERE s_id='.$this->m_iId." AND s_fieldname='dir'");
 
             foreach ($this->m_arrAdditionalSkinValues as $sKey => $sValue) {
-                cDBFactory::getInstance()->executeQuery('UPDATE pxm_skin SET s_fieldvalue='.cDBFactory::getInstance()->quote($sValue).' WHERE s_id='.$this->m_iId.' AND s_fieldname='.cDBFactory::getInstance()->quote($sKey));
+                cDB::getInstance()->executeQuery('UPDATE pxm_skin SET s_fieldvalue='.cDB::getInstance()->quote($sValue).' WHERE s_id='.$this->m_iId.' AND s_fieldname='.cDB::getInstance()->quote($sKey));
             }
             $bReturn = true;
         }

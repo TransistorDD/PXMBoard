@@ -1,5 +1,5 @@
 {*
-  Redirect Template (Partial) - HTMX Skin
+  Redirect Template (Partial) - PXM Skin
 
   Shown after an action that requires a full-page redirect.
   Renders a message and triggers a JS redirect after 5 seconds.

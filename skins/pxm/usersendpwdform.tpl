@@ -1,5 +1,5 @@
 {*
-  Send Password Form Template (Partial) - HTMX Skin
+  Send Password Form Template (Partial) - PXM Skin
 
   Form for requesting a password reset. Loaded into modal via openModal().
 

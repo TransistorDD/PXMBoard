@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * Message read tracking
@@ -21,7 +21,7 @@ class cMessageReadTracker
      */
     public static function markAsRead(int $iUserId, int $iMessageId): bool
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
 
         if ($iUserId <= 0 || $iMessageId <= 0) {
             return false;
@@ -47,7 +47,7 @@ class cMessageReadTracker
      */
     public static function getReadCount(int $iMessageId): int
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
 
         if ($iMessageId <= 0) {
             return 0;
@@ -72,7 +72,7 @@ class cMessageReadTracker
      */
     public static function cleanup(int $iDaysOld = 60): int
     {
-        $objDb = cDBFactory::getInstance();
+        $objDb = cDB::getInstance();
         $iCutoff = time() - ($iDaysOld * 86400);
 
         $sQuery = 'DELETE FROM pxm_message_read ' .

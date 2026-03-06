@@ -2,7 +2,7 @@
 
 namespace PXMBoard\Model;
 
-use PXMBoard\Database\cDBFactory;
+use PXMBoard\Database\cDB;
 
 /**
  * user online list handling
@@ -66,7 +66,7 @@ class cUserOnlineList extends cScrollList
     {
         $arrTmp = ['all' => '0','visible' => '0','invisible' => '0'];
 
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT u_visible,count(*) AS anz  FROM pxm_user WHERE u_lastonlinetstmp>$this->m_iOnlineTimestamp GROUP BY u_visible")) {
+        if ($objResultSet = cDB::getInstance()->executeQuery("SELECT u_visible,count(*) AS anz  FROM pxm_user WHERE u_lastonlinetstmp>$this->m_iOnlineTimestamp GROUP BY u_visible")) {
             $iAll = 0;
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $iAll += (int) $objResultRow->anz;
