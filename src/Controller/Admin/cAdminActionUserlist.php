@@ -1,8 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cUserAdminList.php');
-require_once(SRCDIR . '/Enum/eUser.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eUserStatus;
+use PXMBoard\Model\cUserAdminList;
+
 /**
  * displays a list of users
  *
@@ -34,7 +37,7 @@ class cAdminActionUserlist extends cAdminAction
 
         $this->m_sOutput .= $this->_getHead();
 
-        $arrUserStates = UserStatus::getAll();
+        $arrUserStates = eUserStatus::getAll();
 
         $iUserStateFilter = $this->m_objInputHandler->getIntFormVar('filter', true, true, true);
         $sSortMode = $this->m_objInputHandler->getStringFormVar('sort', 'sortmode', true, true, 'trim');
@@ -127,9 +130,9 @@ class cAdminActionUserlist extends cAdminAction
             $iUserCount = 0;
             $this->m_sOutput .= '<tbody>';
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                if (isset($arrUserStates[intval($objResultRow->u_status)])) {
-                    $iUserCount += intval($objResultRow->usercount);
-                    $this->m_sOutput .= '<tr><td>'.htmlspecialchars($arrUserStates[intval($objResultRow->u_status)]).'</td><td>'.intval($objResultRow->usercount)."</td></tr>\n";
+                if (isset($arrUserStates[(int) $objResultRow->u_status])) {
+                    $iUserCount += (int) $objResultRow->usercount;
+                    $this->m_sOutput .= '<tr><td>'.htmlspecialchars($arrUserStates[(int) $objResultRow->u_status]).'</td><td>'.intval($objResultRow->usercount)."</td></tr>\n";
                 }
             }
             $this->m_sOutput .= '</tbody>';

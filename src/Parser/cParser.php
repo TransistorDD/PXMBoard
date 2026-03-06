@@ -1,5 +1,7 @@
 <?php
 
+namespace PXMBoard\Parser;
+
 /**
  * text parsing
  *

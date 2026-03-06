@@ -1,7 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Model/cBoard.php');
-require_once(SRCDIR . '/Enum/eBoardStatus.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eBoardStatus;
+
 /**
  * boardlist handling
  *
@@ -12,17 +15,8 @@ require_once(SRCDIR . '/Enum/eBoardStatus.php');
  */
 class cBoardList
 {
-    protected array $m_arrBoards;			// boards
-
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->m_arrBoards = [];
-    }
+    /** @var array<cBoard> */
+    protected array $m_arrBoards = [];			// boards
 
     /**
      * get data from database
@@ -31,8 +25,6 @@ class cBoardList
      */
     public function loadData(): bool
     {
-
-
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT b_id,b_name,b_description,b_position,b_lastmsgtstmp,b_status FROM pxm_board ORDER BY b_position ASC')) {
 
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
@@ -44,7 +36,7 @@ class cBoardList
                 $objBoard->setDescription($objResultRow->b_description);
                 $objBoard->setPosition($objResultRow->b_position);
                 $objBoard->setLastMessageTimestamp($objResultRow->b_lastmsgtstmp);
-                $objBoard->setStatus(BoardStatus::from($objResultRow->b_status));
+                $objBoard->setStatus(eBoardStatus::from($objResultRow->b_status));
 
                 $objBoard->loadModData();
 
@@ -64,8 +56,6 @@ class cBoardList
      */
     public function loadBasicData(): bool
     {
-
-
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT b_id,b_name,b_position,b_status FROM pxm_board ORDER BY b_position ASC')) {
 
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
@@ -75,7 +65,7 @@ class cBoardList
                 $objBoard->setId($objResultRow->b_id);
                 $objBoard->setName($objResultRow->b_name);
                 $objBoard->setPosition($objResultRow->b_position);
-                $objBoard->setStatus(BoardStatus::from($objResultRow->b_status));
+                $objBoard->setStatus(eBoardStatus::from($objResultRow->b_status));
 
                 $this->m_arrBoards[] = $objBoard;
             }
@@ -89,13 +79,11 @@ class cBoardList
     /**
      * open boards - sets status to PUBLIC for specified boards
      *
-     * @param array $arrBoardIds board ids
+     * @param array<int> $arrBoardIds board ids
      * @return bool success / failure
      */
     public function openBoards(array $arrBoardIds): bool
     {
-
-
         if (sizeof($arrBoardIds) > 0) {
             if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_board SET b_status=1 WHERE b_id IN ('.implode(',', $arrBoardIds).')')) {
                 return false;
@@ -107,11 +95,10 @@ class cBoardList
     /**
      * close all boards - sets status to CLOSED for all boards
      *
-     * @return array closed boards
+     * @return array<int> closed boards
      */
     public function closeAllBoards(): array
     {
-
         $arrClosedBoards = [];
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT b_id FROM pxm_board WHERE b_status!=5')) {
@@ -130,11 +117,10 @@ class cBoardList
      * @param string $sDateFormat php date format
      * @param int $iLastOnlineTimestamp last online timestamp for user
      * @param object $objParser message parser (for signature)
-     * @return array member variables
+     * @return list<array<string, mixed>> member variables
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, object $objParser): array
     {
-
         $arrOutput = [];
         foreach ($this->m_arrBoards as $objBoard) {
             $arrOutput[] = $objBoard->getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp, $objParser);

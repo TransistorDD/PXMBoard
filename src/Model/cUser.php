@@ -1,7 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Enum/eUser.php');
-require_once(SRCDIR . '/Enum/ePrivateMessage.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\ePrivateMessageStatus;
+use PXMBoard\Enum\eUserStatus;
+
 /**
  * user handling
  *
@@ -12,51 +16,30 @@ require_once(SRCDIR . '/Enum/ePrivateMessage.php');
  */
 class cUser
 {
-    protected int $m_iId;						// user id
-    protected string $m_sUserName;				// user username
-    protected string $m_sPassword;				// user password
-    protected string $m_sPublicMail;			// public mailadress
-    protected string $m_sPrivateMail;			// mailadress for internal use only
-    protected string $m_sRegistrationMail;		// registration mailadress
-    protected string $m_sFirstName;				// first name
-    protected string $m_sLastName;				// last name
-    protected string $m_sCity;					// user city
-    protected string $m_sSignature;				// signature (will not be loaded in this class)
-    protected string $m_sImgFileName;			// filename of profile picture
-    protected int $m_iMessageQuantity;			// number of messages
-    protected int $m_iRegistrationTimestamp;	// date of registration
-    protected int $m_iLastOnlineTimestamp;		// last online timestamp
-    protected bool $m_bHighlight;				// highlight user ?
-    protected UserStatus $m_eStatus;			// status of the user
-    protected int $m_iNotificationUnreadCount;	// unread notification count
-    protected int $m_iPrivMessageUnreadCount;	// unread private message count
+    protected int $m_iId = 0;						// user id
+    protected string $m_sUserName = '';				// user username
+    protected string $m_sPassword = '';				// user password
+    protected string $m_sPublicMail = '';			// public mailadress
+    protected string $m_sPrivateMail = '';			// mailadress for internal use only
+    protected string $m_sRegistrationMail = '';		// registration mailadress
+    protected string $m_sFirstName = '';			// first name
+    protected string $m_sLastName = '';				// last name
+    protected string $m_sCity = '';					// user city
+    protected string $m_sSignature = '';			// signature (will not be loaded in this class)
+    protected string $m_sImgFileName = '';			// filename of profile picture
+    protected int $m_iMessageQuantity = 0;			// number of messages
+    protected int $m_iRegistrationTimestamp = 0;	// date of registration
+    protected int $m_iLastOnlineTimestamp = 0;		// last online timestamp
+    protected bool $m_bHighlight = false;			// highlight user ?
+    protected eUserStatus $m_eStatus = eUserStatus::NOT_ACTIVATED;	// status of the user
+    protected int $m_iNotificationUnreadCount = 0;	// unread notification count
+    protected int $m_iPrivMessageUnreadCount = 0;	// unread private message count
 
     /**
      * Constructor
-     *
-     * @return void
      */
     public function __construct()
     {
-
-        $this->m_iId = 0;
-        $this->m_sUserName = '';
-        $this->m_sPassword = '';
-        $this->m_sPublicMail = '';
-        $this->m_sPrivateMail = '';
-        $this->m_sRegistrationMail = '';
-        $this->m_sFirstName = '';
-        $this->m_sLastName = '';
-        $this->m_sCity = '';
-        $this->m_sSignature = '';
-        $this->m_sImgFileName = '';
-        $this->m_iMessageQuantity = 0;
-        $this->m_iRegistrationTimestamp = 0;
-        $this->m_iLastOnlineTimestamp = 0;
-        $this->m_bHighlight = false;
-        $this->m_eStatus = UserStatus::NOT_ACTIVATED;
-        $this->m_iNotificationUnreadCount = 0;
-        $this->m_iPrivMessageUnreadCount = 0;
     }
 
     /**
@@ -67,9 +50,7 @@ class cUser
      */
     public function loadDataById(int $iUserId): bool
     {
-
         $bReturn = false;
-        $iUserId = intval($iUserId);
 
         if ($iUserId > 0) {
             if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT '.$this->_getDbAttributes().' FROM pxm_user WHERE u_id='.$iUserId)) {
@@ -91,12 +72,9 @@ class cUser
      */
     public function loadDataByUserName(string $sUserName): bool
     {
-
         $bReturn = false;
 
         if (!empty($sUserName)) {
-
-
             if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT '.$this->_getDbAttributes().' FROM pxm_user WHERE u_username='.cDBFactory::getInstance()->quote($sUserName))) {
                 if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                     $bReturn = $this->_setDataFromDb($objResultRow);
@@ -116,8 +94,6 @@ class cUser
      */
     public function loadDataByTicket(string $sTicket): bool
     {
-        require_once(SRCDIR . '/Model/cUserLoginTicket.php');
-
         $bReturn = false;
 
         if (!empty($sTicket)) {
@@ -140,12 +116,9 @@ class cUser
      */
     public function loadDataByPasswordKey(string $sPasswordKey): bool
     {
-
         $bReturn = false;
 
         if (!empty($sPasswordKey)) {
-
-
             if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT '.$this->_getDbAttributes().' FROM pxm_user WHERE u_passwordkey='.cDBFactory::getInstance()->quote($sPasswordKey))) {
                 if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                     $bReturn = $this->_setDataFromDb($objResultRow);
@@ -165,8 +138,7 @@ class cUser
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
-        $this->m_iId = intval($objResultRow->u_id);
+        $this->m_iId = (int) $objResultRow->u_id;
         $this->m_sUserName = $objResultRow->u_username;
         $this->m_sPassword = $objResultRow->u_password;
         $this->m_sFirstName = $objResultRow->u_firstname;
@@ -176,13 +148,13 @@ class cUser
         $this->m_sPublicMail = $objResultRow->u_publicmail;
         $this->m_sPrivateMail = $objResultRow->u_privatemail;
         $this->m_sRegistrationMail = $objResultRow->u_registrationmail;
-        $this->m_iRegistrationTimestamp = intval($objResultRow->u_registrationtstmp);
-        $this->m_iLastOnlineTimestamp = intval($objResultRow->u_lastonlinetstmp);
-        $this->m_iMessageQuantity = intval($objResultRow->u_msgquantity);
-        $this->m_bHighlight = $objResultRow->u_highlight ? true : false;
-        $this->m_eStatus = UserStatus::tryFrom($objResultRow->u_status) ?? UserStatus::NOT_ACTIVATED;
-        $this->m_iNotificationUnreadCount = intval($objResultRow->u_notification_unread_count);
-        $this->m_iPrivMessageUnreadCount = intval($objResultRow->u_priv_message_unread_count);
+        $this->m_iRegistrationTimestamp = (int) $objResultRow->u_registrationtstmp;
+        $this->m_iLastOnlineTimestamp = (int) $objResultRow->u_lastonlinetstmp;
+        $this->m_iMessageQuantity = (int) $objResultRow->u_msgquantity;
+        $this->m_bHighlight = (bool) $objResultRow->u_highlight;
+        $this->m_eStatus = eUserStatus::tryFrom($objResultRow->u_status) ?? eUserStatus::NOT_ACTIVATED;
+        $this->m_iNotificationUnreadCount = (int) $objResultRow->u_notification_unread_count;
+        $this->m_iPrivMessageUnreadCount = (int) $objResultRow->u_priv_message_unread_count;
 
         return true;
     }
@@ -208,7 +180,6 @@ class cUser
      */
     public function insertData(bool $bUniqueRegistrationMail): bool
     {
-
         $bReturn = false;
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT u_id FROM pxm_user WHERE u_username='.cDBFactory::getInstance()->quote($this->m_sUserName).
@@ -236,7 +207,6 @@ class cUser
      */
     public function updateData(): bool
     {
-
         $bReturn = false;
 
         if ($this->m_iId > 0) {
@@ -256,7 +226,6 @@ class cUser
      */
     public function deleteData(): bool
     {
-
         $bReturn = false;
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_user WHERE u_id='.$this->m_iId)) {
@@ -285,7 +254,7 @@ class cUser
      */
     public function setId(int $iId): void
     {
-        $this->m_iId = intval($iId);
+        $this->m_iId = $iId;
     }
 
     /**
@@ -425,8 +394,6 @@ class cUser
      */
     public function addImage(string $sImageDir, int $iSplitImageDir, string $sSrcFileName, string $sImageType): bool
     {
-
-
         $this->deleteImage($sImageDir);
 
         $sImageDir .= (floor($this->m_iId / $iSplitImageDir) * $iSplitImageDir).'/';
@@ -445,7 +412,6 @@ class cUser
         } else {
             return false;
         }
-
         return true;
     }
 
@@ -457,8 +423,6 @@ class cUser
      */
     public function deleteImage(string $sImageDir): bool
     {
-
-
         if (!empty($this->m_sImgFileName)) {
             if (!file_exists($sImageDir.$this->m_sImgFileName) || @unlink($sImageDir.$this->m_sImgFileName)) {
                 $this->m_sImgFileName = '';
@@ -488,7 +452,7 @@ class cUser
      */
     public function setMessageQuantity(int $iMessageQuantity): void
     {
-        $this->m_iMessageQuantity = intval($iMessageQuantity);
+        $this->m_iMessageQuantity = $iMessageQuantity;
     }
 
     /**
@@ -498,8 +462,6 @@ class cUser
      */
     public function incrementMessageQuantity(): void
     {
-
-
         cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_msgquantity=u_msgquantity+1 WHERE u_id='.$this->m_iId);
         ++$this->m_iMessageQuantity;
     }
@@ -522,7 +484,7 @@ class cUser
      */
     public function setRegistrationTimestamp(int $iRegistrationTimestamp): void
     {
-        $this->m_iRegistrationTimestamp = intval($iRegistrationTimestamp);
+        $this->m_iRegistrationTimestamp = $iRegistrationTimestamp;
     }
 
     /**
@@ -555,11 +517,9 @@ class cUser
      */
     public function changePassword(string $sNewPassword, string $sNewPasswordConfirm): bool
     {
-
         $bReturn = false;
 
         if ((strlen($sNewPassword) > 2) && (strcmp($sNewPassword, $sNewPasswordConfirm) == 0)) {
-
 
             $sNewPasswordHash = password_hash($sNewPassword, PASSWORD_DEFAULT);
 
@@ -567,7 +527,6 @@ class cUser
                 $this->m_sPassword = $sNewPasswordHash;
 
                 // Delete all login tickets for security
-                require_once(SRCDIR . '/Model/cUserLoginTicketList.php');
                 cUserLoginTicketList::deleteAllTicketsForUser($this->m_iId);
 
                 $bReturn = true;
@@ -579,9 +538,9 @@ class cUser
     /**
      * get the user status
      *
-     * @return UserStatus user status
+     * @return eUserStatus user status
      */
-    public function getStatus(): UserStatus
+    public function getStatus(): eUserStatus
     {
         return $this->m_eStatus;
     }
@@ -589,10 +548,10 @@ class cUser
     /**
      * set the user status
      *
-     * @param UserStatus $status user status
+     * @param eUserStatus $status user status
      * @return void
      */
-    public function setStatus(UserStatus $status): void
+    public function setStatus(eUserStatus $status): void
     {
         $this->m_eStatus = $status;
     }
@@ -604,8 +563,6 @@ class cUser
      */
     public function updateStatus(): bool
     {
-
-
         if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_status='.$this->m_eStatus->value.' WHERE u_id='.$this->m_iId)) {
             return false;
         }
@@ -626,7 +583,7 @@ class cUser
      * validate and set registration mail
      *
      * @param string $sRegistrationMail registration mail address
-     * @param array $arrForbiddenMails forbidden mail address parts
+     * @param array<string> $arrForbiddenMails forbidden mail address parts
      * @return bool success / failure
      */
     public function setRegistrationMail(string $sRegistrationMail, array $arrForbiddenMails = []): bool
@@ -716,7 +673,7 @@ class cUser
      */
     public function setLastOnlineTimestamp(int $iLastOnlineTimestamp): void
     {
-        $this->m_iLastOnlineTimestamp = intval($iLastOnlineTimestamp);
+        $this->m_iLastOnlineTimestamp = $iLastOnlineTimestamp;
     }
 
     /**
@@ -727,12 +684,10 @@ class cUser
      */
     public function updateLastOnlineTimestamp(int $iLastOnlineTimestamp): bool
     {
-
-
-        $iLastOnlineTimestamp = intval($iLastOnlineTimestamp);
+        $iLastOnlineTimestamp = $iLastOnlineTimestamp;
 
         if (cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_lastonlinetstmp='.$iLastOnlineTimestamp.' WHERE u_id='.$this->m_iId)) {
-            #			$this->m_iLastOnlineTimestamp = $iLastOnlineTimestamp;
+            //TODO $this->m_iLastOnlineTimestamp = $iLastOnlineTimestamp;
         } else {
             return false;
         }
@@ -757,7 +712,7 @@ class cUser
      */
     public function setHighlightUser(bool $bHighlight): void
     {
-        $this->m_bHighlight = $bHighlight ? true : false;
+        $this->m_bHighlight = $bHighlight;
     }
 
     /**
@@ -781,7 +736,6 @@ class cUser
      */
     public function generatePassword(): string
     {
-
         $sAllowedChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}<>?';
         $sPassword = '';
         for ($i = 0; $i < 12; $i++) {
@@ -845,7 +799,6 @@ class cUser
      */
     private function _migratePasswordHash(string $sPassword): bool
     {
-
         $sNewHash = password_hash($sPassword, PASSWORD_DEFAULT);
 
         if (cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_password='.cDBFactory::getInstance()->quote($sNewHash).' WHERE u_id='.$this->m_iId)) {
@@ -864,8 +817,6 @@ class cUser
      */
     public function createNewTicket(string $sUserAgent, string $sIpAddress): string
     {
-        require_once(SRCDIR . '/Model/cUserLoginTicket.php');
-
         return cUserLoginTicket::createTicket($this->m_iId, $sUserAgent, $sIpAddress);
     }
 
@@ -889,22 +840,22 @@ class cUser
      * @param int $iTimeOffset time offset in seconds
      * @param string $sDateFormat php date format
      * @param object|null $objParser message parser (for signature)
-     * @return array member variables
+     * @return array<string, mixed> member variables
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat, ?object $objParser): array
     {
-        return [	'id'		=>	$this->m_iId,
-                        'username'	=>	$this->m_sUserName,
-                        'email'		=>	$this->m_sPublicMail,
-                        'fname'		=>	$this->m_sFirstName,
-                        'lname'		=>	$this->m_sLastName,
-                        'city'		=>	$this->m_sCity,
-                        '_signature' =>	$objParser ? $objParser->parse($this->m_sSignature) : $this->m_sSignature,
-                        'imgfile'	=>	$this->m_sImgFileName,
-                        'msgquan'	=>	$this->m_iMessageQuantity,
-                        'regdate'	=>	(($this->m_iRegistrationTimestamp > 0) ? date($sDateFormat, ($this->m_iRegistrationTimestamp + $iTimeOffset)) : 0),
-                        'highlight'	=>	$this->m_bHighlight,
-                        'status' => $this->m_eStatus->value];
+        return ['id'		=>	$this->m_iId,
+                'username'	=>	$this->m_sUserName,
+                'email'		=>	$this->m_sPublicMail,
+                'fname'		=>	$this->m_sFirstName,
+                'lname'		=>	$this->m_sLastName,
+                'city'		=>	$this->m_sCity,
+                '_signature' =>	$objParser ? $objParser->parse($this->m_sSignature) : $this->m_sSignature,
+                'imgfile'	=>	$this->m_sImgFileName,
+                'msgquan'	=>	$this->m_iMessageQuantity,
+                'regdate'	=>	(($this->m_iRegistrationTimestamp > 0) ? date($sDateFormat, ($this->m_iRegistrationTimestamp + $iTimeOffset)) : 0),
+                'highlight'	=>	$this->m_bHighlight,
+                'status'    => $this->m_eStatus->value];
     }
 
     /**
@@ -969,7 +920,7 @@ class cUser
         $iCount = 0;
         if ($objResultSet = cDBFactory::getInstance()->executeQuery($sCountQuery)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $iCount = intval($objResultRow->count);
+                $iCount = (int) $objResultRow->count;
             }
         }
 
@@ -1040,12 +991,12 @@ class cUser
     {
         // Count actual unread private messages
         $sCountQuery = 'SELECT COUNT(*) AS count FROM pxm_priv_message '.
-                       'WHERE p_touserid='.$this->m_iId.' AND p_tostate='.PrivateMessageStatus::UNREAD->value;
+                       'WHERE p_touserid='.$this->m_iId.' AND p_tostate='.ePrivateMessageStatus::UNREAD->value;
 
         $iCount = 0;
         if ($objResultSet = cDBFactory::getInstance()->executeQuery($sCountQuery)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $iCount = intval($objResultRow->count);
+                $iCount = (int) $objResultRow->count;
             }
         }
 

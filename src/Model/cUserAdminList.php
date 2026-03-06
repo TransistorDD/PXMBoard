@@ -1,7 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cScrollList.php');
-require_once(SRCDIR . '/Model/cUserProfile.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Enum\eUserStatus;
+
 /**
  * user overview for admins
  *
@@ -13,8 +15,8 @@ require_once(SRCDIR . '/Model/cUserProfile.php');
 class cUserAdminList extends cScrollList
 {
     protected int $m_iUserStateFilter;	// user state filter
-    protected string $m_sSortAttribute;		// sort attribute
-    protected string $m_sSortDirection;		// sort direction
+    protected string $m_sSortAttribute;	// sort attribute
+    protected string $m_sSortDirection;	// sort direction
 
     /**
      * Constructor
@@ -26,10 +28,9 @@ class cUserAdminList extends cScrollList
      */
     public function __construct(int $iUserStateFilter, string $sSortAttribute, string $sSortDirection)
     {
-
         parent::__construct();
 
-        $this->m_iUserStateFilter = intval($iUserStateFilter);
+        $this->m_iUserStateFilter = $iUserStateFilter;
         $this->m_sSortAttribute = $sSortAttribute;
         $this->m_sSortDirection = $sSortDirection;
     }
@@ -59,7 +60,6 @@ class cUserAdminList extends cScrollList
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         $objUser = new cUserProfile();
         $objUser->setId($objResultRow->u_id);
         $objUser->setUserName($objResultRow->u_username);
@@ -67,7 +67,7 @@ class cUserAdminList extends cScrollList
         $objUser->setLastOnlineTimestamp($objResultRow->u_lastonlinetstmp);
         $objUser->setLastUpdateTimestamp($objResultRow->u_profilechangedtstmp);
         $objUser->setMessageQuantity($objResultRow->u_msgquantity);
-        $objUser->setStatus(UserStatus::from((int)$objResultRow->u_status));
+        $objUser->setStatus(eUserStatus::from((int)$objResultRow->u_status));
 
         $this->m_arrResultList[] = $objUser;
         return true;

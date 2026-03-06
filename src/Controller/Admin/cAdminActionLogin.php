@@ -1,7 +1,10 @@
 <?php
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Enum/eUser.php');
-require_once(SRCDIR . '/Model/cUserConfig.php');
+
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Enum\eUserStatus;
+use PXMBoard\Model\cUserConfig;
+
 /**
  * displays the admin login page
  *
@@ -51,7 +54,7 @@ class cAdminActionLogin extends cAdminAction{
 			if($objUser->loadDataByUserName($sUserName)){
 
 				if($objUser->validatePassword($sPassword)){
-					if($objUser->getStatus() === UserStatus::ACTIVE){
+					if($objUser->getStatus() === eUserStatus::ACTIVE){
 						if($objUser->isAdmin()){
 							// Set active user - pxmboard.php will update session, then getOutput() redirects
 							$this->m_objActiveUser = $objUser;

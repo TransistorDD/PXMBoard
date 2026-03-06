@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cTemplate.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * handles the templates of the system
  *
@@ -12,23 +15,12 @@ require_once(SRCDIR . '/Model/cTemplate.php');
 class cTemplateList
 {
     /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * get all templates
      *
-     * @return array templates
+     * @return array<cTemplate> templates
      */
     public function getList(): array
     {
-
-
         $arrTemplates = [];
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT te_id,te_message,te_name,te_description FROM pxm_template ORDER BY te_id ASC')) {
@@ -40,7 +32,7 @@ class cTemplateList
                 $objTemplate->setName($objResultRow->te_name);
                 $objTemplate->setDescription($objResultRow->te_description);
 
-                $arrTemplates[intval($objResultRow->te_id)] = $objTemplate;
+                $arrTemplates[(int) $objResultRow->te_id] = $objTemplate;
             }
             $objResultSet->freeResult();
         }

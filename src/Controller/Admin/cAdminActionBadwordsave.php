@@ -1,7 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cBadwordList.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Model\cBadwordList;
+
 /**
  * save the badwords
  *
@@ -29,7 +31,6 @@ class cAdminActionBadwordsave extends cAdminAction
      */
     public function performAction(): void
     {
-
         $this->m_sOutput .= $this->_getHead();
 
         $this->m_sOutput .= "<h4>save badwords</h4>\n";

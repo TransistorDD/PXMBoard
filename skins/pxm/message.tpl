@@ -85,6 +85,7 @@
 	<!-- Aktionsleiste -->
 	<div class="px-4 py-2 flex items-center justify-end gap-1.5 text-xs bg-surface-secondary border-t border-border-light text-content-primary">
 		<!-- Gruppe 1: Kommunikation -->
+		{if !$msg.is_draft}
 		<button type="button"
 		   hx-get="pxmboard.php?mode=messageform&brdid={$config.board.id}&msgid={$msg.id}"
 		   hx-target="#message-container"
@@ -93,6 +94,7 @@
 		   title="Antworten">
 			<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M15 14v-5H8"/><polyline points="10 7 8 9 10 11"/></svg>
 		</button>
+		{/if}
 {if $config.admin == 1 || $config.moderator == 1 || $config.edit == 1}
 		<button type="button"
 		   hx-get="pxmboard.php?mode=messageeditform&brdid={$config.board.id}&msgid={$msg.id}"
@@ -104,6 +106,7 @@
 		</button>
 {/if}
 {if $config.logedin == 1}
+		{if !$msg.is_draft}
 		<button type="button"
 		   hx-get="pxmboard.php?mode=privatemessageform&brdid={$config.board.id}&msgid={$msg.id}&toid={$msg.user.id}"
 		   hx-target="#htmxModalBody"
@@ -114,6 +117,7 @@
 		   title="Private Nachricht">
 			<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="7" r="3"/><path d="M2 20c0-3.314 2.686-6 6-6h1"/><path d="M14 12h6a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-2.5l-2 2.5V18h-.5a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1Z"/></svg>
 		</button>
+		{/if}
 		<!-- Trenner: Kommunikation | Benachrichtigungen -->
 		<div class="h-5 w-px opacity-30 shrink-0 bg-current mx-1"></div>
 		<!-- Gruppe 2: Benachrichtigungen -->
@@ -131,8 +135,8 @@
 {/if}
 		<button onclick="toggleMessageNotification({$msg.id}, {$config.board.id}, this); return false;"
 				class="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-surface-tertiary transition-colors text-content-primary cursor-pointer border-none bg-transparent"
-				title="{if $msg.notification_active}Benachrichtigungen deaktivieren{else}Benachrichtigungen aktivieren{/if}">
-			{if $msg.notification_active}<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>{else}<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.7 3A6 6 0 0 1 18 8c0 2.9.86 5.4 1.64 7"/><path d="M6 6a6 6 0 0 0-.7 2c0 7-3 9-3 9h14"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><line x1="2" y1="2" x2="22" y2="22"/></svg>{/if}
+				title="{if $msg.notification_active}Beobachten deaktivieren{else}Beobachten{/if}">
+			{if $msg.notification_active}<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>{else}<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>{/if}
 		</button>
 {/if}
 	</div>

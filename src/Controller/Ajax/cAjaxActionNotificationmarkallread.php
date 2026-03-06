@@ -1,7 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cNotificationList.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Enum\eSuccessKeys;
+use PXMBoard\Model\cNotificationList;
+
 /**
  * Ajax-Action: Mark all notifications as read
  *
@@ -36,6 +39,6 @@ class cAjaxActionNotificationmarkallread extends cAjaxAction
         $objActiveUser->loadDataById($objActiveUser->getId());
 
         // Success response
-        $this->_setJsonSuccess(eSuccessMessage::ALL_NOTIFICATIONS_READ, ['count' => 0]);
+        $this->_setJsonSuccess(eSuccessKeys::ALL_NOTIFICATIONS_READ, ['count' => 0]);
     }
 }

@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cSearchProfile.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * searchprofilelist handling
  *
@@ -11,17 +14,8 @@ require_once(SRCDIR . '/Model/cSearchProfile.php');
  */
 class cSearchProfileList
 {
-    public $m_arrSearchProfiles;			// SearchProfiles
-
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->m_arrSearchProfiles = [];
-    }
+    /** @var array<cSearchProfile> */
+    public array $m_arrSearchProfiles = [];			// SearchProfiles
 
     /**
      * get data from database
@@ -30,8 +24,6 @@ class cSearchProfileList
      */
     public function loadData(): bool
     {
-
-
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT se_id,se_userid,se_message,se_username,se_days,se_tstmp FROM pxm_search ORDER BY se_tstmp DESC', 10)) {
 
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
@@ -59,11 +51,10 @@ class cSearchProfileList
      *
      * @param int $iTimeOffset time offset in seconds
      * @param string $sDateFormat php date format
-     * @return array member variables
+     * @return list<array<string, mixed>> member variables
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat): array
     {
-
         $arrOutput = [];
         foreach ($this->m_arrSearchProfiles as $objSearchProfile) {
             $arrOutput[] = $objSearchProfile->getDataArray($iTimeOffset, $sDateFormat);
@@ -78,7 +69,6 @@ class cSearchProfileList
      */
     public function getLastProfileTimestamp(): int
     {
-
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT MAX(se_tstmp) as lasttstmp FROM pxm_search')) {
 
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {

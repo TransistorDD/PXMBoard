@@ -1,4 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Unit\Enum;
+
+use PHPUnit\Framework\TestCase;
+use PXMBoard\Enum\eNotificationStatus;
+use PXMBoard\Enum\eNotificationType;
+
 /**
  * Unit test for NotificationType and NotificationStatus enums
  *
@@ -7,12 +16,6 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Unit\Enum;
-
-use PHPUnit\Framework\TestCase;
-
 class NotificationEnumsTest extends TestCase
 {
     /**
@@ -22,7 +25,7 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationType_hasExpectedCases(): void
     {
-        $arrCases = \NotificationType::cases();
+        $arrCases = eNotificationType::cases();
 
         $this->assertCount(6, $arrCases);
     }
@@ -34,7 +37,7 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationType_reply_hasCorrectValue(): void
     {
-        $this->assertSame('reply', \NotificationType::REPLY->value);
+        $this->assertSame('reply', eNotificationType::REPLY->value);
     }
 
     /**
@@ -44,7 +47,7 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationType_privateMessage_hasCorrectValue(): void
     {
-        $this->assertSame('private_message', \NotificationType::PRIVATE_MESSAGE->value);
+        $this->assertSame('private_message', eNotificationType::PRIVATE_MESSAGE->value);
     }
 
     /**
@@ -54,7 +57,7 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationType_mention_hasCorrectValue(): void
     {
-        $this->assertSame('mention', \NotificationType::MENTION->value);
+        $this->assertSame('mention', eNotificationType::MENTION->value);
     }
 
     /**
@@ -64,7 +67,7 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationType_draftReminder_hasCorrectValue(): void
     {
-        $this->assertSame('draft_reminder', \NotificationType::DRAFT_REMINDER->value);
+        $this->assertSame('draft_reminder', eNotificationType::DRAFT_REMINDER->value);
     }
 
     /**
@@ -74,7 +77,7 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationType_threadMoved_hasCorrectValue(): void
     {
-        $this->assertSame('thread_moved', \NotificationType::THREAD_MOVED->value);
+        $this->assertSame('thread_moved', eNotificationType::THREAD_MOVED->value);
     }
 
     /**
@@ -84,7 +87,7 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationType_userActivated_hasCorrectValue(): void
     {
-        $this->assertSame('user_activated', \NotificationType::USER_ACTIVATED->value);
+        $this->assertSame('user_activated', eNotificationType::USER_ACTIVATED->value);
     }
 
     /**
@@ -94,9 +97,9 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationType_from_withValidValue_returnsCase(): void
     {
-        $objType = \NotificationType::from('reply');
+        $objType = eNotificationType::from('reply');
 
-        $this->assertSame(\NotificationType::REPLY, $objType);
+        $this->assertSame(eNotificationType::REPLY, $objType);
     }
 
     /**
@@ -106,7 +109,7 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationStatus_hasExpectedCases(): void
     {
-        $arrCases = \NotificationStatus::cases();
+        $arrCases = eNotificationStatus::cases();
 
         $this->assertCount(2, $arrCases);
     }
@@ -118,7 +121,7 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationStatus_unread_hasCorrectValue(): void
     {
-        $this->assertSame('unread', \NotificationStatus::UNREAD->value);
+        $this->assertSame('unread', eNotificationStatus::UNREAD->value);
     }
 
     /**
@@ -128,7 +131,7 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationStatus_read_hasCorrectValue(): void
     {
-        $this->assertSame('read', \NotificationStatus::READ->value);
+        $this->assertSame('read', eNotificationStatus::READ->value);
     }
 
     /**
@@ -138,9 +141,9 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationStatus_from_withValidValue_returnsCase(): void
     {
-        $objStatus = \NotificationStatus::from('unread');
+        $objStatus = eNotificationStatus::from('unread');
 
-        $this->assertSame(\NotificationStatus::UNREAD, $objStatus);
+        $this->assertSame(eNotificationStatus::UNREAD, $objStatus);
     }
 
     /**
@@ -150,7 +153,7 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationType_allCases_haveStringValues(): void
     {
-        $arrCases = \NotificationType::cases();
+        $arrCases = eNotificationType::cases();
 
         foreach ($arrCases as $objCase) {
             $this->assertIsString($objCase->value);
@@ -165,7 +168,7 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationStatus_allCases_haveStringValues(): void
     {
-        $arrCases = \NotificationStatus::cases();
+        $arrCases = eNotificationStatus::cases();
 
         foreach ($arrCases as $objCase) {
             $this->assertIsString($objCase->value);
@@ -180,8 +183,8 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationType_allCases_haveUniqueNames(): void
     {
-        $arrCases = \NotificationType::cases();
-        $arrNames = array_map(fn($case) => $case->name, $arrCases);
+        $arrCases = eNotificationType::cases();
+        $arrNames = array_map(fn ($case) => $case->name, $arrCases);
 
         $this->assertSame(count($arrNames), count(array_unique($arrNames)));
     }
@@ -193,8 +196,8 @@ class NotificationEnumsTest extends TestCase
      */
     public function test_notificationStatus_allCases_haveUniqueNames(): void
     {
-        $arrCases = \NotificationStatus::cases();
-        $arrNames = array_map(fn($case) => $case->name, $arrCases);
+        $arrCases = eNotificationStatus::cases();
+        $arrNames = array_map(fn ($case) => $case->name, $arrCases);
 
         $this->assertSame(count($arrNames), count(array_unique($arrNames)));
     }

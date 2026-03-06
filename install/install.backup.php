@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
 // Lock page: already installed
 // -------------------------------------------------------------------------
 if (file_exists($sConfigFile)) {
-    renderPage('Already installed', function() use ($sConfigFile): void { ?>
+    renderPage('Already installed', function () use ($sConfigFile): void { ?>
         <div class="pxm-alert pxm-alert--warning">
             <strong>The board is already configured.</strong><br>
             To run the installer again, delete
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') !== 'delet
     $arrValues['db_name']        = trim($_POST['db_name'] ?? '');
     $arrValues['template_types'] = array_filter(
         array_map('trim', (array)($_POST['template_types'] ?? [])),
-        fn($t) => in_array($t, ['Smarty', 'Xslt'], true)
+        fn ($t) => in_array($t, ['Smarty', 'Xslt'], true)
     );
     $arrValues['search_type']    = in_array($_POST['search_type'] ?? '', ['MySql', 'ElasticSearch'], true)
                                     ? $_POST['search_type'] : 'MySql';
@@ -98,10 +98,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') !== 'delet
     $arrValues['install_sql']    = ($_POST['install_sql'] ?? 'no') === 'yes' ? 'yes' : 'no';
 
     // Validation
-    if (empty($arrValues['db_host']))   $arrErrors['db_host']   = 'DB host is required.';
-    if (empty($arrValues['db_user']))   $arrErrors['db_user']   = 'DB user is required.';
-    if (empty($arrValues['db_name']))   $arrErrors['db_name']   = 'Database name is required.';
-    if (empty($arrValues['template_types'])) $arrErrors['template_types'] = 'At least one template engine must be selected.';
+    if (empty($arrValues['db_host'])) {
+        $arrErrors['db_host']   = 'DB host is required.';
+    }
+    if (empty($arrValues['db_user'])) {
+        $arrErrors['db_user']   = 'DB user is required.';
+    }
+    if (empty($arrValues['db_name'])) {
+        $arrErrors['db_name']   = 'Database name is required.';
+    }
+    if (empty($arrValues['template_types'])) {
+        $arrErrors['template_types'] = 'At least one template engine must be selected.';
+    }
     if ($arrValues['search_type'] === 'ElasticSearch' && empty($arrValues['es_host'])) {
         $arrErrors['es_host'] = 'ElasticSearch host is required.';
     }
@@ -118,7 +126,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') !== 'delet
     } elseif (!is_dir($arrValues['basedir'])) {
         $arrErrors['basedir'] = 'Path does not exist or is not a directory.';
     }
-    if (empty($arrValues['admin_user'])) $arrErrors['admin_user'] = 'Admin username is required.';
+    if (empty($arrValues['admin_user'])) {
+        $arrErrors['admin_user'] = 'Admin username is required.';
+    }
     if ($arrValues['install_sql'] === 'yes' && empty($arrValues['admin_pass'])) {
         $arrErrors['admin_pass'] = 'Admin password is required when installing the SQL schema.';
     }
@@ -226,8 +236,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') !== 'delet
 // Render
 // -------------------------------------------------------------------------
 if ($bSuccess) {
-    renderPage('Installation complete', function() use (
-        $arrValues, $bAdminCreated, $arrSqlErrors, $bSqlRun, $sPublicDirPath
+    renderPage('Installation complete', function () use (
+        $arrValues,
+        $bAdminCreated,
+        $arrSqlErrors
     ): void {
         ?>
         <div class="pxm-alert pxm-alert--success">
@@ -269,7 +281,7 @@ if ($bSuccess) {
                         'BASEDIR'        => $arrValues['basedir'],
                         'Admin user'     => $bAdminCreated ? htmlspecialchars($arrValues['admin_user']) . ' (created)' : 'not created',
                     ];
-                    foreach ($rows as $label => $value): ?>
+        foreach ($rows as $label => $value): ?>
                     <tr>
                         <td style="padding:4px 12px 4px 0; font-weight:500; white-space:nowrap; color:#555; width:160px;"><?= htmlspecialchars($label) ?></td>
                         <td style="padding:4px 0;"><?= $value ?></td>
@@ -299,7 +311,7 @@ if ($bSuccess) {
 }
 
 $sDeleteErrorMsg = $sDeleteError ?? null;
-renderPage('Installation', function() use ($arrValues, $arrErrors, $bXslAvailable, $sDeleteErrorMsg): void {
+renderPage('Installation', function () use ($arrValues, $arrErrors, $bXslAvailable, $sDeleteErrorMsg): void {
     if (!empty($arrErrors)): ?>
     <div class="pxm-alert pxm-alert--error">
         <strong>Please correct the highlighted fields:</strong>
@@ -321,15 +333,15 @@ renderPage('Installation', function() use ($arrValues, $arrErrors, $bXslAvailabl
                     <label>Database type</label>
                     <div class="pxm-field">
                         <div class="pxm-radio-group">
-                            <label><input type="radio" name="db_type" value="MySql" <?= $arrValues['db_type']==='MySql'?'checked':'' ?>> MySQL / MariaDB</label>
-                            <label><input type="radio" name="db_type" value="PostgreSql" <?= $arrValues['db_type']==='PostgreSql'?'checked':'' ?>> PostgreSQL (experimental)</label>
+                            <label><input type="radio" name="db_type" value="MySql" <?= $arrValues['db_type'] === 'MySql' ? 'checked' : '' ?>> MySQL / MariaDB</label>
+                            <label><input type="radio" name="db_type" value="PostgreSql" <?= $arrValues['db_type'] === 'PostgreSql' ? 'checked' : '' ?>> PostgreSQL (experimental)</label>
                         </div>
                     </div>
                 </div>
 
-                <?php formField('db_host', 'Host',          $arrValues, $arrErrors, 'localhost') ?>
-                <?php formField('db_user', 'User',          $arrValues, $arrErrors, 'pxmboard') ?>
-                <?php formField('db_pass', 'Password',      $arrValues, $arrErrors, '', 'password') ?>
+                <?php formField('db_host', 'Host', $arrValues, $arrErrors, 'localhost') ?>
+                <?php formField('db_user', 'User', $arrValues, $arrErrors, 'pxmboard') ?>
+                <?php formField('db_pass', 'Password', $arrValues, $arrErrors, '', 'password') ?>
                 <?php formField('db_name', 'Database name', $arrValues, $arrErrors, 'pxmboard') ?>
 
             </div>
@@ -345,14 +357,14 @@ renderPage('Installation', function() use ($arrValues, $arrErrors, $bXslAvailabl
                         <div class="pxm-checkbox-group">
                             <label>
                                 <input type="checkbox" name="template_types[]" value="Smarty"
-                                    <?= in_array('Smarty', $arrValues['template_types'],true)?'checked':'' ?>>
+                                    <?= in_array('Smarty', $arrValues['template_types'], true) ? 'checked' : '' ?>>
                                 Smarty
                             </label>
-                            <label class="<?= $bXslAvailable?'':'pxm-greyed' ?>">
+                            <label class="<?= $bXslAvailable ? '' : 'pxm-greyed' ?>">
                                 <input type="checkbox" name="template_types[]" value="Xslt"
-                                    <?= in_array('Xslt', $arrValues['template_types'],true)?'checked':'' ?>
-                                    <?= $bXslAvailable?'':'disabled' ?>>
-                                XSLT <?= $bXslAvailable?'':'<span style="font-size:0.8em">(PHP extension ext-xsl not loaded)</span>' ?>
+                                    <?= in_array('Xslt', $arrValues['template_types'], true) ? 'checked' : '' ?>
+                                    <?= $bXslAvailable ? '' : 'disabled' ?>>
+                                XSLT <?= $bXslAvailable ? '' : '<span style="font-size:0.8em">(PHP extension ext-xsl not loaded)</span>' ?>
                             </label>
                         </div>
                         <?php fieldError('template_types', $arrErrors) ?>
@@ -371,22 +383,22 @@ renderPage('Installation', function() use ($arrValues, $arrErrors, $bXslAvailabl
                         <div class="pxm-radio-group">
                             <label>
                                 <input type="radio" name="search_type" value="MySql" id="searchMysql"
-                                    <?= $arrValues['search_type']==='MySql'?'checked':'' ?>>
+                                    <?= $arrValues['search_type'] === 'MySql' ? 'checked' : '' ?>>
                                 MySQL FULLTEXT (default)
                             </label>
                             <label>
                                 <input type="radio" name="search_type" value="ElasticSearch" id="searchEs"
-                                    <?= $arrValues['search_type']==='ElasticSearch'?'checked':'' ?>>
+                                    <?= $arrValues['search_type'] === 'ElasticSearch' ? 'checked' : '' ?>>
                                 ElasticSearch
                             </label>
                         </div>
                     </div>
                 </div>
 
-                <div id="esFields" class="pxm-sub-fields" style="<?= $arrValues['search_type']==='ElasticSearch'?'':'display:none' ?>">
-                    <?php formField('es_host',    'ES host',  $arrValues, $arrErrors, 'https://localhost:9200') ?>
-                    <?php formField('es_index',   'ES index', $arrValues, $arrErrors, 'pxmboard_messages') ?>
-                    <?php formField('es_api_key', 'API key',  $arrValues, $arrErrors, '(optional)') ?>
+                <div id="esFields" class="pxm-sub-fields" style="<?= $arrValues['search_type'] === 'ElasticSearch' ? '' : 'display:none' ?>">
+                    <?php formField('es_host', 'ES host', $arrValues, $arrErrors, 'https://localhost:9200') ?>
+                    <?php formField('es_index', 'ES index', $arrValues, $arrErrors, 'pxmboard_messages') ?>
+                    <?php formField('es_api_key', 'API key', $arrValues, $arrErrors, '(optional)') ?>
                 </div>
             </div>
         </div>
@@ -395,8 +407,8 @@ renderPage('Installation', function() use ($arrValues, $arrErrors, $bXslAvailabl
         <div class="pxm-admin-card">
             <div class="pxm-admin-card__header">4. Session &amp; Paths</div>
             <div class="pxm-admin-card__body">
-                <?php formField('session_name', 'Session name',       $arrValues, $arrErrors, 'brdsid', 'text', 'Letters and digits only.') ?>
-                <?php formField('basedir', 'Project path (BASEDIR)',   $arrValues, $arrErrors, '', 'text', 'Absolute path to the project directory.') ?>
+                <?php formField('session_name', 'Session name', $arrValues, $arrErrors, 'brdsid', 'text', 'Letters and digits only.') ?>
+                <?php formField('basedir', 'Project path (BASEDIR)', $arrValues, $arrErrors, '', 'text', 'Absolute path to the project directory.') ?>
             </div>
         </div>
 
@@ -420,12 +432,12 @@ renderPage('Installation', function() use ($arrValues, $arrErrors, $bXslAvailabl
                             <div class="pxm-radio-group">
                                 <label>
                                     <input type="radio" name="install_sql" value="yes"
-                                        <?= $arrValues['install_sql']==='yes'?'checked':'' ?>>
+                                        <?= $arrValues['install_sql'] === 'yes' ? 'checked' : '' ?>>
                                     Yes – run <code>install/sql/pxmboard-mysql.sql</code> and create admin user
                                 </label>
                                 <label>
                                     <input type="radio" name="install_sql" value="no"
-                                        <?= $arrValues['install_sql']==='no'?'checked':'' ?>>
+                                        <?= $arrValues['install_sql'] === 'no' ? 'checked' : '' ?>>
                                     No – install schema manually later
                                 </label>
                             </div>
@@ -485,7 +497,8 @@ renderPage('Installation', function() use ($arrValues, $arrErrors, $bXslAvailabl
 /**
  * Render the full HTML page frame with header, container, and content.
  */
-function renderPage(string $sTitle, callable $fnContent): void {
+function renderPage(string $sTitle, callable $fnContent): void
+{
     ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -553,7 +566,8 @@ function formField(
  * @param string $sName   Field name
  * @param array  $arrErrors Validation errors
  */
-function fieldError(string $sName, array $arrErrors): void {
+function fieldError(string $sName, array $arrErrors): void
+{
     if (isset($arrErrors[$sName])) {
         echo '<span class="pxm-inline-error">' . htmlspecialchars($arrErrors[$sName]) . '</span>';
     }
@@ -620,7 +634,8 @@ PHP;
  * @param string $sFile    Path to SQL file
  * @return string[] Errors
  */
-function executeSqlFile(mysqli $objDb, string $sFile): array {
+function executeSqlFile(mysqli $objDb, string $sFile): array
+{
     $sContent = file_get_contents($sFile);
     if ($sContent === false) {
         return ['Could not read SQL file: ' . $sFile];
@@ -628,10 +643,10 @@ function executeSqlFile(mysqli $objDb, string $sFile): array {
 
     // Remove comments and split into statements
     $sContent = preg_replace('/^--.*$/m', '', $sContent);
-    $sContent = preg_replace('/^#.*$/m',  '', $sContent);
+    $sContent = preg_replace('/^#.*$/m', '', $sContent);
     $arrStatements = array_filter(
         array_map('trim', explode(';', $sContent)),
-        fn($s) => $s !== ''
+        fn ($s) => $s !== ''
     );
 
     $arrErrors = [];

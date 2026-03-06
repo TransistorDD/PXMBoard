@@ -1,4 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Integration\Model;
+
+use PXMBoard\Model\cMessageStatistics;
+use PXMBoard\Tests\TestCase\IntegrationTestCase;
+
 /**
  * Integration test for cMessageStatistics class
  * Tests message statistics against the real test database
@@ -8,20 +16,14 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Integration\Model;
-
-use PXMBoard\Tests\TestCase\IntegrationTestCase;
-
 class cMessageStatisticsTest extends IntegrationTestCase
 {
-    private \cMessageStatistics $statistics;
+    private cMessageStatistics $statistics;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->statistics = new \cMessageStatistics();
+        $this->statistics = new cMessageStatistics();
     }
 
     /**

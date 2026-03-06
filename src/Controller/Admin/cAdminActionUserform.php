@@ -1,12 +1,12 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cProfileConfig.php');
-require_once(SRCDIR . '/Enum/eUser.php');
-require_once(SRCDIR . '/Model/cBoardList.php');
-require_once(SRCDIR . '/Model/cUserAdmin.php');
-require_once(SRCDIR . '/Model/cSkinList.php');
-require_once(SRCDIR . '/Parser/cParser.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Enum\eUserStatus;
+use PXMBoard\Model\cProfileConfig;
+use PXMBoard\Model\cSkinList;
+use PXMBoard\Model\cUserAdmin;
+
 /**
  * displays the user edit form
  *
@@ -85,7 +85,7 @@ class cAdminActionUserform extends cAdminAction
                 $this->m_sOutput .= "<div class=\"pxm-admin-card\"><div class=\"pxm-admin-card__header\">rights</div><div class=\"pxm-admin-card__body\">\n";
 
                 $this->m_sOutput .= '<div class="pxm-form-group"><label>state</label><div class="pxm-field"><select name="state" size="1">';
-                foreach (UserStatus::getAll() as $iKey => $sVal) {
+                foreach (eUserStatus::getAll() as $iKey => $sVal) {
                     $this->m_sOutput .= '<option value="'.$iKey.(($objUser->getStatus()->value == $iKey) ? '" selected>' : '">').htmlspecialchars($sVal).'</option>';
                 }
                 $this->m_sOutput .= "</select></div></div>\n";

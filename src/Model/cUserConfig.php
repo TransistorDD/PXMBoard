@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cUserPermissions.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * user configuration handling
  *
@@ -11,30 +14,12 @@ require_once(SRCDIR . '/Model/cUserPermissions.php');
  */
 class cUserConfig extends cUserPermissions
 {
-    protected bool $m_bIsVisible;					// user visible? (online list)
-    protected int $m_iSkinId;						// skin id
-    protected string $m_sThreadListSortMode;			// sort mode for threadlist
-    protected int $m_iTimeOffset;					// timeoffset
-    protected bool $m_bEmbedExternal;				// externe Inhalte einbetten (Bilder, YouTube, Twitch)
-    protected bool $m_bPrivateMessageNotification;	// send private message notification
-
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-
-        parent::__construct();
-
-        $this->m_bIsVisible	= true;
-        $this->m_iSkinId = 0;
-        $this->m_sThreadListSortMode = '';
-        $this->m_iTimeOffset = 0;
-        $this->m_bEmbedExternal = false;
-        $this->m_bPrivateMessageNotification = false;
-    }
+    protected bool $m_bIsVisible = true;					// user visible? (online list)
+    protected int $m_iSkinId = 0;						    // skin id
+    protected string $m_sThreadListSortMode = '';			// sort mode for threadlist
+    protected int $m_iTimeOffset = 0;					    // timeoffset
+    protected bool $m_bEmbedExternal = false;				// externe Inhalte einbetten (Bilder, YouTube, Twitch)
+    protected bool $m_bPrivateMessageNotification = false;	// send private message notification
 
     /**
      * initalize the member variables with the resultset from the db
@@ -44,13 +29,12 @@ class cUserConfig extends cUserPermissions
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         cUserPermissions::_setDataFromDb($objResultRow);
 
         $this->m_bIsVisible	= $objResultRow->u_visible ? true : false;
-        $this->m_iSkinId = intval($objResultRow->u_skinid);
+        $this->m_iSkinId = (int) $objResultRow->u_skinid;
         $this->m_sThreadListSortMode = $objResultRow->u_threadlistsort;
-        $this->m_iTimeOffset = intval($objResultRow->u_timeoffset);
+        $this->m_iTimeOffset = (int) $objResultRow->u_timeoffset;
         $this->m_bEmbedExternal = $objResultRow->u_embed_external ? true : false;
         $this->m_bPrivateMessageNotification = $objResultRow->u_privatenotification ? true : false;
 
@@ -64,7 +48,6 @@ class cUserConfig extends cUserPermissions
      */
     public function updateData(): bool
     {
-
         $bReturn = false;
 
         if (cDBFactory::getInstance()->executeQuery('UPDATE pxm_user SET u_visible='.intval($this->m_bIsVisible).','.
@@ -111,7 +94,7 @@ class cUserConfig extends cUserPermissions
      */
     public function setIsVisible(bool $bVisible): void
     {
-        $this->m_bIsVisible = $bVisible ? true : false;
+        $this->m_bIsVisible = $bVisible;
     }
 
     /**
@@ -132,7 +115,7 @@ class cUserConfig extends cUserPermissions
      */
     public function setSkinId(int $iSkinId): void
     {
-        $this->m_iSkinId = intval($iSkinId);
+        $this->m_iSkinId = $iSkinId;
     }
 
     /**
@@ -174,7 +157,6 @@ class cUserConfig extends cUserPermissions
      */
     public function setTimeOffset(int $iTimeOffset): void
     {
-        $iTimeOffset = intval($iTimeOffset);
         if (($iTimeOffset < 13) && ($iTimeOffset > -13)) {
             $this->m_iTimeOffset = $iTimeOffset;
         }
@@ -198,7 +180,7 @@ class cUserConfig extends cUserPermissions
      */
     public function setEmbedExternal(bool $bEmbedExternal): void
     {
-        $this->m_bEmbedExternal = $bEmbedExternal ? true : false;
+        $this->m_bEmbedExternal = $bEmbedExternal;
     }
 
     /**
@@ -219,7 +201,7 @@ class cUserConfig extends cUserPermissions
      */
     public function setSendPrivateMessageNotification(bool $bPrivateMessageNotification): void
     {
-        $this->m_bPrivateMessageNotification = $bPrivateMessageNotification ? true : false;
+        $this->m_bPrivateMessageNotification = $bPrivateMessageNotification;
     }
 
     /**
@@ -227,19 +209,19 @@ class cUserConfig extends cUserPermissions
      *
      * @param int $iTimeOffs time offset in seconds
      * @param string $sDateFormat php date format
-     * @return array member variables
+     * @return array<string, mixed> member variables
      */
     public function getDataArray(int $iTimeOffs = 0, string $sDateFormat = '', $objParser = null): array
     {
         // TODO: bessere Lösung für die übergabe von $iTimeOffset, $sDateFormat und $objParser finden bei Vererbung von cUserProfile
         return ['id'				=>	$this->m_iId,
-                     'username'			=>	$this->m_sUserName,
-                     'visible'			=>	$this->m_bIsVisible,
-                     'skin'				=>	$this->m_iSkinId,
-                     'sort'				=>	$this->m_sThreadListSortMode,
-                     'toff'				=>	$this->m_iTimeOffset,
-                     'embed_external'	=>	$this->m_bEmbedExternal,
-                     'privatemail'		=>	$this->m_sPrivateMail,
-                     'privnotification'	=>	$this->m_bPrivateMessageNotification];
+                'username'			=>	$this->m_sUserName,
+                'visible'			=>	$this->m_bIsVisible,
+                'skin'				=>	$this->m_iSkinId,
+                'sort'				=>	$this->m_sThreadListSortMode,
+                'toff'				=>	$this->m_iTimeOffset,
+                'embed_external'	=>	$this->m_bEmbedExternal,
+                'privatemail'		=>	$this->m_sPrivateMail,
+                'privnotification'	=>	$this->m_bPrivateMessageNotification];
     }
 }

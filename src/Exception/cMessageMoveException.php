@@ -1,5 +1,7 @@
 <?php
 
+namespace PXMBoard\Exception;
+
 /**
  * Base exception for message move operations
  *
@@ -8,7 +10,7 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-class cMessageMoveException extends Exception
+class cMessageMoveException extends \Exception
 {
 }
 

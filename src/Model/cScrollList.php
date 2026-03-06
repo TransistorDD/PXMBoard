@@ -1,5 +1,9 @@
 <?php
 
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * scrolllist handling
  *
@@ -10,29 +14,20 @@
  */
 class cScrollList
 {
-    protected array $m_arrResultList;			// array containing listelements
-    protected int $m_iPrevPageId;				// id of previous index page
-    protected int $m_iCurPageId;				// id of current index page
-    protected int $m_iNextPageId;				// id of next index page
+    /** @var array<mixed> */
+    protected array $m_arrResultList = [];			// array containing listelements
+    protected int $m_iPrevPageId = 0;				// id of previous index page
+    protected int $m_iCurPageId = 0;				// id of current index page
+    protected int $m_iNextPageId = 0;				// id of next index page
 
-    protected int $m_iItemsPerPage;				// items visible on one page
-    protected int $m_iItemCount;				// item count
+    protected int $m_iItemsPerPage = 0;				// items visible on one page
+    protected int $m_iItemCount = 0;				// item count
 
     /**
      * Constructor
-     *
-     * @return void
      */
     public function __construct()
     {
-
-        $this->m_arrResultList = [];
-        $this->m_iPrevPageId = 0;
-        $this->m_iCurPageId = 0;
-        $this->m_iNextPageId = 0;
-
-        $this->m_iItemsPerPage = 0;
-        $this->m_iItemCount = 0;
     }
 
     /**
@@ -44,10 +39,6 @@ class cScrollList
      */
     public function loadData(int $iCurPageId, int $iResultRowLimit): bool
     {
-
-        $iCurPageId = intval($iCurPageId);
-        $iResultRowLimit = intval($iResultRowLimit);
-
         $this->m_iItemsPerPage = $iResultRowLimit;
         $this->m_iCurPageId = $iCurPageId;
         if ($iCurPageId > 0) {
@@ -143,7 +134,7 @@ class cScrollList
     public function getPageCount(): int
     {
         if ($this->m_iItemsPerPage > 0) {
-            return intval(ceil($this->m_iItemCount / $this->m_iItemsPerPage));
+            return (int) ceil($this->m_iItemCount / $this->m_iItemsPerPage);
         }
         return 0;
     }
@@ -181,7 +172,7 @@ class cScrollList
     /**
      * get membervariables as array
      *
-     * @return array member variables
+     * @return array<mixed> member variables
      */
     public function getDataArray(): array
     {

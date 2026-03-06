@@ -1,5 +1,9 @@
 <?php
 
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * handles the textreplacements (smilies etc)
  *
@@ -11,23 +15,12 @@
 class cTextreplacementList
 {
     /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * get all textreplacements
      *
-     * @return array textreplacements
+     * @return array{search: array<string>, replace: array<string>} textreplacements
      */
     public function getList(): array
     {
-
-
         $arrReplacements = ['search' => [],'replace' => []];
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT tr_name,tr_replacement FROM pxm_textreplacement')) {
@@ -45,12 +38,11 @@ class cTextreplacementList
     /**
      * update all textreplacements
      *
-     * @param array $arrReplacements textreplacements
+     * @param array{search?: array<string>, replace?: array<string>} $arrReplacements textreplacements
      * @return bool success / failure
      */
     public function updateList(array $arrReplacements): bool
     {
-
         if (isset($arrReplacements['search']) && isset($arrReplacements['replace'])) {
             if (cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_textreplacement')) {
                 foreach ($arrReplacements['search'] as $iKey => $sReplacementSearch) {

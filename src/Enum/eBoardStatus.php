@@ -1,88 +1,89 @@
 <?php
+
+namespace PXMBoard\Enum;
+
+use PXMBoard\I18n\cTranslator;
+
 /**
- * Board status enumeration
+ * Board access/permission status enumeration
  *
  * Defines the different access and write permission levels for boards.
  *
- * @author Torsten Rentsch <forum@torsten-rentsch.de>
- * @copyright Torsten Rentsch 2001 - 2026
+ * @link      https://github.com/TransistorDD/PXMBoard
+ * @author    Torsten Rentsch <forum@torsten-rentsch.de>
+ * @copyright 2001-2026 Torsten Rentsch
+ * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
+enum eBoardStatus: int
+{
+    /**
+     * Checks whether the board is readable for unauthenticated users.
+     *
+     * @return bool true if public can read
+     */
+    public function isPublicReadable(): bool
+    {
+        return $this === self::PUBLIC || $this === self::READONLY_PUBLIC;
+    }
 
-enum BoardStatus: int {
-	/**
-	 * Public board - everyone can read, authenticated users with post permission can write
-	 */
-	case PUBLIC = 1;
+    /**
+     * Checks whether regular authenticated users can write to the board.
+     *
+     * @return bool true if regular users can write
+     */
+    public function isWritable(): bool
+    {
+        return $this === self::PUBLIC || $this === self::MEMBERS_ONLY;
+    }
 
-	/**
-	 * Members only - only authenticated users can read and write (with post permission)
-	 */
-	case MEMBERS_ONLY = 2;
+    /**
+     * Checks whether the board requires authentication to read.
+     *
+     * @return bool true if authentication is required
+     */
+    public function requiresAuthentication(): bool
+    {
+        return $this !== self::PUBLIC && $this !== self::READONLY_PUBLIC;
+    }
 
-	/**
-	 * Read-only public - everyone can read, only moderators/admins can write
-	 */
-	case READONLY_PUBLIC = 3;
+    /**
+     * Checks whether the board is closed (only moderators/admins may access).
+     *
+     * @return bool true if closed
+     */
+    public function isClosed(): bool
+    {
+        return $this === self::CLOSED;
+    }
 
-	/**
-	 * Read-only members - only authenticated users can read, only moderators/admins can write
-	 */
-	case READONLY_MEMBERS = 4;
+    /**
+     * Returns the translated label for this board status.
+     *
+     * @return string translated label
+     */
+    public function getLabel(): string
+    {
+        return cTranslator::translate(match ($this) {
+            self::PUBLIC           => 'board_status.public',
+            self::MEMBERS_ONLY     => 'board_status.members_only',
+            self::READONLY_PUBLIC  => 'board_status.readonly_public',
+            self::READONLY_MEMBERS => 'board_status.readonly_members',
+            self::CLOSED           => 'board_status.closed',
+        });
+    }
 
-	/**
-	 * Closed - only moderators and admins can access
-	 */
-	case CLOSED = 5;
+    /** Public board — everyone can read; authenticated users with post permission can write. */
+    case PUBLIC = 1;
 
-	/**
-	 * Check if board is readable for public (non-authenticated users)
-	 *
-	 * @return bool true if public can read
-	 */
-	public function isPublicReadable(): bool {
-		return $this === self::PUBLIC || $this === self::READONLY_PUBLIC;
-	}
+    /** Members only — only authenticated users can read and write (with post permission). */
+    case MEMBERS_ONLY = 2;
 
-	/**
-	 * Check if board is writable (for regular users, not mods/admins)
-	 *
-	 * @return bool true if regular users can write
-	 */
-	public function isWritable(): bool {
-		return $this === self::PUBLIC || $this === self::MEMBERS_ONLY;
-	}
+    /** Read-only public — everyone can read; only moderators/admins can write. */
+    case READONLY_PUBLIC = 3;
 
-	/**
-	 * Check if board requires authentication to read
-	 *
-	 * @return bool true if authentication required
-	 */
-	public function requiresAuthentication(): bool {
-		return $this !== self::PUBLIC && $this !== self::READONLY_PUBLIC;
-	}
+    /** Read-only members — only authenticated users can read; only moderators/admins can write. */
+    case READONLY_MEMBERS = 4;
 
-	/**
-	 * Check if board is closed (only mods/admins can access)
-	 *
-	 * @return bool true if closed
-	 */
-	public function isClosed(): bool {
-		return $this === self::CLOSED;
-	}
-
-	/**
-	 * Get human-readable label (German)
-	 *
-	 * @return string label
-	 */
-	public function getLabel(): string {
-		return match($this) {
-			self::PUBLIC => 'Öffentlich',
-			self::MEMBERS_ONLY => 'Nur Mitglieder',
-			self::READONLY_PUBLIC => 'Nur Lesen (Öffentlich)',
-			self::READONLY_MEMBERS => 'Nur Lesen (Mitglieder)',
-			self::CLOSED => 'Geschlossen',
-		};
-	}
+    /** Closed — only moderators and admins can access. */
+    case CLOSED = 5;
 }
-?>

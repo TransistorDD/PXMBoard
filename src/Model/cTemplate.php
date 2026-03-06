@@ -1,5 +1,9 @@
 <?php
 
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * Template handling (text templates for emails and application messages)
  *
@@ -10,23 +14,10 @@
  */
 class cTemplate
 {
-    protected int $m_iId;									// template id
-    protected string $m_sMessage;							// template message
-    protected string $m_sName;								// name of the template
-    protected string $m_sDescription;						// description of the template
-
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->m_iId = 0;
-        $this->m_sMessage = '';
-        $this->m_sName = '';
-        $this->m_sDescription = '';
-    }
+    protected int $m_iId = 0;							// template id
+    protected string $m_sMessage = '';					// template message
+    protected string $m_sName = '';						// name of the template
+    protected string $m_sDescription = '';				// description of the template
 
     /**
      * get data from database by template id
@@ -36,13 +27,9 @@ class cTemplate
      */
     public function loadDataById(int $iTemplateId): bool
     {
-
         $bReturn = false;
-        $iTemplateId = intval($iTemplateId);
 
         if ($iTemplateId > 0) {
-
-
             if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT te_id,'.
                                                             'te_message,'.
                                                             'te_name,'.
@@ -50,7 +37,7 @@ class cTemplate
                                                             ' FROM pxm_template'.
                                                             ' WHERE te_id='.$iTemplateId)) {
                 if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                    $this->m_iId = intval($objResultRow->te_id);
+                    $this->m_iId = (int) $objResultRow->te_id;
                     $this->m_sMessage = $objResultRow->te_message;
                     $this->m_sName = $objResultRow->te_name;
                     $this->m_sDescription = $objResultRow->te_description;
@@ -71,8 +58,6 @@ class cTemplate
      */
     public function updateData(): bool
     {
-
-
         $bReturn = false;
         if ($this->m_iId > 0) {
             if (cDBFactory::getInstance()->executeQuery('UPDATE pxm_template SET te_message='.cDBFactory::getInstance()->quote($this->m_sMessage)." WHERE te_id=$this->m_iId")) {
@@ -100,8 +85,7 @@ class cTemplate
      */
     public function setId(int $iTemplateId): void
     {
-        $this->m_iId = intval($iTemplateId);
-        ;
+        $this->m_iId = $iTemplateId;
     }
 
     /**

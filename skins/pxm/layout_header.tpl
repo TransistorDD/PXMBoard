@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>{if isset($config.board) && $config.board.name}{$config.board.name} - {/if}PXMBoard</title>
-	<link href="css/pxmboard.css" rel="stylesheet">
+	<link href="css/pxmboard.css?v={$config.css_version}" rel="stylesheet">
 	<link rel="manifest" href="manifest.json">
 	<meta name="theme-color" content="#17A2B8">
 	<meta name="csrf-token" content="{$config.csrf_token}">

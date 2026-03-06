@@ -1,7 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cNotification.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eSuccessKeys;
+use PXMBoard\Model\cNotification;
+
 /**
  * Ajax-Action: Mark notification as read
  *
@@ -32,20 +36,20 @@ class cAjaxActionNotificationmarkread extends cAjaxAction
         // Input-Validierung
         $iNotificationId = $this->m_objInputHandler->getIntFormVar('nid', true, true, true);
         if ($iNotificationId <= 0) {
-            $this->_setJsonError(eError::INVALID_MODE, 400);
+            $this->_setJsonError(eErrorKeys::INVALID_MODE, 400);
             return;
         }
 
         // Load notification
         $objNotification = new cNotification();
         if (!$objNotification->loadDataById($iNotificationId)) {
-            $this->_setJsonError(eError::INVALID_MODE, 404);
+            $this->_setJsonError(eErrorKeys::INVALID_MODE, 404);
             return;
         }
 
         // Security check: notification belongs to current user
         if ($objNotification->getUserId() != $objActiveUser->getId()) {
-            $this->_setJsonError(eError::NOT_AUTHORIZED, 403);
+            $this->_setJsonError(eErrorKeys::NOT_AUTHORIZED, 403);
             return;
         }
 
@@ -57,7 +61,7 @@ class cAjaxActionNotificationmarkread extends cAjaxAction
 
         // Success response with link
         $sLink = $objNotification->getLink();
-        $this->_setJsonSuccess(eSuccessMessage::NOTIFICATION_MARKED_READ, [
+        $this->_setJsonSuccess(eSuccessKeys::NOTIFICATION_MARKED_READ, [
             'redirect_url' => !empty($sLink) ? $sLink : 'pxmboard.php?mode=notificationlist',
             'count' => $objActiveUser->getUnreadNotificationCount()
         ]);

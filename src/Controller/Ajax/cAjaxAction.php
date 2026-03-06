@@ -1,7 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Controller/cBaseAction.php');
-require_once(SRCDIR . '/Enum/eSuccessMessage.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Controller\cBaseAction;
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eSuccessKeys;
+
 /**
  * Base class for AJAX actions with JSON response
  *
@@ -13,16 +17,17 @@ require_once(SRCDIR . '/Enum/eSuccessMessage.php');
  */
 abstract class cAjaxAction extends cBaseAction
 {
+    /** @var array<string, mixed> */
     protected array $m_arrJsonData = [];
     protected int $m_iHttpStatusCode = 200;
 
     /**
      * Handle permission error by setting a JSON error response.
      *
-     * @param eError $error the error that caused the permission failure
+     * @param eErrorKeys $error the error that caused the permission failure
      * @return void
      */
-    protected function _handlePermissionError(eError $error): void
+    protected function _handlePermissionError(eErrorKeys $error): void
     {
         $this->_setJsonError($error, $this->_mapErrorToHttpStatus($error));
     }
@@ -30,26 +35,26 @@ abstract class cAjaxAction extends cBaseAction
     /**
      * Map an eError value to the appropriate HTTP status code for AJAX responses.
      *
-     * @param eError $error error enum
+     * @param eErrorKeys $error error enum
      * @return int HTTP status code
      */
-    protected function _mapErrorToHttpStatus(eError $error): int
+    protected function _mapErrorToHttpStatus(eErrorKeys $error): int
     {
         return match ($error) {
-            eError::NOT_LOGGED_IN                => 401,
-            eError::NOT_AUTHORIZED,
-            eError::BOARD_CLOSED,
-            eError::BOARD_READONLY,
-            eError::CSRF_TOKEN_INVALID           => 403,
-            eError::INVALID_BOARD_ID,
-            eError::BOARD_ID_MISSING,
-            eError::INVALID_MESSAGE_ID,
-            eError::INVALID_THREAD_ID,
-            eError::INVALID_USER_ID,
-            eError::ALREADY_LOGGED_IN            => 400,
-            eError::COULD_NOT_INSERT_DATA,
-            eError::COULD_NOT_UPDATE_DATA,
-            eError::COULD_NOT_DELETE_DATA        => 500,
+            eErrorKeys::NOT_LOGGED_IN            => 401,
+            eErrorKeys::NOT_AUTHORIZED,
+            eErrorKeys::BOARD_CLOSED,
+            eErrorKeys::BOARD_READONLY,
+            eErrorKeys::CSRF_TOKEN_INVALID       => 403,
+            eErrorKeys::INVALID_BOARD_ID,
+            eErrorKeys::BOARD_ID_MISSING,
+            eErrorKeys::INVALID_MESSAGE_ID,
+            eErrorKeys::INVALID_THREAD_ID,
+            eErrorKeys::INVALID_USER_ID,
+            eErrorKeys::ALREADY_LOGGED_IN        => 400,
+            eErrorKeys::COULD_NOT_INSERT_DATA,
+            eErrorKeys::COULD_NOT_UPDATE_DATA,
+            eErrorKeys::COULD_NOT_DELETE_DATA    => 500,
             default                              => 400,
         };
     }
@@ -57,7 +62,7 @@ abstract class cAjaxAction extends cBaseAction
     /**
      * Set JSON response data (instead of template)
      *
-     * @param array $arrData data for JSON response
+     * @param array<string, mixed> $arrData data for JSON response
      * @param int $iHttpCode HTTP status code (200, 400, 404, 500)
      */
     protected function _setJsonResponse(array $arrData, int $iHttpCode = 200): void
@@ -69,24 +74,24 @@ abstract class cAjaxAction extends cBaseAction
     /**
      * Set error response using error enum
      *
-     * @param eError $eErrorCode error enum constant
+     * @param eErrorKeys $eErrorCode error enum constant
      * @param int $iHttpCode HTTP status code (400, 401, 403, 404, 500)
      */
-    protected function _setJsonError(eError $eErrorCode, int $iHttpCode = 400): void
+    protected function _setJsonError(eErrorKeys $eErrorCode, int $iHttpCode = 400): void
     {
-        $this->_setJsonResponse(['error' => $eErrorCode->value], $iHttpCode);
+        $this->_setJsonResponse(['error' => $eErrorCode->t()], $iHttpCode);
     }
 
     /**
      * Set success response using success message enum
      *
-     * @param eSuccessMessage $eSuccessMessage success message enum constant
-     * @param array $arrAdditionalData optional additional data (e.g. count, isActive, etc.)
+     * @param eSuccessKeys $eSuccessMessage success message enum constant
+     * @param array<string, mixed> $arrAdditionalData optional additional data (e.g. count, isActive, etc.)
      * @param int $iHttpCode HTTP status code (default 200)
      */
-    protected function _setJsonSuccess(eSuccessMessage $eSuccessMessage, array $arrAdditionalData = [], int $iHttpCode = 200): void
+    protected function _setJsonSuccess(eSuccessKeys $eSuccessMessage, array $arrAdditionalData = [], int $iHttpCode = 200): void
     {
-        $arrResponse = array_merge(['success' => true, 'message' => $eSuccessMessage->value], $arrAdditionalData);
+        $arrResponse = array_merge(['success' => true, 'message' => $eSuccessMessage->t()], $arrAdditionalData);
         $this->_setJsonResponse($arrResponse, $iHttpCode);
     }
 

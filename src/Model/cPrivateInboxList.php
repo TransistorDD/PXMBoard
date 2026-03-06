@@ -1,6 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Model/cPrivateMessageList.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\ePrivateMessageStatus;
+
 /**
  * private message inbox handling
  *
@@ -19,7 +23,7 @@ class cPrivateInboxList extends cPrivateMessageList
     protected function _getQuery(): string
     {
         $sQuery = 'SELECT p_id,p_subject,p_tstmp,u_id,u_username,u_highlight,p_tostate FROM pxm_priv_message,pxm_user WHERE ';
-        $sQuery .= "p_fromuserid=u_id AND p_touserid=$this->m_iUserId AND p_tostate!=".PrivateMessageStatus::DELETED->value;
+        $sQuery .= "p_fromuserid=u_id AND p_touserid=$this->m_iUserId AND p_tostate!=".ePrivateMessageStatus::DELETED->value;
         $sQuery .= ' ORDER BY p_tstmp DESC';
         return $sQuery;
     }
@@ -32,11 +36,10 @@ class cPrivateInboxList extends cPrivateMessageList
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         $this->m_arrResultList[] = ['id'		=> $objResultRow->p_id,
                                          'subject'	=> $objResultRow->p_subject,
                                          'date'		=> date($this->m_sDateFormat, ($objResultRow->p_tstmp + $this->m_iTimeOffset)),
-                                         'read'		=> ($objResultRow->p_tostate == PrivateMessageStatus::READ->value ? '1' : '0'),
+                                         'read'		=> ($objResultRow->p_tostate == ePrivateMessageStatus::READ->value ? '1' : '0'),
                                          'user'		=> ['id'		=> $objResultRow->u_id,
                                                             'username'	=> $objResultRow->u_username,
                                                             'highlight'	=> $objResultRow->u_highlight]];
@@ -50,13 +53,11 @@ class cPrivateInboxList extends cPrivateMessageList
      */
     public function deleteData(): bool
     {
-
-
         // set the message to deleted if we are the recipient
-        cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_tostate='.PrivateMessageStatus::DELETED->value." WHERE p_touserid=$this->m_iUserId");
+        cDBFactory::getInstance()->executeQuery('UPDATE pxm_priv_message SET p_tostate='.ePrivateMessageStatus::DELETED->value." WHERE p_touserid=$this->m_iUserId");
 
         // remove all deleted messages from db
-        cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_priv_message WHERE p_tostate='.PrivateMessageStatus::DELETED->value.' AND p_fromstate='.PrivateMessageStatus::DELETED->value);
+        cDBFactory::getInstance()->executeQuery('DELETE FROM pxm_priv_message WHERE p_tostate='.ePrivateMessageStatus::DELETED->value.' AND p_fromstate='.ePrivateMessageStatus::DELETED->value);
 
         return true;
     }
@@ -68,10 +69,9 @@ class cPrivateInboxList extends cPrivateMessageList
      */
     public function countUnread(): int
     {
-
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS msgcount FROM pxm_priv_message WHERE p_touserid=$this->m_iUserId AND p_tostate=".PrivateMessageStatus::UNREAD->value)) {
+        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS msgcount FROM pxm_priv_message WHERE p_touserid=$this->m_iUserId AND p_tostate=".ePrivateMessageStatus::UNREAD->value)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                return intval($objResultRow->msgcount);
+                return (int) $objResultRow->msgcount;
             }
         }
         return 0;

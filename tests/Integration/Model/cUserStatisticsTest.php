@@ -1,4 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Integration\Model;
+
+use PXMBoard\Model\cUser;
+use PXMBoard\Model\cUserStatistics;
+use PXMBoard\Tests\TestCase\IntegrationTestCase;
+
 /**
  * Integration test for cUserStatistics class
  * Tests user statistics against the real test database
@@ -8,20 +17,14 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Integration\Model;
-
-use PXMBoard\Tests\TestCase\IntegrationTestCase;
-
 class cUserStatisticsTest extends IntegrationTestCase
 {
-    private \cUserStatistics $statistics;
+    private cUserStatistics $statistics;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->statistics = new \cUserStatistics();
+        $this->statistics = new cUserStatistics();
     }
 
     /**
@@ -64,7 +67,7 @@ class cUserStatisticsTest extends IntegrationTestCase
 
         $objUser = $this->statistics->getNewestMember();
 
-        $this->assertInstanceOf(\cUser::class, $objUser);
+        $this->assertInstanceOf(cUser::class, $objUser);
         $this->assertSame('newest_user_stats_test', $objUser->getUserName());
     }
 }

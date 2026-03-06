@@ -1,7 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cTemplateList.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Model\cTemplateList;
+
 /**
  * displays the template configuration tool
  *

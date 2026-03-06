@@ -14,16 +14,16 @@ declare(strict_types=1);
 // Composer Autoloader
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use PXMBoard\Database\cDB;
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Exception\cDatabaseException;
+use PXMBoard\Search\cSearchEngineFactory;
+use PXMBoard\Exception\cSearchEngineException;
+
 // PXMBoard constants (same as pxmboard.php)
 define('BASEDIR', dirname(__DIR__));
 define('PUBLICDIR', BASEDIR . '/public');
 define('SRCDIR', BASEDIR . '/src');
-
-// Load core PXMBoard infrastructure
-require_once(SRCDIR . '/Exception/cDatabaseException.php');
-require_once(SRCDIR . '/Exception/cSearchEngineException.php');
-require_once(SRCDIR . '/Database/cDBFactory.php');
-require_once(SRCDIR . '/Search/cSearchEngineFactory.php');
 
 // Error reporting for tests
 error_reporting(E_ALL);

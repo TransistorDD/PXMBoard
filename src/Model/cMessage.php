@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cMessageHeader.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Parser\cParser;
+
 /**
  * message handling
  *
@@ -11,22 +14,8 @@ require_once(SRCDIR . '/Model/cMessageHeader.php');
  */
 class cMessage extends cMessageHeader
 {
-    protected string $m_sBody;				// messagebody
-    protected string $m_sIp;					// ip number for this message
-
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-
-        parent::__construct();
-
-        $this->m_sBody = '';
-        $this->m_sIp = '';
-    }
+    protected string $m_sBody = '';			// messagebody
+    protected string $m_sIp = '';			// ip number for this message
 
     /**
      * initalize the member variables with the resultset from the db
@@ -36,7 +25,6 @@ class cMessage extends cMessageHeader
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         cMessageHeader::_setDataFromDb($objResultRow);
 
         $this->m_sBody = $objResultRow->m_body;
@@ -105,7 +93,7 @@ class cMessage extends cMessageHeader
      * @param int $iLastOnlineTimestamp last online timestamp for user
      * @param string $sSubjectQuotePrefix prefix for quoted subject
      * @param ?cParser $objParser message parser
-     * @return array member variables
+     * @return array<string, mixed> member variables
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, string $sSubjectQuotePrefix = '', ?cParser $objParser = null): array
     {
@@ -113,7 +101,7 @@ class cMessage extends cMessageHeader
         return array_merge(
             cMessageHeader::getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp, $sSubjectQuotePrefix, $objParser),
             ['_body'	=>	$objParser->parse($this->getBody()),
-                                 'ip'		=>	$this->m_sIp]
+             'ip'		=>	$this->m_sIp]
         );
     }
 }

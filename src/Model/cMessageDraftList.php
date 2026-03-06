@@ -1,7 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Model/cScrollList.php');
-require_once(SRCDIR . '/Enum/eMessage.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eMessageStatus;
+
 /**
  * message draft list handling
  *
@@ -22,16 +25,14 @@ class cMessageDraftList extends cScrollList
      * @param int $iUserId user id
      * @param int $iTimeOffset time offset
      * @param string $sDateFormat date format
-     * @return void
      */
     public function __construct(int $iUserId, int $iTimeOffset = 0, string $sDateFormat = '')
     {
-
-        $this->m_iUserId = intval($iUserId);
-        $this->m_iTimeOffset = intval($iTimeOffset);
-        $this->m_sDateFormat = $sDateFormat;
-
         parent::__construct();
+
+        $this->m_iUserId = $iUserId;
+        $this->m_iTimeOffset = $iTimeOffset;
+        $this->m_sDateFormat = $sDateFormat;
     }
 
     /**
@@ -45,7 +46,7 @@ class cMessageDraftList extends cScrollList
         $sQuery .= 'FROM pxm_message m ';
         $sQuery .= 'LEFT JOIN pxm_thread t ON m.m_threadid = t.t_id ';
         $sQuery .= 'LEFT JOIN pxm_board b ON t.t_boardid = b.b_id ';
-        $sQuery .= "WHERE m.m_userid=$this->m_iUserId AND m.m_status=".MessageStatus::DRAFT->value;
+        $sQuery .= "WHERE m.m_userid=$this->m_iUserId AND m.m_status=".eMessageStatus::DRAFT->value;
         $sQuery .= ' ORDER BY m.m_tstmp DESC';
         return $sQuery;
     }
@@ -58,17 +59,16 @@ class cMessageDraftList extends cScrollList
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         $this->m_arrResultList[] = ['id'		=> $objResultRow->m_id,
-                                         'threadid'	=> $objResultRow->m_threadid,
-                                         'subject'	=> $objResultRow->m_subject,
-                                         'boardid'	=> $objResultRow->b_id,
-                                         'boardname' => $objResultRow->b_name,
-                                         'date'		=> date($this->m_sDateFormat, ($objResultRow->m_tstmp + $this->m_iTimeOffset)),
-                                         'status'	=> $objResultRow->m_status,
-                                         'user'		=> ['id'		=> $objResultRow->m_userid,
-                                                            'username'	=> $objResultRow->m_username,
-                                                            'highlight'	=> $objResultRow->m_userhighlight]];
+                                    'threadid'	=> $objResultRow->m_threadid,
+                                    'subject'	=> $objResultRow->m_subject,
+                                    'boardid'	=> $objResultRow->b_id,
+                                    'boardname' => $objResultRow->b_name,
+                                    'date'		=> date($this->m_sDateFormat, ($objResultRow->m_tstmp + $this->m_iTimeOffset)),
+                                    'status'	=> $objResultRow->m_status,
+                                    'user'		=> ['id'		=> $objResultRow->m_userid,
+                                                    'username'	=> $objResultRow->m_username,
+                                                    'highlight'	=> $objResultRow->m_userhighlight]];
         return true;
     }
 
@@ -79,10 +79,9 @@ class cMessageDraftList extends cScrollList
      */
     public function countDrafts(): int
     {
-
-        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS msgcount FROM pxm_message WHERE m_userid=$this->m_iUserId AND m_status=".MessageStatus::DRAFT->value)) {
+        if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS msgcount FROM pxm_message WHERE m_userid=$this->m_iUserId AND m_status=".eMessageStatus::DRAFT->value)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                return intval($objResultRow->msgcount);
+                return (int) $objResultRow->msgcount;
             }
         }
         return 0;

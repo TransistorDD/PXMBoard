@@ -1,5 +1,7 @@
 <?php
 
+namespace PXMBoard\Exception;
+
 /**
  * Exception thrown on search engine errors (configuration issues, unavailable engine)
  *
@@ -8,6 +10,6 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-class cSearchEngineException extends RuntimeException
+class cSearchEngineException extends \RuntimeException
 {
 }

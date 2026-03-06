@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+
+namespace PXMBoard\Validation;
+
 /**
  * Encapsulates access to the $_SERVER superglobal
  *

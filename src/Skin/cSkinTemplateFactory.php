@@ -1,5 +1,7 @@
 <?php
 
+namespace PXMBoard\Skin;
+
 /**
  * factory class for template abstraction
  *
@@ -30,8 +32,7 @@ class cSkinTemplateFactory
     {
         $objTemplate = null;
         if (preg_match('/^[a-zA-Z]+$/', $sTemplateType)) {
-            $sTemplateType = 'cSkinTemplate'.$sTemplateType;
-            require_once(SRCDIR.'/Skin/'.$sTemplateType.'.php');
+            $sTemplateType = __NAMESPACE__ . '\\cSkinTemplate' . $sTemplateType;
             $objTemplate = new $sTemplateType($sSkinDir);
         }
         return $objTemplate;

@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cScrollList.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * user online list handling
  *
@@ -12,7 +15,7 @@ require_once(SRCDIR . '/Model/cScrollList.php');
 class cUserOnlineList extends cScrollList
 {
     protected bool $m_bAdminMode;			// query in adminmode?
-    protected int $m_iOnlineTimestamp;	// online timestamp
+    protected int $m_iOnlineTimestamp;	    // online timestamp
 
     /**
      * Constructor
@@ -23,11 +26,10 @@ class cUserOnlineList extends cScrollList
      */
     public function __construct(bool $bAdminMode, int $iOnlineTimestamp)
     {
-
         parent::__construct();
 
-        $this->m_bAdminMode = $bAdminMode ? true : false;
-        $this->m_iOnlineTimestamp = intval($iOnlineTimestamp);
+        $this->m_bAdminMode = $bAdminMode;
+        $this->m_iOnlineTimestamp = $iOnlineTimestamp;
     }
 
     /**
@@ -48,33 +50,30 @@ class cUserOnlineList extends cScrollList
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         $this->m_arrResultList[] = ['id'		=> $objResultRow->u_id,
-                                         'username'	=> $objResultRow->u_username,
-                                         'highlight' => $objResultRow->u_highlight,
-                                         'status'	=> $objResultRow->u_status];
+                                    'username'	=> $objResultRow->u_username,
+                                    'highlight' => $objResultRow->u_highlight,
+                                    'status'	=> $objResultRow->u_status];
         return true;
     }
 
     /**
      * count visible / invisible
      *
-     * @return array data
+     * @return array<string, mixed> data
      */
     public function getVisibilityDataArray(): array
     {
-
-
         $arrTmp = ['all' => '0','visible' => '0','invisible' => '0'];
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT u_visible,count(*) AS anz  FROM pxm_user WHERE u_lastonlinetstmp>$this->m_iOnlineTimestamp GROUP BY u_visible")) {
             $iAll = 0;
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $iAll += intval($objResultRow->anz);
+                $iAll += (int) $objResultRow->anz;
                 if ($objResultRow->u_visible) {
-                    $arrTmp['visible'] = strval($objResultRow->anz);
+                    $arrTmp['visible'] = (string) $objResultRow->anz;
                 } else {
-                    $arrTmp['invisible'] = strval($objResultRow->anz);
+                    $arrTmp['invisible'] = (string) $objResultRow->anz;
                 }
             }
             $arrTmp['all'] = strval($iAll);

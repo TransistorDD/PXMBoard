@@ -1,9 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cTemplate.php');
-require_once(SRCDIR . '/Enum/eUser.php');
-require_once(SRCDIR . '/Model/cUser.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Enum\eUserStatus;
+use PXMBoard\Model\cTemplate;
+use PXMBoard\Model\cUser;
+
 /**
  * handles the user activation
  *
@@ -51,7 +53,7 @@ class cAdminActionActivateusers extends cAdminAction
             $this->m_sOutput .= "<div class=\"pxm-admin-card\"><div class=\"pxm-admin-card__header\">activate / delete users</div><div class=\"pxm-admin-card__body\">\n";
             $this->m_sOutput .= "<p><strong>activated users</strong></p>\n";
 
-            $iUserActiveStatus = UserStatus::ACTIVE;
+            $iUserActiveStatus = eUserStatus::ACTIVE;
             $arrDeleteUsers = $this->m_objInputHandler->getArrFormVar('del', true, true, true, 'intval');
             foreach ($this->m_objInputHandler->getArrFormVar('act', true, true, true, 'intval') as $iUserId) {
                 if (!in_array($iUserId, $arrDeleteUsers)) {

@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Parser/cParser.php');
+namespace PXMBoard\Parser;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * PXM markup to HTML parser
  *
@@ -11,9 +14,11 @@ require_once(SRCDIR . '/Parser/cParser.php');
  */
 class cPxmParser extends cParser
 {
+    /** @var array<string, array<string>> */
     protected array $m_arrReplacements;			// textreplacements (array[search];array[replace])
     protected bool $m_bEmbedExternal;			// embed external content (images, YouTube, Twitch)?
     protected bool $m_bIsLoggedIn;				// is current user logged in?
+    /** @var array<int, string> */
     protected array $m_arrMentionCache;			// cached user usernames for mentions
     private string $m_sHttpHost;				// HTTP Host header value (for Twitch embed parent parameter)
 
@@ -177,7 +182,7 @@ class cPxmParser extends cParser
                                 // user mentions: [user:123]
                             } elseif (preg_match('/^\[user:(\d+)\]/iu', substr($sText, $iCharPointer), $arrMentionMatch)) {
                                 if (!$bMemberSkip) {
-                                    $iUserId = intval($arrMentionMatch[1]);
+                                    $iUserId = (int) $arrMentionMatch[1];
                                     if (isset($this->m_arrMentionCache[$iUserId])) {
                                         $sUsername = htmlspecialchars($this->m_arrMentionCache[$iUserId]);
                                         $sProfileUrl = 'pxmboard.php?mode=userprofile&usrid='.$iUserId;
@@ -263,7 +268,7 @@ class cPxmParser extends cParser
     /**
      * get replacements
      *
-     * @return array replacements
+     * @return array<string, array<string>> replacements
      */
     public function getReplacements(): array
     {
@@ -273,7 +278,7 @@ class cPxmParser extends cParser
     /**
      * set replacements
      *
-     * @param array $arrReplacements replacements
+     * @param array<string, array<string>> $arrReplacements replacements
      * @return void
      */
     public function setReplacements(array $arrReplacements): void
@@ -342,7 +347,6 @@ class cPxmParser extends cParser
             $arrUserIds = array_slice($arrUserIds, 0, 10);
 
             if (!empty($arrUserIds)) {
-                require_once(SRCDIR . '/Database/cDBFactory.php');
                 $objDb = cDBFactory::getInstance();
 
                 $sIds = implode(',', $arrUserIds);
@@ -350,9 +354,8 @@ class cPxmParser extends cParser
                 $objResultSet = $objDb->executeQuery($sQuery);
 
                 while ($objRow = $objResultSet->getNextResultRowObject()) {
-                    $this->m_arrMentionCache[intval($objRow->u_id)] = $objRow->u_username;
+                    $this->m_arrMentionCache[(int) $objRow->u_id] = $objRow->u_username;
                 }
-
                 $objResultSet->freeResult();
             }
         }
@@ -387,7 +390,7 @@ class cPxmParser extends cParser
      * Extract Twitch embed data from URL
      *
      * @param string $sUrl Twitch URL
-     * @return array|null ['type' => 'video'|'clip'|'channel', 'id' => string] or null
+     * @return array<string, mixed>|null ['type' => 'video'|'clip'|'channel', 'id' => string] or null
      */
     private function _extractTwitchData(string $sUrl): ?array
     {
@@ -417,7 +420,7 @@ class cPxmParser extends cParser
     /**
      * Generate Twitch iframe embed HTML
      *
-     * @param array $arrData ['type' => 'video'|'clip'|'channel', 'id' => string]
+     * @param array<string, mixed> $arrData ['type' => 'video'|'clip'|'channel', 'id' => string]
      * @return string iframe HTML
      */
     private function _getTwitchIframe(array $arrData): string

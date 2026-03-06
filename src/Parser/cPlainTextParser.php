@@ -1,6 +1,7 @@
 <?php
 
-require_once(SRCDIR . '/Parser/cParser.php');
+namespace PXMBoard\Parser;
+
 /**
  * Plain text to HTML parser (escapes HTML entities)
  *

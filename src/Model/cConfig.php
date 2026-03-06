@@ -1,5 +1,9 @@
 <?php
 
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * configuration handling
  *
@@ -10,87 +14,55 @@
  */
 class cConfig
 {
+    /** @var array<string> */
     protected array $m_arrAvailableTemplateEngines;			// available template engines
-    protected string $m_sActiveTemplateEngine;				// active template engine, depending on installed engines and skin configuration
+    protected string $m_sActiveTemplateEngine	= '';		// active template engine, depending on installed engines and skin configuration
 
     protected int $m_iAccessTimestamp;						// current timestamp
 
-    protected int $m_iDefaultSkinId;						// default skin id
-    protected string $m_sSkinDir;							// skin directory
-    protected bool $m_bUseQuickPost;						// activate quickpost?
-    protected bool $m_bUseDirectRegistration;				// activate direct registratiom?
-    protected bool $m_bUniqueRegistrationMails;				// unique registration mail?
-    protected bool $m_bUseSignatures;						// use usersignatures?
-    protected string $m_sDateFormat;						// string for php date function
-    protected int $m_iTimeOffset;							// date & time offset in hours
-    protected int $m_iOnlineTime;							// time that a user will be visible in onlinelist in seconds
+    protected int $m_iDefaultSkinId = 0;					// default skin id
+    protected string $m_sSkinDir = 'skins/';				// skin directory
+    protected bool $m_bUseQuickPost = false;				// activate quickpost?
+    protected bool $m_bUseDirectRegistration = false;		// activate direct registratiom?
+    protected bool $m_bUniqueRegistrationMails = false;	    // unique registration mail?
+    protected bool $m_bUseSignatures = false;				// use usersignatures?
+    protected string $m_sDateFormat = 'j.m.Y H:i';			// string for php date function
+    protected int $m_iTimeOffset = 0;						// date & time offset in hours
+    protected int $m_iOnlineTime = 300;						// time that a user will be visible in onlinelist in seconds
 
-    protected int $m_iThreadSizeLimit;						// close threads with at least x messages
-    protected int $m_iUserPerPage;							// display x user per page
-    protected int $m_iMessageHeaderPerPage;					// display x messages per page (search)
-    protected int $m_iMessagesPerPage;						// display x messages per page (flat mode)
-    protected int $m_iPrivateMessagesPerPage;				// display x private messages per page
-    protected int $m_iThreadsPerPage;						// display x threads per page
+    protected int $m_iThreadSizeLimit = 500;				// close threads with at least x messages
+    protected int $m_iUserPerPage = 20;						// display x user per page
+    protected int $m_iMessageHeaderPerPage = 50;			// display x messages per page (search)
+    protected int $m_iPrivateMessagesPerPage = 20;			// display x private messages per page
+    protected int $m_iThreadsPerPage = 50;					// display x threads per page
 
-    protected string $m_sQuoteSubject;						// prefix for quoted subjects
-    protected string $m_sQuoteTag;							// HTML tag for quoted text (blockquote)
+    protected string $m_sQuoteSubject = 'Re:';				// prefix for quoted subjects
+    protected string $m_sQuoteTag = 'blockquote';			// HTML tag for quoted text (blockquote)
 
-    protected string $m_sMailWebmaster;						// mail of webmaster
+    protected string $m_sMailWebmaster	= '';				// mail of webmaster
 
-    protected int $m_iMaxProfileImgSize;					// size of profile images in bytes
-    protected int $m_iMaxProfileImgWidth;					// width of profile images
-    protected int $m_iMaxProfileImgHeight;					// height of profile images
-    protected string $m_sProfileImgDir;						// profile images directory
-    protected int $m_iProfileImgSplitDir;					// one directory for x profile images
-    protected array $m_arrProfileImgTypes;					// accepted filetypes for profile images
+    protected int $m_iMaxProfileImgSize = 512000;			// size of profile images in bytes
+    protected int $m_iMaxProfileImgWidth = 200;				// width of profile images
+    protected int $m_iMaxProfileImgHeight = 400;			// height of profile images
+    protected string $m_sProfileImgDir	= '';				// profile images directory
+    protected int $m_iProfileImgSplitDir = 100;				// one directory for x profile images
+    /** @var array<string> */
+    protected array $m_arrProfileImgTypes = ['image/jpeg' => 'jpg','image/pjpeg' => 'jpg','image/gif' => 'gif','image/png' => 'png'];					// accepted filetypes for profile images
 
     /**
      * Constructor
      *
-     * @param array $arrTemplateEngines available template engine ordered by priority
+     * @param array<string> $arrTemplateEngines available template engine ordered by priority
      * @return void
      */
     public function __construct(array $arrTemplateEngines)
     {
-
         $this->m_arrAvailableTemplateEngines = $arrTemplateEngines;
-        $this->m_sActiveTemplateEngine = '';
-
-        // initialize general configuration
 
         // defaults
         $this->m_iAccessTimestamp = time();
 
-        $this->m_iDefaultSkinId = 0;
-        $this->m_sSkinDir = 'skins/';
-        $this->m_bUseQuickPost = false;
-        $this->m_bUseDirectRegistration = false;
-        $this->m_bUniqueRegistrationMails = false;
-        $this->m_bUseSignatures = false;
-        $this->m_sDateFormat = 'j.m.Y H:i';
-        $this->m_iTimeOffset = 0;
-        $this->m_iOnlineTime = 300;
-
-        $this->m_iThreadSizeLimit = 500;
-        $this->m_iUserPerPage = 20;
-        $this->m_iMessageHeaderPerPage = 20;
-        $this->m_iMessagesPerPage = 20;
-        $this->m_iPrivateMessagesPerPage = 20;
-        $this->m_iThreadsPerPage = 50;
-
-        $this->m_sQuoteSubject = 'Re:';
-        $this->m_sQuoteTag = 'blockquote';
-
-        $this->m_sMailWebmaster	= '';
-
-        $this->m_iMaxProfileImgSize = 0;
-        $this->m_iMaxProfileImgWidth = 200;
-        $this->m_iMaxProfileImgHeight = 400;
-        $this->m_sProfileImgDir = '';
-        $this->m_iProfileImgSplitDir = 100;
-        $this->m_arrProfileImgTypes = ['image/jpeg' => 'jpg','image/pjpeg' => 'jpg','image/gif' => 'gif','image/png' => 'png'];
-
-        // get general configuration from database
+        // load general configuration from database
         $this->_loadData();
     }
 
@@ -101,8 +73,6 @@ class cConfig
      */
     private function _loadData(): bool
     {
-
-
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT c_skinid,'.
                                                         'c_quickpost,'.
                                                         'c_directregistration,'.
@@ -113,7 +83,6 @@ class cConfig
                                                         'c_onlinetime,'.
                                                         'c_closethreads,'.
                                                         'c_usrperpage,'.
-                                                        'c_msgperpage,'.
                                                         'c_msgheaderperpage,'.
                                                         'c_privatemsgperpage,'.
                                                         'c_thrdperpage,'.
@@ -130,31 +99,30 @@ class cConfig
                 $objResultSet->freeResult();
                 unset($objResultSet);
 
-                $this->m_iDefaultSkinId = intval($objResultRow->c_skinid);
+                $this->m_iDefaultSkinId = (int) $objResultRow->c_skinid;
 
-                $this->m_bUseQuickPost = $objResultRow->c_quickpost ? true : false;
-                $this->m_bUseDirectRegistration = $objResultRow->c_directregistration ? true : false;
-                $this->m_bUniqueRegistrationMails = $objResultRow->c_uniquemail ? true : false;
-                $this->m_bUseSignatures = $objResultRow->c_usesignatures ? true : false;
+                $this->m_bUseQuickPost = (bool) $objResultRow->c_quickpost;
+                $this->m_bUseDirectRegistration = (bool) $objResultRow->c_directregistration;
+                $this->m_bUniqueRegistrationMails = (bool) $objResultRow->c_uniquemail;
+                $this->m_bUseSignatures = (bool) $objResultRow->c_usesignatures;
                 $this->m_sDateFormat = $objResultRow->c_dateformat;
-                $this->m_iTimeOffset = intval($objResultRow->c_timeoffset);
-                $this->m_iOnlineTime = intval($objResultRow->c_onlinetime);
+                $this->m_iTimeOffset = (int) $objResultRow->c_timeoffset;
+                $this->m_iOnlineTime = (int) $objResultRow->c_onlinetime;
 
-                $this->m_iThreadSizeLimit = intval($objResultRow->c_closethreads);
-                $this->m_iUserPerPage = intval($objResultRow->c_usrperpage);
-                $this->m_iMessagesPerPage = intval($objResultRow->c_msgperpage);
-                $this->m_iMessageHeaderPerPage = intval($objResultRow->c_msgheaderperpage);
-                $this->m_iPrivateMessagesPerPage = intval($objResultRow->c_privatemsgperpage);
-                $this->m_iThreadsPerPage = intval($objResultRow->c_thrdperpage);
+                $this->m_iThreadSizeLimit = (int) $objResultRow->c_closethreads;
+                $this->m_iUserPerPage = (int) $objResultRow->c_usrperpage;
+                $this->m_iMessageHeaderPerPage = (int) $objResultRow->c_msgheaderperpage;
+                $this->m_iPrivateMessagesPerPage = (int) $objResultRow->c_privatemsgperpage;
+                $this->m_iThreadsPerPage = (int) $objResultRow->c_thrdperpage;
 
                 $this->m_sQuoteSubject = $objResultRow->c_quotesubject;
 
                 $this->m_sMailWebmaster	= $objResultRow->c_mailwebmaster;
 
                 $this->m_sSkinDir = $objResultRow->c_skindir;
-                $this->m_iMaxProfileImgSize = intval($objResultRow->c_maxprofilepicsize);
-                $this->m_iMaxProfileImgWidth = intval($objResultRow->c_maxprofilepicwidth);
-                $this->m_iMaxProfileImgHeight = intval($objResultRow->c_maxprofilepicheight);
+                $this->m_iMaxProfileImgSize = (int) $objResultRow->c_maxprofilepicsize;
+                $this->m_iMaxProfileImgWidth = (int) $objResultRow->c_maxprofilepicwidth;
+                $this->m_iMaxProfileImgHeight = (int) $objResultRow->c_maxprofilepicheight;
                 $this->m_sProfileImgDir = $objResultRow->c_profileimgdir;
 
                 unset($objResultRow);
@@ -172,8 +140,6 @@ class cConfig
      */
     public function updateData(): bool
     {
-
-
         if (cDBFactory::getInstance()->executeQuery("UPDATE pxm_configuration SET c_skinid=$this->m_iDefaultSkinId,".
                                                                         'c_quickpost='.intval($this->m_bUseQuickPost).','.
                                                                         'c_directregistration='.intval($this->m_bUseDirectRegistration).','.
@@ -184,7 +150,6 @@ class cConfig
                                                                         "c_onlinetime=$this->m_iOnlineTime,".
                                                                         "c_closethreads=$this->m_iThreadSizeLimit,".
                                                                         "c_usrperpage=$this->m_iUserPerPage,".
-                                                                        "c_msgperpage=$this->m_iMessagesPerPage,".
                                                                         "c_msgheaderperpage=$this->m_iMessageHeaderPerPage,".
                                                                         "c_privatemsgperpage=$this->m_iPrivateMessagesPerPage,".
                                                                         "c_thrdperpage=$this->m_iThreadsPerPage,".
@@ -203,7 +168,7 @@ class cConfig
     /**
      * get available template engines
      *
-     * @return array available template engines
+     * @return array<string> available template engines
      */
     public function getAvailableTemplateEngines(): array
     {
@@ -249,7 +214,7 @@ class cConfig
      */
     public function setDefaultSkinId(int $iDefaultSkinId): void
     {
-        $this->m_iDefaultSkinId = intval($iDefaultSkinId);
+        $this->m_iDefaultSkinId = $iDefaultSkinId;
     }
 
     /**
@@ -385,7 +350,6 @@ class cConfig
      */
     public function setTimeOffset(int $iTimeOffset): void
     {
-        $iTimeOffset = intval($iTimeOffset);
         if ($iTimeOffset < 13 && $iTimeOffset > -13) {
             $this->m_iTimeOffset = $iTimeOffset;
         }
@@ -409,7 +373,7 @@ class cConfig
      */
     public function setOnlineTime(int $iOnlineTime): void
     {
-        $this->m_iOnlineTime = intval($iOnlineTime);
+        $this->m_iOnlineTime = $iOnlineTime;
     }
 
     /**
@@ -430,7 +394,7 @@ class cConfig
      */
     public function setThreadSizeLimit(int $iThreadSizeLimit): void
     {
-        $this->m_iThreadSizeLimit = intval($iThreadSizeLimit);
+        $this->m_iThreadSizeLimit = $iThreadSizeLimit;
     }
 
     /**
@@ -451,7 +415,7 @@ class cConfig
      */
     public function setUserPerPage(int $iUserPerPage): void
     {
-        $this->m_iUserPerPage = intval($iUserPerPage);
+        $this->m_iUserPerPage = $iUserPerPage;
     }
 
     /**
@@ -472,28 +436,7 @@ class cConfig
      */
     public function setMessageHeaderPerPage(int $iMessageHeaderPerPage): void
     {
-        $this->m_iMessageHeaderPerPage = intval($iMessageHeaderPerPage);
-    }
-
-    /**
-     * get messages per page (flat mode)
-     *
-     * @return int messages per page
-     */
-    public function getMessagesPerPage(): int
-    {
-        return $this->m_iMessagesPerPage;
-    }
-
-    /**
-     * set messages per page (flat mode)
-     *
-     * @param int $iMessagesPerPage messages per page
-     * @return void
-     */
-    public function setMessagesPerPage(int $iMessagesPerPage): void
-    {
-        $this->m_iMessagesPerPage = intval($iMessagesPerPage);
+        $this->m_iMessageHeaderPerPage = $iMessageHeaderPerPage;
     }
 
     /**
@@ -514,7 +457,7 @@ class cConfig
      */
     public function setPrivateMessagesPerPage(int $iPrivateMessagesPerPage): void
     {
-        $this->m_iPrivateMessagesPerPage = intval($iPrivateMessagesPerPage);
+        $this->m_iPrivateMessagesPerPage = $iPrivateMessagesPerPage;
     }
 
     /**
@@ -535,7 +478,7 @@ class cConfig
      */
     public function setThreadsPerPage(int $iThreadsPerPage): void
     {
-        $this->m_iThreadsPerPage = intval($iThreadsPerPage);
+        $this->m_iThreadsPerPage = $iThreadsPerPage;
     }
 
     /**
@@ -634,7 +577,7 @@ class cConfig
      */
     public function setMaxProfileImgSize(int $iMaxProfileImgSize): void
     {
-        $this->m_iMaxProfileImgSize = intval($iMaxProfileImgSize);
+        $this->m_iMaxProfileImgSize = $iMaxProfileImgSize;
     }
 
     /**
@@ -655,7 +598,7 @@ class cConfig
      */
     public function setMaxProfileImgWidth(int $iMaxProfileImgWidth): void
     {
-        $this->m_iMaxProfileImgWidth = intval($iMaxProfileImgWidth);
+        $this->m_iMaxProfileImgWidth = $iMaxProfileImgWidth;
     }
 
     /**
@@ -676,7 +619,7 @@ class cConfig
      */
     public function setMaxProfileImgHeight(int $iMaxProfileImgHeight): void
     {
-        $this->m_iMaxProfileImgHeight = intval($iMaxProfileImgHeight);
+        $this->m_iMaxProfileImgHeight = $iMaxProfileImgHeight;
     }
 
     /**
@@ -717,7 +660,7 @@ class cConfig
     /**
      * get profile img types
      *
-     * @return array profile img types
+     * @return array<string> profile img types
      */
     public function getProfileImgTypes(): array
     {
@@ -737,14 +680,14 @@ class cConfig
     /**
      * get membervariables as array
      *
-     * @param array  $arrAdditionalConfig additional configuration
-     * @return array member variables
+     * @param array<string, mixed>  $arrAdditionalConfig additional configuration
+     * @return array<mixed> member variables
      */
     public function getDataArray(array $arrAdditionalConfig = []): array
     {
         $arrGeneralConfiguration = [
             'webmaster'			=> $this->m_sMailWebmaster,
-            'usesignatures'		=> intval($this->m_bUseSignatures),
+            'usesignatures'		=> (int) $this->m_bUseSignatures,
             'profile_img_dir'	=> $this->m_sProfileImgDir
         ];
         //TODO: additonalConfig entfernen

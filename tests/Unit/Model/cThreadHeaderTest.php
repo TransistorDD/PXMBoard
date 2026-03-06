@@ -1,4 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Unit\Model;
+
+use PHPUnit\Framework\TestCase;
+use PXMBoard\Model\cThreadHeader;
+
 /**
  * Unit test for cThreadHeader class
  *
@@ -7,20 +15,14 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Unit\Model;
-
-use PHPUnit\Framework\TestCase;
-
 class cThreadHeaderTest extends TestCase
 {
-    private \cThreadHeader $threadHeader;
+    private cThreadHeader $threadHeader;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->threadHeader = new \cThreadHeader();
+        $this->threadHeader = new cThreadHeader();
     }
 
     /**
@@ -187,7 +189,7 @@ class cThreadHeaderTest extends TestCase
     {
         $this->assertSame(0, $this->threadHeader->getBoardId());
         $this->assertSame(0, $this->threadHeader->getThreadId());
-        $this->assertFalse($this->threadHeader->isThreadActive());
+        $this->assertTrue($this->threadHeader->isThreadActive());
         $this->assertFalse($this->threadHeader->isThreadFixed());
         $this->assertSame(0, $this->threadHeader->getLastMessageId());
         $this->assertSame(0, $this->threadHeader->getLastMessageTimestamp());

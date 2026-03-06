@@ -1,8 +1,8 @@
 <?php
 
-require_once(SRCDIR . '/Model/cScrollList.php');
-require_once(SRCDIR . '/Model/cNotification.php');
-require_once(SRCDIR . '/Model/cUser.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
 
 /**
  * Notification list
@@ -12,20 +12,8 @@ require_once(SRCDIR . '/Model/cUser.php');
  */
 class cNotificationList extends cScrollList
 {
-    protected int $m_iUserId;
-    protected string $m_sStatus;
-
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->m_iUserId = 0;
-        $this->m_sStatus = '';
-    }
+    protected int $m_iUserId = 0;
+    protected string $m_sStatus = '';
 
     /**
      * Set user ID for notifications
@@ -35,7 +23,7 @@ class cNotificationList extends cScrollList
      */
     public function setUserId(int $iUserId): void
     {
-        $this->m_iUserId = intval($iUserId);
+        $this->m_iUserId = $iUserId;
     }
 
     /**
@@ -56,7 +44,6 @@ class cNotificationList extends cScrollList
      */
     protected function _getQuery(): string
     {
-
         $sQuery = 'SELECT n_id, n_userid, n_type, n_status, n_title, n_message, n_link, '.
                   'n_related_messageid, n_related_pmid, '.
                   'n_created_timestamp, n_read_timestamp '.
@@ -81,17 +68,17 @@ class cNotificationList extends cScrollList
     protected function _setDataFromDb(object $objResultRow): bool
     {
         $this->m_arrResultList[] = [
-            'id' => intval($objResultRow->n_id),
-            'userid' => intval($objResultRow->n_userid),
+            'id' => (int) $objResultRow->n_id,
+            'userid' => (int) $objResultRow->n_userid,
             'type' => $objResultRow->n_type,
             'status' => $objResultRow->n_status,
             'title' => $objResultRow->n_title,
             'message' => $objResultRow->n_message,
             'link' => $objResultRow->n_link,
-            'related_messageid' => intval($objResultRow->n_related_messageid),
-            'related_pmid' => intval($objResultRow->n_related_pmid),
-            'created_timestamp' => intval($objResultRow->n_created_timestamp),
-            'read_timestamp' => intval($objResultRow->n_read_timestamp),
+            'related_messageid' => (int) $objResultRow->n_related_messageid,
+            'related_pmid' => (int) $objResultRow->n_related_pmid,
+            'created_timestamp' => (int) $objResultRow->n_created_timestamp,
+            'read_timestamp' => (int) $objResultRow->n_read_timestamp,
             'is_unread' => ($objResultRow->n_status == 'unread')
         ];
         return true;
@@ -106,7 +93,7 @@ class cNotificationList extends cScrollList
     public static function markAllAsRead(int $iUserId): bool
     {
         $objDb = cDBFactory::getInstance();
-        $iUserId = intval($iUserId);
+
         $iTimestamp = time();
 
         if ($iUserId <= 0) {
@@ -138,7 +125,6 @@ class cNotificationList extends cScrollList
      */
     public static function deleteOldNotifications(int $iDaysOld = 90): int
     {
-        $iDaysOld = intval($iDaysOld);
         $iCutoffTimestamp = time() - ($iDaysOld * 86400);
 
         $sQuery = 'DELETE FROM pxm_notification '.

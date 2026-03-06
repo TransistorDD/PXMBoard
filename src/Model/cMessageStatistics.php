@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cBoardMessage.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * message statistics
  *
@@ -12,23 +15,12 @@ require_once(SRCDIR . '/Model/cBoardMessage.php');
 class cMessageStatistics
 {
     /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * get the amount of messages
      *
      * @return int amount of messages
      */
     public function getMessageCount(): int
     {
-
-
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT count(*) AS messages FROM pxm_message')) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 return $objResultRow->messages;
@@ -44,8 +36,6 @@ class cMessageStatistics
      */
     public function getPrivateMessageCount(): int
     {
-
-
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT count(*) AS messages FROM pxm_priv_message')) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 return $objResultRow->messages;
@@ -58,7 +48,7 @@ class cMessageStatistics
      * get the newest messages
      *
      * @param int $iTimeSpan timespan
-     * @return array newest messages
+     * @return list<cBoardMessage> newest messages
      */
     public function getNewestMessages(int $iTimeSpan): array
     {
@@ -68,7 +58,7 @@ class cMessageStatistics
     /**
      * get the oldest messages
      *
-     * @return array oldest messages
+     * @return list<cBoardMessage> oldest messages
      */
     public function getOldestMessages(): array
     {
@@ -82,11 +72,10 @@ class cMessageStatistics
      * @param string $sOrder order by (asc|desc)
      * @param int $iLimit limit the result to x rows
      * @param int $iTimeSpan timespan
-     * @return array boardmessage objects
+     * @return list<cBoardMessage> boardmessage objects
      */
     private function _getMessagesByAttribute(string $sAttribute, string $sOrder = 'ASC', int $iLimit = 1, int $iTimeSpan = 0): array
     {
-
         $arrBoardMessages = [];
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT m_id,m_parentid,t_boardid,t_id,t_active,m_subject,m_tstmp,m_userid,m_username,m_usermail,m_userhighlight FROM pxm_board,pxm_thread,pxm_message WHERE b_id=t_boardid AND t_id=m_threadid AND b_status!=5 AND m_tstmp>'.intval($iTimeSpan)." ORDER BY $sAttribute $sOrder", $iLimit)) {

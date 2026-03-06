@@ -1,5 +1,7 @@
 <?php
 
+namespace PXMBoard\Model;
+
 /**
  * session and cookie support
  *
@@ -15,7 +17,6 @@ class cSession
      * Constructor
      *
      * @param  string  $sSessionName  name of the session / cookie name
-     * @return void
      */
     public function __construct(string $sSessionName)
     {

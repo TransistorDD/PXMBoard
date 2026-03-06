@@ -1,4 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Integration\Model;
+
+use PXMBoard\Model\cUser;
+use PXMBoard\Tests\TestCase\IntegrationTestCase;
+
 /**
  * Integration test for cUser class
  * Tests user data loading and password validation against the real test database
@@ -8,12 +16,6 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Integration\Model;
-
-use PXMBoard\Tests\TestCase\IntegrationTestCase;
-
 class cUserTest extends IntegrationTestCase
 {
     /**
@@ -29,7 +31,7 @@ class cUserTest extends IntegrationTestCase
             'u_lastname'  => 'User',
         ]);
 
-        $objUser = new \cUser();
+        $objUser = new cUser();
         $bResult = $objUser->loadDataById($iUserId);
 
         $this->assertTrue($bResult);
@@ -44,7 +46,7 @@ class cUserTest extends IntegrationTestCase
      */
     public function test_loadDataById_withInvalidId_returnsFalse(): void
     {
-        $objUser = new \cUser();
+        $objUser = new cUser();
         $bResult = $objUser->loadDataById(999999);
 
         $this->assertFalse($bResult);
@@ -63,7 +65,7 @@ class cUserTest extends IntegrationTestCase
             'u_password' => password_hash($sPassword, PASSWORD_DEFAULT),
         ]);
 
-        $objUser = new \cUser();
+        $objUser = new cUser();
         $objUser->loadDataById($iUserId);
 
         $this->assertTrue($objUser->validatePassword($sPassword));
@@ -81,7 +83,7 @@ class cUserTest extends IntegrationTestCase
             'u_password' => password_hash('correctpassword', PASSWORD_DEFAULT),
         ]);
 
-        $objUser = new \cUser();
+        $objUser = new cUser();
         $objUser->loadDataById($iUserId);
 
         $this->assertFalse($objUser->validatePassword('wrongpassword'));

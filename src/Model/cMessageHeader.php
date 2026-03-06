@@ -1,6 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Model/cUser.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eMessageStatus;
+use PXMBoard\Parser\cParser;
+
 /**
  * messageheader handling
  *
@@ -11,11 +16,12 @@ require_once(SRCDIR . '/Model/cUser.php');
  */
 class cMessageHeader
 {
-    protected int $m_iId;					// message id
-    protected mixed $m_objAuthor;			// author (user)
-    protected string $m_sSubject;			// message subject
-    protected int $m_iMessageTimestamp;		// date of the message
-    protected ?bool $m_bIsRead = null;		// DB-based read status (null = use timestamp fallback)
+    protected int $m_iId = 0;					// message id
+    protected mixed $m_objAuthor;			    // author (user)
+    protected string $m_sSubject = '';			// message subject
+    protected int $m_iMessageTimestamp = 0;		// date of the message
+    protected eMessageStatus $m_eStatus = eMessageStatus::PUBLISHED;	// message status
+    protected ?bool $m_bIsRead = null;          // DB-based read status (null = use timestamp fallback)
 
     /**
      * Constructor
@@ -24,11 +30,7 @@ class cMessageHeader
      */
     public function __construct()
     {
-
-        $this->m_iId = 0;
         $this->m_objAuthor = new cUser();
-        $this->m_sSubject = '';
-        $this->m_iMessageTimestamp = 0;
     }
 
     /**
@@ -39,20 +41,9 @@ class cMessageHeader
      */
     public function loadDataById(int $iMessageId): bool
     {
-
         $bReturn = false;
-        $iMessageId = intval($iMessageId);
-
         if ($iMessageId > 0) {
-
-
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT m_id,'.
-                                                             'm_subject,'.
-                                                             'm_tstmp,'.
-                                                             'm_userid,'.
-                                                             'm_username,'.
-                                                             'm_usermail,'.
-                                                             'm_userhighlight'.
+            if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT '.
                                                              $this->_getDbAttributes().
                                                              ' FROM '.
                                                              $this->_getDbTables().
@@ -76,10 +67,10 @@ class cMessageHeader
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
-        $this->m_iId = intval($objResultRow->m_id);
+        $this->m_iId = (int) $objResultRow->m_id;
         $this->m_sSubject = $objResultRow->m_subject;
-        $this->m_iMessageTimestamp = intval($objResultRow->m_tstmp);
+        $this->m_iMessageTimestamp = (int) $objResultRow->m_tstmp;
+        $this->m_eStatus = eMessageStatus::tryFrom((int) $objResultRow->m_status) ?? eMessageStatus::PUBLISHED;
 
         $this->m_objAuthor->setId($objResultRow->m_userid);
         $this->m_objAuthor->setUserName($objResultRow->m_username);
@@ -96,7 +87,7 @@ class cMessageHeader
      */
     protected function _getDbAttributes(): string
     {
-        return '';
+        return 'm_id,m_subject,m_tstmp,m_userid,m_username,m_usermail,m_userhighlight,m_status';
     }
 
     /**
@@ -137,7 +128,7 @@ class cMessageHeader
      */
     public function setId(int $iId): void
     {
-        $this->m_iId = intval($iId);
+        $this->m_iId = $iId;
     }
 
     /**
@@ -183,7 +174,7 @@ class cMessageHeader
      */
     public function setMessageTimestamp(int $iMessageTimestamp): void
     {
-        $this->m_iMessageTimestamp = intval($iMessageTimestamp);
+        $this->m_iMessageTimestamp = $iMessageTimestamp;
     }
 
     /**
@@ -264,6 +255,57 @@ class cMessageHeader
     }
 
     /**
+     * get message status
+     *
+     * @return eMessageStatus message status enum
+     */
+    public function getStatus(): eMessageStatus
+    {
+        return $this->m_eStatus;
+    }
+
+    /**
+     * set message status
+     *
+     * @param eMessageStatus $eStatus message status
+     * @return void
+     */
+    public function setStatus(eMessageStatus $eStatus): void
+    {
+        $this->m_eStatus = $eStatus;
+    }
+
+    /**
+     * check if message is a draft
+     *
+     * @return bool true if message is a draft
+     */
+    public function isDraft(): bool
+    {
+        return $this->m_eStatus === eMessageStatus::DRAFT;
+    }
+
+    /**
+     * check if message is published
+     *
+     * @return bool true if message is published
+     */
+    public function isPublished(): bool
+    {
+        return $this->m_eStatus === eMessageStatus::PUBLISHED;
+    }
+
+    /**
+     * check if message is deleted
+     *
+     * @return bool true if message is deleted
+     */
+    public function isDeleted(): bool
+    {
+        return $this->m_eStatus === eMessageStatus::DELETED;
+    }
+
+    /**
      * set DB-based read status
      *
      * @param ?bool $bIsRead true = read, false = unread, null = use timestamp fallback
@@ -274,6 +316,7 @@ class cMessageHeader
         $this->m_bIsRead = $bIsRead;
     }
 
+
     /**
      * get membervariables as array
      *
@@ -282,17 +325,18 @@ class cMessageHeader
      * @param int $iLastOnlineTimestamp last online timestamp for user
      * @param string $sSubjectQuotePrefix prefix for quoted subject
      * @param ?cParser $objParser message parser
-     * @return array member variables
+     * @return array<string, mixed> member variables
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, string $sSubjectQuotePrefix = '', ?cParser $objParser = null): array
     {
         // TODO: Vererbung mit unterschiedlicher Methodensignatur optimieren
         return ['id'		=>	$this->m_iId,
-                     'subject'	=>	$this->getSubject($sSubjectQuotePrefix),
-                     'date'		=>	(($this->m_iMessageTimestamp > 0) ? date($sDateFormat, ($this->m_iMessageTimestamp + $iTimeOffset)) : 0),
-                     'new'		=>	$this->m_bIsRead !== null
-                                        ? ($this->m_bIsRead ? 0 : 1)
-                                        : (($iLastOnlineTimestamp > $this->m_iMessageTimestamp) ? 0 : 1),
-                     'user'		=>	$this->m_objAuthor->getDataArray($iTimeOffset, $sDateFormat, $objParser)];
+                'subject'	=>	$this->getSubject($sSubjectQuotePrefix),
+                'date'		=>	(($this->m_iMessageTimestamp > 0) ? date($sDateFormat, ($this->m_iMessageTimestamp + $iTimeOffset)) : 0),
+                'new'		=>	$this->m_bIsRead !== null
+                    ? ($this->m_bIsRead ? 0 : 1)
+                    : (($iLastOnlineTimestamp > $this->m_iMessageTimestamp) ? 0 : 1),
+                'status'	=>	$this->m_eStatus->value,
+                'user'		=>	$this->m_objAuthor->getDataArray($iTimeOffset, $sDateFormat, $objParser)];
     }
 }

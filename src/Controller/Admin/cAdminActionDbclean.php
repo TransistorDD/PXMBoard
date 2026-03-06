@@ -1,7 +1,14 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cBoardList.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Model\cBoardList;
+use PXMBoard\Model\cMessageReadTracker;
+use PXMBoard\Model\cNotificationList;
+use PXMBoard\Model\cUser;
+use PXMBoard\Model\cUserLoginTicketList;
+
 /**
  * run db clean tool
  *
@@ -171,7 +178,6 @@ class cAdminActionDbclean extends cAdminAction
         // cleanup old read tracking entries //////////////////////////////////////////
 
         if ($this->m_objInputHandler->getIntFormVar('cleanread', true, true, true) > 0) {
-            require_once(SRCDIR . '/Model/cMessageReadTracker.php');
             $iDeleted = cMessageReadTracker::cleanup(60);
             $this->m_sOutput .= $this->_getAlert('old read tracking entries deleted: '.$iDeleted, 'success');
         }
@@ -179,7 +185,6 @@ class cAdminActionDbclean extends cAdminAction
         // cleanup old login tickets //////////////////////////////////////////////////
 
         if ($this->m_objInputHandler->getIntFormVar('logintickets', true, true, true) > 0) {
-            require_once(SRCDIR . '/Model/cUserLoginTicketList.php');
             $iDeleted = cUserLoginTicketList::deleteInactiveTickets(180); // 6 months
             $this->m_sOutput .= $this->_getAlert('old login tickets deleted: '.$iDeleted, 'success');
         }
@@ -187,8 +192,6 @@ class cAdminActionDbclean extends cAdminAction
         // cleanup old notifications //////////////////////////////////////////////////
 
         if ($this->m_objInputHandler->getIntFormVar('cleannotifications', true, true, true) > 0) {
-            require_once(SRCDIR . '/Model/cNotificationList.php');
-            require_once(SRCDIR . '/Model/cUser.php');
 
             // Auto-Aging: Mark notifications older than 7 days as read
             $iAutoAgeDays = 7;
@@ -228,7 +231,6 @@ class cAdminActionDbclean extends cAdminAction
         // cleanup private message cache //////////////////////////////////////////////
 
         if ($this->m_objInputHandler->getIntFormVar('cleanprivmsgcache', true, true, true) > 0) {
-            require_once(SRCDIR . '/Model/cUser.php');
 
             // Recalculate all unread private message counts (safety measure)
             $sQueryUsers = 'SELECT u_id FROM pxm_user WHERE u_priv_message_unread_count > 0';

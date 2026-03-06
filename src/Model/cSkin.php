@@ -1,5 +1,9 @@
 <?php
 
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * skin handling
  *
@@ -10,26 +14,13 @@
  */
 class cSkin
 {
-    protected int $m_iId;							// skin id
-    protected string $m_sName;						// name
-    protected string $m_sDirectory;					// subdirectory of the templates
-    protected array $m_arrSupportedTemplateEngines; // supported template engines
-    protected array $m_arrAdditionalSkinValues;		// additional values
-
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-
-        $this->m_iId = 0;
-        $this->m_sName = '';
-        $this->m_sDirectory = '';
-        $this->m_arrSupportedTemplateEngines = [];
-        $this->m_arrAdditionalSkinValues = [];
-    }
+    protected int $m_iId = 0;							// skin id
+    protected string $m_sName = '';						// name
+    protected string $m_sDirectory = '';				// subdirectory of the templates
+    /** @var array<string> supported template engines */
+    protected array $m_arrSupportedTemplateEngines = [];
+    /** @var array<string, mixed> additional values */
+    protected array $m_arrAdditionalSkinValues = [];
 
     /**
      * get data from database by skin id
@@ -39,13 +30,9 @@ class cSkin
      */
     public function loadDataById(int $iSkinId): bool
     {
-
         $bReturn = false;
-        $iSkinId = intval($iSkinId);
 
         if ($iSkinId > 0) {
-
-
             if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT s_fieldname,s_fieldvalue FROM pxm_skin WHERE s_id='.$iSkinId)) {
                 if ($objResultSet->getNumRows() >= 3) {
                     $bReturn = true;
@@ -76,7 +63,6 @@ class cSkin
      */
     public function updateData(): bool
     {
-
         $bReturn = false;
 
         if ($this->m_iId > 0) {
@@ -109,7 +95,7 @@ class cSkin
      */
     public function setId(int $iId): void
     {
-        $this->m_iId = intval($iId);
+        $this->m_iId = $iId;
     }
 
     /**
@@ -161,7 +147,7 @@ class cSkin
     /**
      * get supported template engines
      *
-     * @return array supported template engines
+     * @return array<string> supported template engines
      */
     public function getSupportedTemplateEngines(): array
     {
@@ -171,7 +157,7 @@ class cSkin
     /**
      * set supported template engines
      *
-     * @param array $arrSupportedTemplateEngines supported template engines
+     * @param array<string> $arrSupportedTemplateEngines supported template engines
      * @return void
      */
     public function setSupportedTemplateEngines(array $arrSupportedTemplateEngines): void
@@ -182,7 +168,7 @@ class cSkin
     /**
      * get additional skin values
      *
-     * @return array additional skin values
+     * @return array<string, mixed> additional skin values
      */
     public function getAdditionalSkinValues(): array
     {
@@ -192,7 +178,7 @@ class cSkin
     /**
      * set additional skin values
      *
-     * @param array $arrAdditionalSkinValues additional skin values
+     * @param array<string, mixed> $arrAdditionalSkinValues additional skin values
      * @return void
      */
     public function setAdditionalSkinValues(array $arrAdditionalSkinValues): void
@@ -203,14 +189,14 @@ class cSkin
     /**
      * get membervariables as array
      *
-     * @param array  $arrAdditionalConfig additional configuration
-     * @return array member variables
+     * @param array<string, mixed>  $arrAdditionalConfig additional configuration
+     * @return array<string, mixed> member variables
      */
     public function getDataArray(array $arrAdditionalConfig = []): array
     {
         return array_merge(
             ['id'			=>	$this->m_iId,
-                                 'name'		 	=>	$this->m_sName],
+             'name'		 	=>	$this->m_sName],
             $this->m_arrAdditionalSkinValues
         );
     }

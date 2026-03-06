@@ -1,7 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cThread.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eSuccessKeys;
+use PXMBoard\Model\cThread;
+
 /**
  * AJAX action: Move a thread to another board
  *
@@ -41,7 +45,7 @@ class cAjaxActionThreadmove extends cAjaxAction
 
         $iThreadId = $this->m_objInputHandler->getIntFormVar('id', false, true);
         if ($iThreadId <= 0) {
-            $this->_setJsonError(eError::INVALID_THREAD_ID, 400);
+            $this->_setJsonError(eErrorKeys::INVALID_THREAD_ID, 400);
             return;
         }
 
@@ -69,16 +73,16 @@ class cAjaxActionThreadmove extends cAjaxAction
         }
 
         if (!$bIsValidBoard) {
-            $this->_setJsonError(eError::INVALID_BOARD_ID, 400);
+            $this->_setJsonError(eErrorKeys::INVALID_BOARD_ID, 400);
             return;
         }
 
         $objThread = new cThread();
         if (!$objThread->loadDataById($iThreadId, $iBoardId) || !$objThread->moveThread($iDestId)) {
-            $this->_setJsonError(eError::MESSAGE_MOVE_ERROR, 500);
+            $this->_setJsonError(eErrorKeys::MESSAGE_MOVE_ERROR, 500);
             return;
         }
 
-        $this->_setJsonSuccess(eSuccessMessage::THREAD_MOVED, ['destBoardId' => $iDestId]);
+        $this->_setJsonSuccess(eSuccessKeys::THREAD_MOVED, ['destBoardId' => $iDestId]);
     }
 }

@@ -1,4 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Unit\Enum;
+
+use PHPUnit\Framework\TestCase;
+use PXMBoard\Enum\eBoardStatus;
+use PXMBoard\I18n\cTranslator;
+
 /**
  * Unit tests for BoardStatus Enum
  * Tests board status values and permission methods
@@ -8,14 +17,19 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Unit\Enum;
-
-use PHPUnit\Framework\TestCase;
-
 class BoardStatusTest extends TestCase
 {
+    /**
+     * Load translations before each test.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        cTranslator::load('de');
+    }
+
+
     /**
      * Test isPublicReadable returns true for PUBLIC
      *
@@ -23,7 +37,7 @@ class BoardStatusTest extends TestCase
      */
     public function test_isPublicReadable_forPublic_returnsTrue(): void
     {
-        $this->assertTrue(\BoardStatus::PUBLIC->isPublicReadable());
+        $this->assertTrue(eBoardStatus::PUBLIC->isPublicReadable());
     }
 
     /**
@@ -33,7 +47,7 @@ class BoardStatusTest extends TestCase
      */
     public function test_isPublicReadable_forMembersOnly_returnsFalse(): void
     {
-        $this->assertFalse(\BoardStatus::MEMBERS_ONLY->isPublicReadable());
+        $this->assertFalse(eBoardStatus::MEMBERS_ONLY->isPublicReadable());
     }
 
     /**
@@ -43,7 +57,7 @@ class BoardStatusTest extends TestCase
      */
     public function test_isPublicReadable_forReadonlyPublic_returnsTrue(): void
     {
-        $this->assertTrue(\BoardStatus::READONLY_PUBLIC->isPublicReadable());
+        $this->assertTrue(eBoardStatus::READONLY_PUBLIC->isPublicReadable());
     }
 
     /**
@@ -53,7 +67,7 @@ class BoardStatusTest extends TestCase
      */
     public function test_isWritable_forPublic_returnsTrue(): void
     {
-        $this->assertTrue(\BoardStatus::PUBLIC->isWritable());
+        $this->assertTrue(eBoardStatus::PUBLIC->isWritable());
     }
 
     /**
@@ -63,7 +77,7 @@ class BoardStatusTest extends TestCase
      */
     public function test_isWritable_forReadonlyPublic_returnsFalse(): void
     {
-        $this->assertFalse(\BoardStatus::READONLY_PUBLIC->isWritable());
+        $this->assertFalse(eBoardStatus::READONLY_PUBLIC->isWritable());
     }
 
     /**
@@ -73,7 +87,7 @@ class BoardStatusTest extends TestCase
      */
     public function test_isWritable_forMembersOnly_returnsTrue(): void
     {
-        $this->assertTrue(\BoardStatus::MEMBERS_ONLY->isWritable());
+        $this->assertTrue(eBoardStatus::MEMBERS_ONLY->isWritable());
     }
 
     /**
@@ -83,7 +97,7 @@ class BoardStatusTest extends TestCase
      */
     public function test_isClosed_forClosed_returnsTrue(): void
     {
-        $this->assertTrue(\BoardStatus::CLOSED->isClosed());
+        $this->assertTrue(eBoardStatus::CLOSED->isClosed());
     }
 
     /**
@@ -93,7 +107,7 @@ class BoardStatusTest extends TestCase
      */
     public function test_isClosed_forPublic_returnsFalse(): void
     {
-        $this->assertFalse(\BoardStatus::PUBLIC->isClosed());
+        $this->assertFalse(eBoardStatus::PUBLIC->isClosed());
     }
 
     /**
@@ -103,7 +117,7 @@ class BoardStatusTest extends TestCase
      */
     public function test_requiresAuthentication_forMembersOnly_returnsTrue(): void
     {
-        $this->assertTrue(\BoardStatus::MEMBERS_ONLY->requiresAuthentication());
+        $this->assertTrue(eBoardStatus::MEMBERS_ONLY->requiresAuthentication());
     }
 
     /**
@@ -113,7 +127,7 @@ class BoardStatusTest extends TestCase
      */
     public function test_requiresAuthentication_forPublic_returnsFalse(): void
     {
-        $this->assertFalse(\BoardStatus::PUBLIC->requiresAuthentication());
+        $this->assertFalse(eBoardStatus::PUBLIC->requiresAuthentication());
     }
 
     /**
@@ -123,7 +137,7 @@ class BoardStatusTest extends TestCase
      */
     public function test_requiresAuthentication_forClosed_returnsTrue(): void
     {
-        $this->assertTrue(\BoardStatus::CLOSED->requiresAuthentication());
+        $this->assertTrue(eBoardStatus::CLOSED->requiresAuthentication());
     }
 
     /**
@@ -133,10 +147,10 @@ class BoardStatusTest extends TestCase
      */
     public function test_getLabel_returnsGermanLabels(): void
     {
-        $this->assertSame('Öffentlich', \BoardStatus::PUBLIC->getLabel());
-        $this->assertSame('Nur Mitglieder', \BoardStatus::MEMBERS_ONLY->getLabel());
-        $this->assertSame('Nur Lesen (Öffentlich)', \BoardStatus::READONLY_PUBLIC->getLabel());
-        $this->assertSame('Nur Lesen (Mitglieder)', \BoardStatus::READONLY_MEMBERS->getLabel());
-        $this->assertSame('Geschlossen', \BoardStatus::CLOSED->getLabel());
+        $this->assertSame('Öffentlich', eBoardStatus::PUBLIC->getLabel());
+        $this->assertSame('Nur Mitglieder', eBoardStatus::MEMBERS_ONLY->getLabel());
+        $this->assertSame('Nur Lesen (Öffentlich)', eBoardStatus::READONLY_PUBLIC->getLabel());
+        $this->assertSame('Nur Lesen (Mitglieder)', eBoardStatus::READONLY_MEMBERS->getLabel());
+        $this->assertSame('Geschlossen', eBoardStatus::CLOSED->getLabel());
     }
 }

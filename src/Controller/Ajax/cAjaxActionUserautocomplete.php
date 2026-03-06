@@ -1,7 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Database/cDBFactory.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eUserStatus;
+
 /**
  * AJAX endpoint for user autocomplete (mention feature)
  *
@@ -30,8 +33,6 @@ class cAjaxActionUserautocomplete extends cAjaxAction
      */
     public function performAction(): void
     {
-        require_once(SRCDIR . '/Enum/eUser.php');
-
         // Get and validate query parameter
         $sQuery = $this->m_objInputHandler->getStringFormVar('q', 'searchstring', true, true, 'trim');
 
@@ -50,7 +51,7 @@ class cAjaxActionUserautocomplete extends cAjaxAction
         $sSql = 'SELECT u_id, u_username
 		         FROM pxm_user
 		         WHERE u_username LIKE '.$objDb->quote($sQueryEscaped.'%').'
-		           AND u_status = '.UserStatus::ACTIVE->value;
+		           AND u_status = '.eUserStatus::ACTIVE->value;
 
         // Exclude self-mentions when logged in
         $objActiveUser = $this->getActiveUser();
@@ -66,7 +67,7 @@ class cAjaxActionUserautocomplete extends cAjaxAction
         $arrResults = [];
         while ($objRow = $objResultSet->getNextResultRowObject()) {
             $arrResults[] = [
-                'id' => intval($objRow->u_id),
+                'id' => (int) $objRow->u_id,
                 'label' => $objRow->u_username
             ];
         }

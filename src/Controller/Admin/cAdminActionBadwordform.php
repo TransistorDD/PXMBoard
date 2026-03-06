@@ -1,7 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cBadwordList.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Model\cBadwordList;
+
 /**
  * displays the badword edit form
  *

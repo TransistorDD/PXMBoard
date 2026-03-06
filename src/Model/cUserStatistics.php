@@ -1,6 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Model/cUser.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eUserStatus;
+
 /**
  * user statistics
  *
@@ -12,23 +16,12 @@ require_once(SRCDIR . '/Model/cUser.php');
 class cUserStatistics
 {
     /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * get the amount of registered users
      *
      * @return int amount of registered users
      */
     public function getMemberCount(): int
     {
-
-
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT count(*) AS users FROM pxm_user')) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 return $objResultRow->users;
@@ -54,7 +47,7 @@ class cUserStatistics
     /**
      * get the newest members of the board
      *
-     * @return array newest members of the board
+     * @return list<cUser> newest members of the board
      */
     public function getNewestMembers(): array
     {
@@ -64,7 +57,7 @@ class cUserStatistics
     /**
      * get the oldest members of the board
      *
-     * @return array oldest members of the board
+     * @return list<cUser> oldest members of the board
      */
     public function getOldestMembers(): array
     {
@@ -74,7 +67,7 @@ class cUserStatistics
     /**
      * get the most active users (most posts)
      *
-     * @return array most active users (most posts)
+     * @return list<cUser> most active users (most posts)
      */
     public function getMostActiveUsers(): array
     {
@@ -84,7 +77,7 @@ class cUserStatistics
     /**
      * get the least active users (most posts)
      *
-     * @return array least active users (least posts)
+     * @return list<cUser> least active users (least posts)
      */
     public function getLeastActiveUsers(): array
     {
@@ -97,11 +90,10 @@ class cUserStatistics
      * @param string $sAttribute db attribute
      * @param string $sOrder order by (asc|desc)
      * @param int $iLimit limit the result to x rows
-     * @return array user objects
+     * @return list<cUser> user objects
      */
     private function _getMembersByAttribute(string $sAttribute, string $sOrder = 'ASC', int $iLimit = 1): array
     {
-
         $arrUsers = [];
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT u_id,u_username,u_city,u_publicmail,u_privatemail,u_registrationtstmp,u_msgquantity,u_highlight,u_highlight,u_status FROM pxm_user WHERE u_status='1' ORDER BY $sAttribute $sOrder", $iLimit)) {
@@ -114,7 +106,7 @@ class cUserStatistics
                 $objUser->setRegistrationTimestamp($objResultRow->u_registrationtstmp);
                 $objUser->setMessageQuantity($objResultRow->u_msgquantity);
                 $objUser->setHighlightUser($objResultRow->u_highlight);
-                $objUser->setStatus(UserStatus::from(intval($objResultRow->u_status)));
+                $objUser->setStatus(eUserStatus::from((int) $objResultRow->u_status));
 
                 $arrUsers[] = $objUser;
             }

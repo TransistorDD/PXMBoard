@@ -1,4 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Unit\Enum;
+
+use PHPUnit\Framework\TestCase;
+use PXMBoard\Enum\eErrorKeys;
+
 /**
  * Unit test for eError enum
  *
@@ -7,12 +15,6 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Unit\Enum;
-
-use PHPUnit\Framework\TestCase;
-
 class eErrorTest extends TestCase
 {
     /**
@@ -22,7 +24,7 @@ class eErrorTest extends TestCase
      */
     public function test_enum_hasExpectedCases(): void
     {
-        $arrCases = \eError::cases();
+        $arrCases = eErrorKeys::cases();
 
         $this->assertNotEmpty($arrCases);
         $this->assertGreaterThan(30, count($arrCases));
@@ -35,7 +37,7 @@ class eErrorTest extends TestCase
      */
     public function test_invalidMode_hasCorrectValue(): void
     {
-        $this->assertSame('ungültiger modus', \eError::INVALID_MODE->value);
+        $this->assertSame('error.invalid_mode', eErrorKeys::INVALID_MODE->value);
     }
 
     /**
@@ -45,7 +47,7 @@ class eErrorTest extends TestCase
      */
     public function test_usernameUnknown_hasCorrectValue(): void
     {
-        $this->assertSame('nutzername unbekannt', \eError::USERNAME_UNKNOWN->value);
+        $this->assertSame('error.username_unknown', eErrorKeys::USERNAME_UNKNOWN->value);
     }
 
     /**
@@ -55,7 +57,7 @@ class eErrorTest extends TestCase
      */
     public function test_invalidPassword_hasCorrectValue(): void
     {
-        $this->assertSame('passwort ungültig', \eError::INVALID_PASSWORD->value);
+        $this->assertSame('error.invalid_password', eErrorKeys::INVALID_PASSWORD->value);
     }
 
     /**
@@ -65,7 +67,7 @@ class eErrorTest extends TestCase
      */
     public function test_subjectMissing_hasCorrectValue(): void
     {
-        $this->assertSame('subject fehlt', \eError::SUBJECT_MISSING->value);
+        $this->assertSame('error.subject_missing', eErrorKeys::SUBJECT_MISSING->value);
     }
 
     /**
@@ -75,7 +77,7 @@ class eErrorTest extends TestCase
      */
     public function test_threadClosed_hasCorrectValue(): void
     {
-        $this->assertSame('dieser thread ist geschlossen', \eError::THREAD_CLOSED->value);
+        $this->assertSame('error.thread_closed', eErrorKeys::THREAD_CLOSED->value);
     }
 
     /**
@@ -85,7 +87,7 @@ class eErrorTest extends TestCase
      */
     public function test_notAuthorized_hasCorrectValue(): void
     {
-        $this->assertSame('sie sind nicht dazu berechtigt', \eError::NOT_AUTHORIZED->value);
+        $this->assertSame('error.not_authorized', eErrorKeys::NOT_AUTHORIZED->value);
     }
 
     /**
@@ -95,7 +97,7 @@ class eErrorTest extends TestCase
      */
     public function test_boardClosed_hasCorrectValue(): void
     {
-        $this->assertSame('dieses board ist geschlossen', \eError::BOARD_CLOSED->value);
+        $this->assertSame('error.board_closed', eErrorKeys::BOARD_CLOSED->value);
     }
 
     /**
@@ -105,7 +107,7 @@ class eErrorTest extends TestCase
      */
     public function test_boardReadonly_hasCorrectValue(): void
     {
-        $this->assertSame('dieses board ist im nur-lesen-modus', \eError::BOARD_READONLY->value);
+        $this->assertSame('error.board_readonly', eErrorKeys::BOARD_READONLY->value);
     }
 
     /**
@@ -115,7 +117,7 @@ class eErrorTest extends TestCase
      */
     public function test_notLoggedIn_hasCorrectValue(): void
     {
-        $this->assertSame('sie sind nicht angemeldet', \eError::NOT_LOGGED_IN->value);
+        $this->assertSame('error.not_logged_in', eErrorKeys::NOT_LOGGED_IN->value);
     }
 
     /**
@@ -125,7 +127,7 @@ class eErrorTest extends TestCase
      */
     public function test_usernameAlreadyExists_hasCorrectValue(): void
     {
-        $this->assertSame('dieser nutzername ist bereits vergeben', \eError::USERNAME_ALREADY_EXISTS->value);
+        $this->assertSame('error.username_already_exists', eErrorKeys::USERNAME_ALREADY_EXISTS->value);
     }
 
     /**
@@ -135,7 +137,7 @@ class eErrorTest extends TestCase
      */
     public function test_cannotMoveToSelf_hasCorrectValue(): void
     {
-        $this->assertSame('Nachricht kann nicht zu sich selbst verschoben werden.', \eError::CANNOT_MOVE_TO_SELF->value);
+        $this->assertSame('error.cannot_move_to_self', eErrorKeys::CANNOT_MOVE_TO_SELF->value);
     }
 
     /**
@@ -145,7 +147,7 @@ class eErrorTest extends TestCase
      */
     public function test_cannotMoveToSubtree_hasCorrectValue(): void
     {
-        $this->assertSame('Nachricht kann nicht in einen ihrer eigenen Unterbäume verschoben werden (Zirkelreferenz).', \eError::CANNOT_MOVE_TO_SUBTREE->value);
+        $this->assertSame('error.cannot_move_to_subtree', eErrorKeys::CANNOT_MOVE_TO_SUBTREE->value);
     }
 
     /**
@@ -155,7 +157,7 @@ class eErrorTest extends TestCase
      */
     public function test_allCases_haveStringValues(): void
     {
-        $arrCases = \eError::cases();
+        $arrCases = eErrorKeys::cases();
 
         foreach ($arrCases as $objCase) {
             $this->assertIsString($objCase->value);
@@ -170,9 +172,9 @@ class eErrorTest extends TestCase
      */
     public function test_from_withValidValue_returnsCase(): void
     {
-        $objError = \eError::from('ungültiger modus');
+        $objError = eErrorKeys::from('error.invalid_mode');
 
-        $this->assertSame(\eError::INVALID_MODE, $objError);
+        $this->assertSame(eErrorKeys::INVALID_MODE, $objError);
     }
 
     /**
@@ -182,8 +184,8 @@ class eErrorTest extends TestCase
      */
     public function test_allCases_haveUniqueNames(): void
     {
-        $arrCases = \eError::cases();
-        $arrNames = array_map(fn($case) => $case->name, $arrCases);
+        $arrCases = eErrorKeys::cases();
+        $arrNames = array_map(fn ($case) => $case->name, $arrCases);
 
         $this->assertSame(count($arrNames), count(array_unique($arrNames)));
     }

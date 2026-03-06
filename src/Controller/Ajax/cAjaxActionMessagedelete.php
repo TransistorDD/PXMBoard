@@ -1,7 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cBoardMessage.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eSuccessKeys;
+use PXMBoard\Model\cBoardMessage;
+
 /**
  * Ajax-Action: Delete a message
  *
@@ -36,24 +40,24 @@ class cAjaxActionMessagedelete extends cAjaxAction
         // Input-Validierung
         $iMessageId = $this->m_objInputHandler->getIntFormVar('msgid', false, true);
         if ($iMessageId <= 0) {
-            $this->_setJsonError(eError::INVALID_MESSAGE_ID, 400);
+            $this->_setJsonError(eErrorKeys::INVALID_MESSAGE_ID, 400);
             return;
         }
 
         // Business Logic - Load message
         $objBoardMessage = new cBoardMessage();
         if (!$objBoardMessage->loadDataById($iMessageId, $iBoardId)) {
-            $this->_setJsonError(eError::INVALID_MESSAGE_ID, 404);
+            $this->_setJsonError(eErrorKeys::INVALID_MESSAGE_ID, 404);
             return;
         }
 
         // Delete message
         if (!$objBoardMessage->deleteData()) {
-            $this->_setJsonError(eError::COULD_NOT_DELETE_DATA, 500);
+            $this->_setJsonError(eErrorKeys::COULD_NOT_DELETE_DATA, 500);
             return;
         }
 
         // Success response
-        $this->_setJsonSuccess(eSuccessMessage::MESSAGE_DELETED);
+        $this->_setJsonSuccess(eSuccessKeys::MESSAGE_DELETED);
     }
 }

@@ -1,4 +1,14 @@
 <?php
+
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Integration\Action;
+
+use PXMBoard\Controller\Board\cActionMessagesave;
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Tests\TestCase\ActionTestCase;
+
 /**
  * Integration test for cActionMessagesave
  *
@@ -10,12 +20,6 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Integration\Action;
-
-use PXMBoard\Tests\TestCase\ActionTestCase;
-
 class cActionMessagesaveTest extends ActionTestCase
 {
     /** CSRF token used by all tests that require authentication. */
@@ -42,11 +46,11 @@ class cActionMessagesaveTest extends ActionTestCase
      *
      * @param int $iUserId  0 for guest
      * @param int $iBoardId 0 for no board
-     * @return \cActionMessagesave
+     * @return cActionMessagesave
      */
-    private function makeAction(int $iUserId, int $iBoardId): \cActionMessagesave
+    private function makeAction(int $iUserId, int $iBoardId): cActionMessagesave
     {
-        $objAction = new \cActionMessagesave($this->objConfig, $iUserId, $iBoardId);
+        $objAction = new cActionMessagesave($this->objConfig, $iUserId, $iBoardId);
         $objAction->setCsrfToken(self::CSRF_TOKEN);
         return $objAction;
     }
@@ -104,7 +108,7 @@ class cActionMessagesaveTest extends ActionTestCase
 
         $this->assertFalse($objAction->validateBasePermissionsAndConditions());
         $this->assertStringContainsString(
-            \eError::CSRF_TOKEN_INVALID->value,
+            eErrorKeys::CSRF_TOKEN_INVALID->t(),
             $objAction->getOutput()
         );
     }
@@ -122,7 +126,7 @@ class cActionMessagesaveTest extends ActionTestCase
 
         $this->assertFalse($objAction->validateBasePermissionsAndConditions());
         $this->assertStringContainsString(
-            \eError::CSRF_TOKEN_INVALID->value,
+            eErrorKeys::CSRF_TOKEN_INVALID->t(),
             $objAction->getOutput()
         );
     }
@@ -180,7 +184,7 @@ class cActionMessagesaveTest extends ActionTestCase
         $objAction->performAction();
 
         $this->assertStringContainsString(
-            \eError::SUBJECT_MISSING->value,
+            eErrorKeys::SUBJECT_MISSING->t(),
             $objAction->getOutput()
         );
     }

@@ -1,7 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Model/cScrollList.php');
-require_once(SRCDIR . '/Model/cThreadHeader.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eMessageStatus;
+
 /**
  * threadlist handling
  *
@@ -29,6 +32,7 @@ class cThreadList extends cScrollList
      */
     public function __construct(int $iBoardId, string $sSortMode, int $iTimeSpan, int $iUserId = 0)
     {
+        parent::__construct();
 
         $this->m_sSortDirection = 'DESC';
 
@@ -50,11 +54,9 @@ class cThreadList extends cScrollList
             default: 		$this->m_sSortMode = 'm_tstmp';
                 break;
         }
-        $this->m_iBoardId = intval($iBoardId);
-        $this->m_iTimeSpan = intval($iTimeSpan);
-        $this->m_iUserId = intval($iUserId);
-
-        parent::__construct();
+        $this->m_iBoardId = $iBoardId;
+        $this->m_iTimeSpan = $iTimeSpan;
+        $this->m_iUserId = $iUserId;
     }
 
     /**
@@ -64,7 +66,6 @@ class cThreadList extends cScrollList
      */
     protected function _getQuery(): string
     {
-        require_once(SRCDIR . '/Enum/eMessage.php');
         $objDb = cDBFactory::getInstance();
 
         // For logged-in users: Add read status via LEFT JOIN (more efficient than EXISTS subqueries)
@@ -90,7 +91,7 @@ class cThreadList extends cScrollList
             $sReadSelectLastMsg = ', (mr_last.mr_messageid IS NOT null) AS last_msg_read';
         }
 
-        $sStatusFilter = '(m_status='.MessageStatus::PUBLISHED->value.' OR (m_status='.MessageStatus::DRAFT->value.' AND m_userid='.$this->m_iUserId.'))';
+        $sStatusFilter = '(m_status='.eMessageStatus::PUBLISHED->value.' OR (m_status='.eMessageStatus::DRAFT->value.' AND m_userid='.$this->m_iUserId.'))';
 
         return 'SELECT    m_id,'
                     .'m_subject,'
@@ -126,7 +127,6 @@ class cThreadList extends cScrollList
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         $objThreadHeader = new cThreadHeader();
         $objThreadHeader->setId($objResultRow->m_id);
         $objThreadHeader->setSubject($objResultRow->m_subject);
@@ -159,7 +159,7 @@ class cThreadList extends cScrollList
      * @param int $iTimeOffset time offset in seconds
      * @param string $sDateFormat php date format
      * @param int $iLastOnlineTimestamp last online timestamp for user
-     * @return array member variables
+     * @return list<array<string, mixed>> member variables
      */
     public function getDataArray(int $iTimeOffset = 0, string $sDateFormat = '', int $iLastOnlineTimestamp = 0): array
     {

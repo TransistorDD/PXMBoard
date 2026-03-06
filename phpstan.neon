@@ -1,17 +1,16 @@
 parameters:
-    level: 5 # Range: 0 (loose) to 9 (strictest). Level 5 is the project minimum.
+    level: 6 # Range: 0 (loose) to 9 (strictest). Level 5 is the project minimum.
     paths:
         - .
     excludePaths:
         - build
-        - config
         - coverage
         - css
         - install
         - node_modules
-        - public
         - reports
         - skins
         - stories
         - tests
         - vendor
+        - deploy

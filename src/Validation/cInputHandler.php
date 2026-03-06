@@ -1,7 +1,9 @@
 <?php
 
 declare(strict_types=1);
-require_once(SRCDIR . '/Validation/cStringValidations.php');
+
+namespace PXMBoard\Validation;
+
 /**
  * Handles the input from the web
  *
@@ -64,9 +66,9 @@ class cInputHandler
     {
         $iValue = 0;
         if (($bSearchPost) && isset($_POST[$sVarName])) {
-            $iValue = intval($_POST[$sVarName]);
+            $iValue = (int) $_POST[$sVarName];
         } elseif (($bSearchGet) && isset($_GET[$sVarName])) {
-            $iValue = intval($_GET[$sVarName]);
+            $iValue = (int) $_GET[$sVarName];
         }
         if (($iValue < 0) && ($bForcePositive)) {
             $iValue = 0;
@@ -83,7 +85,7 @@ class cInputHandler
      * @param bool $bForceUnique make the array elements unique
      * @param string $sAddFunction name of an additional function that should be called (e.g. trim)
      * @param string $sValidName name of the validation that should be used
-     * @return array value of the variable
+     * @return array<string, mixed> value of the variable
      */
     public function getArrFormVar(string $sVarName, bool $bSearchPost, bool $bSearchGet, bool $bForceUnique = false, string $sAddFunction = '', string $sValidName = ''): array
     {
@@ -123,7 +125,6 @@ class cInputHandler
      */
     public function getFileFormObject(string $sVarName): object
     {
-        require_once(SRCDIR . '/Validation/cFileUpload.php');
         $objFileUpload = new cFileUpload($sVarName);
         return $objFileUpload;
     }

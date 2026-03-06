@@ -1,6 +1,12 @@
 <?php
 
-require_once(SRCDIR . '/Controller/cBaseAction.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Controller\cBaseAction;
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Model\cConfig;
+
 /**
  * base class for the board admin actions
  *
@@ -31,13 +37,13 @@ abstract class cAdminAction extends cBaseAction
     /**
      * Handle permission error by rendering an HTML error page.
      *
-     * @param eError $error the error that caused the permission failure
+     * @param eErrorKeys $error the error that caused the permission failure
      * @return void
      */
-    protected function _handlePermissionError(eError $error): void
+    protected function _handlePermissionError(eErrorKeys $error): void
     {
         $this->m_sOutput = $this->_getHead()
-            . $this->_getAlert(htmlspecialchars($error->value))
+            . $this->_getAlert(htmlspecialchars($error->t()))
             . $this->_getFooter();
     }
 
@@ -177,7 +183,6 @@ abstract class cAdminAction extends cBaseAction
      */
     protected function _getTextField(string $sName, int $iMaxLength, string $sValue, string $sDesc = ''): string
     {
-        $iMaxLength = intval($iMaxLength);
         $sInput = '<input type="text" id="' . htmlspecialchars($sName) . '" name="' . htmlspecialchars($sName) . '"'
             . ' value="' . htmlspecialchars($sValue) . '"'
             . " maxlength=\"$iMaxLength\">\n";
@@ -204,7 +209,6 @@ abstract class cAdminAction extends cBaseAction
      */
     protected function _getPasswordField(string $sName, int $iMaxLength, string $sDesc = ''): string
     {
-        $iMaxLength = intval($iMaxLength);
         $sInput = '<input type="password" id="' . htmlspecialchars($sName) . '" name="' . htmlspecialchars($sName) . '"'
             . " maxlength=\"$iMaxLength\" autocomplete=\"current-password\">\n";
 

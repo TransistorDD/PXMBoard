@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Database/cDBFactory.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * User login ticket (for multi-device persistent login)
  *
@@ -11,24 +14,13 @@ require_once(SRCDIR . '/Database/cDBFactory.php');
  */
 class cUserLoginTicket
 {
-    protected int $m_iId;
-    protected int $m_iUserId;
-    protected string $m_sToken;
-    protected string $m_sUserAgent;
-    protected string $m_sIpAddress;
-    protected int $m_iCreatedTimestamp;
-    protected int $m_iLastUsedTimestamp;
-
-    public function __construct()
-    {
-        $this->m_iId = 0;
-        $this->m_iUserId = 0;
-        $this->m_sToken = '';
-        $this->m_sUserAgent = '';
-        $this->m_sIpAddress = '';
-        $this->m_iCreatedTimestamp = 0;
-        $this->m_iLastUsedTimestamp = 0;
-    }
+    protected int $m_iId = 0;
+    protected int $m_iUserId = 0;
+    protected string $m_sToken = '';
+    protected string $m_sUserAgent = '';
+    protected string $m_sIpAddress = '';
+    protected int $m_iCreatedTimestamp = 0;
+    protected int $m_iLastUsedTimestamp = 0;
 
     /**
      * Create a new login ticket for user
@@ -89,7 +81,7 @@ class cUserLoginTicket
         $iUserId = 0;
         if ($objResultSet = $objDb->executeQuery($sQuery)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $iUserId = intval($objResultRow->ult_userid);
+                $iUserId = (int) $objResultRow->ult_userid;
 
                 // Update last_used timestamp
                 $iTimestamp = time();
@@ -173,13 +165,13 @@ class cUserLoginTicket
      */
     protected function _setDataFromDb(object $objResultRow): void
     {
-        $this->m_iId = intval($objResultRow->ult_id);
-        $this->m_iUserId = intval($objResultRow->ult_userid);
+        $this->m_iId = (int) $objResultRow->ult_id;
+        $this->m_iUserId = (int) $objResultRow->ult_userid;
         $this->m_sToken = $objResultRow->ult_token;
         $this->m_sUserAgent = $objResultRow->ult_useragent;
         $this->m_sIpAddress = $objResultRow->ult_ipaddress;
-        $this->m_iCreatedTimestamp = intval($objResultRow->ult_created_timestamp);
-        $this->m_iLastUsedTimestamp = intval($objResultRow->ult_last_used_timestamp);
+        $this->m_iCreatedTimestamp = (int) $objResultRow->ult_created_timestamp;
+        $this->m_iLastUsedTimestamp = (int) $objResultRow->ult_last_used_timestamp;
     }
 
     /**
@@ -302,19 +294,19 @@ class cUserLoginTicket
      *
      * @param int $iTimeOffset Time offset in seconds
      * @param string $sDateFormat PHP date format
-     * @return array Member variables as array
+     * @return array<string, mixed> Member variables as array
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat): array
     {
         return [
-            'id' => $this->m_iId,
-            'userid' => $this->m_iUserId,
-            'token' => $this->m_sToken,
+            'id'        => $this->m_iId,
+            'userid'    => $this->m_iUserId,
+            'token'     => $this->m_sToken,
             'useragent' => $this->m_sUserAgent,
             'ipaddress' => $this->m_sIpAddress,
             'deviceinfo' => $this->getDeviceInfo(),
-            'created' => date($sDateFormat, $this->m_iCreatedTimestamp + $iTimeOffset),
-            'lastused' => date($sDateFormat, $this->m_iLastUsedTimestamp + $iTimeOffset)
+            'created'   => date($sDateFormat, $this->m_iCreatedTimestamp + $iTimeOffset),
+            'lastused'  => date($sDateFormat, $this->m_iLastUsedTimestamp + $iTimeOffset)
         ];
     }
 }

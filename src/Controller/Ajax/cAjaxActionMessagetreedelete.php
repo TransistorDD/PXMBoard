@@ -1,15 +1,17 @@
 <?php
 
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eSuccessKeys;
+use PXMBoard\Model\cThread;
+
 /**
  * Ajax-Action: Delete a message tree (automatically handles thread vs subthread)
  *
  * @author Torsten Rentsch <forum@torsten-rentsch.de>
  * @copyright Torsten Rentsch 2001 - 2026
  */
-
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cThread.php');
-
 class cAjaxActionMessagetreedelete extends cAjaxAction
 {
     /**
@@ -39,30 +41,30 @@ class cAjaxActionMessagetreedelete extends cAjaxAction
         // Input-Validierung
         $iMessageId = $this->m_objInputHandler->getIntFormVar('msgid', false, true);
         if ($iMessageId <= 0) {
-            $this->_setJsonError(eError::INVALID_MESSAGE_ID, 400);
+            $this->_setJsonError(eErrorKeys::INVALID_MESSAGE_ID, 400);
             return;
         }
 
         $iThreadId = $this->m_objInputHandler->getIntFormVar('thrdid', false, true);
         if ($iThreadId <= 0) {
-            $this->_setJsonError(eError::INVALID_THREAD_ID, 400);
+            $this->_setJsonError(eErrorKeys::INVALID_THREAD_ID, 400);
             return;
         }
 
         // Load thread directly (thread ID is provided by frontend)
         $objThread = new cThread();
         if (!$objThread->loadDataById($iThreadId, $iBoardId)) {
-            $this->_setJsonError(eError::INVALID_THREAD_ID, 404);
+            $this->_setJsonError(eErrorKeys::INVALID_THREAD_ID, 404);
             return;
         }
 
         // Delete message tree (automatically handles thread vs subthread)
         if (!$objThread->deleteMessageTree($iMessageId)) {
-            $this->_setJsonError(eError::COULD_NOT_DELETE_DATA, 500);
+            $this->_setJsonError(eErrorKeys::COULD_NOT_DELETE_DATA, 500);
             return;
         }
 
         // Success response
-        $this->_setJsonSuccess(eSuccessMessage::MESSAGE_TREE_DELETED);
+        $this->_setJsonSuccess(eSuccessKeys::MESSAGE_TREE_DELETED);
     }
 }

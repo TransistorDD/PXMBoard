@@ -1,7 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cSkinList.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Model\cSkinList;
+
 /**
  * displays the general config edit form
  *
@@ -59,7 +61,6 @@ class cAdminActionConfigform extends cAdminAction
         $this->m_sOutput .= $this->_getTextField('userperpage', 3, $this->m_objConfig->getUserPerPage(), 'user per page (online, search & admin)');
         $this->m_sOutput .= $this->_getTextField('threadsperpage', 3, $this->m_objConfig->getThreadsPerPage(), 'threads per page (msg index)');
         $this->m_sOutput .= $this->_getTextField('messageheaderperpage', 3, $this->m_objConfig->getMessageHeaderPerPage(), 'messages per page (search)');
-        $this->m_sOutput .= $this->_getTextField('messagesperpage', 3, $this->m_objConfig->getMessagesPerPage(), 'messages per page (flat mode)');
         $this->m_sOutput .= $this->_getTextField('privatemessagesperpage', 3, $this->m_objConfig->getPrivateMessagesPerPage(), 'private messages per page');
         $this->m_sOutput .= $this->_getTextField('mailwebmaster', $this->m_objInputHandler->getInputSize('email'), $this->m_objConfig->getMailWebmaster(), 'mail webmaster');
         $this->m_sOutput .= $this->_getTextField('quotesubject', $this->m_objInputHandler->getInputSize('quotesubject'), $this->m_objConfig->getQuoteSubject(), 'quote subject');

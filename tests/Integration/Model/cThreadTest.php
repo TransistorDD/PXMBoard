@@ -1,4 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
+namespace PXMBoard\Tests\Integration\Model;
+
+use PXMBoard\Model\cThread;
+use PXMBoard\Tests\TestCase\IntegrationTestCase;
+
 /**
  * Integration test for cThread class
  * Tests thread data loading against the real test database
@@ -8,12 +16,6 @@
  * @copyright 2001-2026 Torsten Rentsch
  * @license   https://www.gnu.org/licenses/gpl-3.0.html GPL-3.0-or-later
  */
-declare(strict_types=1);
-
-namespace PXMBoard\Tests\Integration\Model;
-
-use PXMBoard\Tests\TestCase\IntegrationTestCase;
-
 class cThreadTest extends IntegrationTestCase
 {
     /**
@@ -31,7 +33,7 @@ class cThreadTest extends IntegrationTestCase
             't_views'   => 100,
         ]);
 
-        $objThread = new \cThread();
+        $objThread = new cThread();
         $bResult = $objThread->loadDataById($iThreadId, $iBoardId);
 
         $this->assertTrue($bResult);
@@ -48,7 +50,7 @@ class cThreadTest extends IntegrationTestCase
     {
         $iBoardId = $this->insertBoard();
 
-        $objThread = new \cThread();
+        $objThread = new cThread();
         $bResult = $objThread->loadDataById(999999, $iBoardId);
 
         $this->assertFalse($bResult);
@@ -64,7 +66,7 @@ class cThreadTest extends IntegrationTestCase
         $iBoardId  = $this->insertBoard();
         $iThreadId = $this->insertThread($iBoardId, ['t_active' => 1]);
 
-        $objThread = new \cThread();
+        $objThread = new cThread();
         $objThread->loadDataById($iThreadId, $iBoardId);
 
         $this->assertTrue($objThread->isActive());
@@ -132,7 +134,7 @@ class cThreadTest extends IntegrationTestCase
             't_fixed'  => 1,
         ]);
 
-        $objThread = new \cThread();
+        $objThread = new cThread();
         $objThread->loadDataById($iThreadId, $iBoardId);
 
         $this->assertTrue($objThread->isFixed());

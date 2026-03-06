@@ -1,8 +1,12 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cBoardMessage.php');
-require_once(SRCDIR . '/Model/cThread.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eSuccessKeys;
+use PXMBoard\Model\cBoardMessage;
+use PXMBoard\Model\cThread;
+
 /**
  * Ajax-Action: Extract a message subtree as a new thread
  *
@@ -37,31 +41,31 @@ class cAjaxActionMessagetreeextract extends cAjaxAction
         // Input-Validierung
         $iMessageId = $this->m_objInputHandler->getIntFormVar('msgid', false, true);
         if ($iMessageId <= 0) {
-            $this->_setJsonError(eError::INVALID_MESSAGE_ID, 400);
+            $this->_setJsonError(eErrorKeys::INVALID_MESSAGE_ID, 400);
             return;
         }
 
         // Business Logic - Load message
         $objBoardMessage = new cBoardMessage();
         if (!$objBoardMessage->loadDataById($iMessageId, $iBoardId)) {
-            $this->_setJsonError(eError::INVALID_MESSAGE_ID, 404);
+            $this->_setJsonError(eErrorKeys::INVALID_MESSAGE_ID, 404);
             return;
         }
 
         // Load thread
         $objThread = new cThread();
         if (!$objThread->loadDataById($objBoardMessage->getThreadId(), $iBoardId)) {
-            $this->_setJsonError(eError::INVALID_THREAD_ID, 404);
+            $this->_setJsonError(eErrorKeys::INVALID_THREAD_ID, 404);
             return;
         }
 
         // Extract subthread
         if (!$objThread->extractSubThread($objBoardMessage->getId())) {
-            $this->_setJsonError(eError::COULD_NOT_INSERT_DATA, 500);
+            $this->_setJsonError(eErrorKeys::COULD_NOT_INSERT_DATA, 500);
             return;
         }
 
         // Success response
-        $this->_setJsonSuccess(eSuccessMessage::MESSAGE_TREE_EXTRACTED);
+        $this->_setJsonSuccess(eSuccessKeys::MESSAGE_TREE_EXTRACTED);
     }
 }

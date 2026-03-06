@@ -1,6 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Model/cScrollList.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Search\cSearchEngineFactory;
+
 /**
  * Message search list handling
  *
@@ -13,6 +17,7 @@ class cMessageSearchList extends cScrollList
 {
     //TODO make this work for postgres
 
+    /** @var array<int> */
     protected array $m_arrBoardIds;			// board ids
     protected string $m_sUserName;			// username
     protected string $m_sSearchString;		// search string
@@ -37,18 +42,18 @@ class cMessageSearchList extends cScrollList
 
         $this->m_arrBoardIds = [];
         foreach ($objSearch->getBoardIds() as $iBoardId) {
-            $iBoardId = intval($iBoardId);
+            $iBoardId = (int) $iBoardId;
             if ($iBoardId > 0) {
                 $this->m_arrBoardIds[] = $iBoardId;
             }
         }
         $this->m_sUserName = $objSearch->getSearchUser();
         $this->m_sSearchString = $objSearch->getSearchMessage();
-        $this->m_iSearchDays = intval($objSearch->getSearchDays());
-        $this->m_iSearchTimestamp = intval($objSearch->getTimestamp());
-        $this->m_iTimeOffset = intval($iTimeOffset);
+        $this->m_iSearchDays = (int) $objSearch->getSearchDays();
+        $this->m_iSearchTimestamp = (int) $objSearch->getTimestamp();
+        $this->m_iTimeOffset = $iTimeOffset;
         $this->m_sDateFormat = $sDateFormat;
-        $this->m_iCurrentUserId = intval($iCurrentUserId);
+        $this->m_iCurrentUserId = $iCurrentUserId;
         $this->m_bGroupByThread = false;
 
         parent::__construct();
@@ -75,9 +80,6 @@ class cMessageSearchList extends cScrollList
      */
     protected function _doPreQuery(): void
     {
-
-        require_once(SRCDIR . '/Search/cSearchEngineFactory.php');
-
         // Get search engine instance
         $objSearchEngine = cSearchEngineFactory::getInstance();
 
@@ -111,11 +113,9 @@ class cMessageSearchList extends cScrollList
                                intval($arrResult['timestamp']) . ')';
             }
 
-            if (!empty($arrValues)) {
-                $sInsertQuery = 'INSERT INTO pxm_tmp_search (tmp_id, tmp_score, tmp_tstmp) VALUES ' .
-                                implode(',', $arrValues);
-                cDBFactory::getInstance()->executeQuery($sInsertQuery);
-            }
+            $sInsertQuery = 'INSERT INTO pxm_tmp_search (tmp_id, tmp_score, tmp_tstmp) VALUES ' .
+                            implode(',', $arrValues);
+            cDBFactory::getInstance()->executeQuery($sInsertQuery);
         }
     }
 
@@ -147,7 +147,6 @@ class cMessageSearchList extends cScrollList
      */
     protected function _doPostQuery(): void
     {
-
         if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT count(*) AS cou FROM pxm_tmp_search')) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $this->m_iItemCount = $objResultRow->cou;
@@ -171,16 +170,15 @@ class cMessageSearchList extends cScrollList
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         $this->m_arrResultList[] = ['id'		=> $objResultRow->m_id,
-                                         'threadid'	=> $objResultRow->m_threadid,
-                                         'boardid'	=> $objResultRow->t_boardid,
-                                         'subject'	=> $objResultRow->m_subject,
-                                         'score'	=> $objResultRow->tmp_score,
-                                         'date'		=> (($objResultRow->tmp_tstmp > 0) ? date($this->m_sDateFormat, ($objResultRow->tmp_tstmp + $this->m_iTimeOffset)) : 0),
-                                         'user'		=> ['id'		=> $objResultRow->m_userid,
-                                                            'username'	=> $objResultRow->m_username,
-                                                            'highlight'	=> $objResultRow->m_userhighlight]];
+                                    'threadid'	=> $objResultRow->m_threadid,
+                                    'boardid'	=> $objResultRow->t_boardid,
+                                    'subject'	=> $objResultRow->m_subject,
+                                    'score'	=> $objResultRow->tmp_score,
+                                    'date'		=> (($objResultRow->tmp_tstmp > 0) ? date($this->m_sDateFormat, ($objResultRow->tmp_tstmp + $this->m_iTimeOffset)) : 0),
+                                    'user'		=> ['id'		=> $objResultRow->m_userid,
+                                                    'username'	=> $objResultRow->m_username,
+                                                    'highlight'	=> $objResultRow->m_userhighlight]];
         return true;
     }
 
@@ -195,7 +193,7 @@ class cMessageSearchList extends cScrollList
         $arrThreadIds = [];
         foreach ($this->m_arrResultList as $arrMessage) {
             if (!in_array($arrMessage['threadid'], $arrThreadIds)) {
-                $arrThreadIds[] = intval($arrMessage['threadid']);
+                $arrThreadIds[] = (int) $arrMessage['threadid'];
             }
         }
 
@@ -211,7 +209,7 @@ class cMessageSearchList extends cScrollList
 
         if ($objResultSet = cDBFactory::getInstance()->executeQuery($sQuery)) {
             while ($objRow = $objResultSet->getNextResultRowObject()) {
-                $arrRootMessages[intval($objRow->m_threadid)] = [
+                $arrRootMessages[(int) $objRow->m_threadid] = [
                     'id'		=> $objRow->m_id,
                     'threadid'	=> $objRow->m_threadid,
                     'subject'	=> $objRow->m_subject,
@@ -229,7 +227,7 @@ class cMessageSearchList extends cScrollList
         // Reorganize results by thread
         $arrGrouped = [];
         foreach ($this->m_arrResultList as $arrMessage) {
-            $iThreadId = intval($arrMessage['threadid']);
+            $iThreadId = (int) $arrMessage['threadid'];
             if (!isset($arrGrouped[$iThreadId])) {
                 $arrGrouped[$iThreadId] = [
                     'threadid'		=> $iThreadId,
@@ -241,6 +239,7 @@ class cMessageSearchList extends cScrollList
         }
 
         // Convert to indexed array (preserve order by first occurrence)
+        // @phpstan-ignore-next-line argument.unresolvableType
         $this->m_arrResultList = array_values($arrGrouped);
     }
 }

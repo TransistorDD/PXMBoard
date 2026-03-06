@@ -1,7 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cBoardMessage.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Model\cBoardMessage;
+
 /**
  * AJAX endpoint for toggling message notification subscription
  *

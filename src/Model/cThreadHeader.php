@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cMessageHeader.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Parser\cParser;
+
 /**
  * threadheader handling
  *
@@ -11,38 +14,16 @@ require_once(SRCDIR . '/Model/cMessageHeader.php');
  */
 class cThreadHeader extends cMessageHeader
 {
-    protected int $m_iBoardId;					// board id
-    protected int $m_iThreadId;					// thread id
-    protected bool $m_bIsActive;					// thread status
-    protected bool $m_bIsFixed;					// is the thread fixed on top of the threadlist?
-    protected int $m_iLastMessageId;				// last message id
-    protected int $m_iLastMessageTimestamp;		// last message timestamp
-    protected int $m_iMessageQuantity;			// quantity of messages in this thread
-    protected int $m_iViews;						// views for this thread
-    protected bool $m_bThreadMsgRead;				// is thread message read (for logged-in users)?
-    protected bool $m_bLastMsgRead;					// is last message read (for logged-in users)?
-
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-
-        parent::__construct();
-
-        $this->m_iBoardId = 0;
-        $this->m_iThreadId = 0;
-        $this->m_bIsActive = false;
-        $this->m_bIsFixed = false;
-        $this->m_iLastMessageId = 0;
-        $this->m_iLastMessageTimestamp = 0;
-        $this->m_iMessageQuantity = 0;
-        $this->m_iViews = 0;
-        $this->m_bThreadMsgRead = false;
-        $this->m_bLastMsgRead = false;
-    }
+    protected int $m_iBoardId = 0;					// board id
+    protected int $m_iThreadId = 0;					// thread id
+    protected bool $m_bIsActive = true;				// thread status
+    protected bool $m_bIsFixed = false;				// is the thread fixed on top of the threadlist?
+    protected int $m_iLastMessageId = 0;			// last message id
+    protected int $m_iLastMessageTimestamp = 0;		// last message timestamp
+    protected int $m_iMessageQuantity = 0;			// quantity of messages in this thread
+    protected int $m_iViews = 0;					// views for this thread
+    protected bool $m_bThreadMsgRead = false;		// is thread message read (for logged-in users)?
+    protected bool $m_bLastMsgRead = false;			// is last message read (for logged-in users)?
 
     /**
      * initalize the member variables with the resultset from the db
@@ -52,16 +33,15 @@ class cThreadHeader extends cMessageHeader
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
         cMessageHeader::_setDataFromDb($objResultRow);
 
-        $this->m_iThreadId = intval($objResultRow->t_id);
-        $this->m_bIsActive = $objResultRow->t_active ? true : false;
-        $this->m_iLastMessageId = intval($objResultRow->t_lastmsgid);
-        $this->m_iLastMessageTimestamp = intval($objResultRow->t_lastmsgtstmp);
-        $this->m_iMessageQuantity = intval($objResultRow->t_msgquantity);
-        $this->m_iViews = intval($objResultRow->t_views);
-        $this->m_bIsFixed = $objResultRow->t_fixed ? true : false;
+        $this->m_iThreadId = (int) $objResultRow->t_id;
+        $this->m_bIsActive = (bool) $objResultRow->t_active;
+        $this->m_iLastMessageId = (int) $objResultRow->t_lastmsgid;
+        $this->m_iLastMessageTimestamp = (int) $objResultRow->t_lastmsgtstmp;
+        $this->m_iMessageQuantity = (int) $objResultRow->t_msgquantity;
+        $this->m_iViews = (int) $objResultRow->t_views;
+        $this->m_bIsFixed = (bool) $objResultRow->t_fixed;
 
         return true;
     }
@@ -114,7 +94,7 @@ class cThreadHeader extends cMessageHeader
      */
     public function setBoardId(int $iBoardId): void
     {
-        $this->m_iBoardId = intval($iBoardId);
+        $this->m_iBoardId = $iBoardId;
     }
 
     /**
@@ -135,7 +115,7 @@ class cThreadHeader extends cMessageHeader
      */
     public function setThreadId(int $iThreadId): void
     {
-        $this->m_iThreadId = intval($iThreadId);
+        $this->m_iThreadId = $iThreadId;
     }
 
     /**
@@ -156,7 +136,7 @@ class cThreadHeader extends cMessageHeader
      */
     public function setThreadActive(bool $bIsActive): void
     {
-        $this->m_bIsActive = $bIsActive ? true : false;
+        $this->m_bIsActive = $bIsActive;
     }
 
     /**
@@ -177,7 +157,7 @@ class cThreadHeader extends cMessageHeader
      */
     public function setIsThreadFixed(bool $bIsFixed): void
     {
-        $this->m_bIsFixed = $bIsFixed ? true : false;
+        $this->m_bIsFixed = $bIsFixed;
     }
 
     /**
@@ -198,7 +178,7 @@ class cThreadHeader extends cMessageHeader
      */
     public function setLastMessageId(int $iLastMessageId): void
     {
-        $this->m_iLastMessageId = intval($iLastMessageId);
+        $this->m_iLastMessageId = $iLastMessageId;
     }
 
     /**
@@ -219,7 +199,7 @@ class cThreadHeader extends cMessageHeader
      */
     public function setLastMessageTimestamp(int $iLastMessageTimestamp): void
     {
-        $this->m_iLastMessageTimestamp = intval($iLastMessageTimestamp);
+        $this->m_iLastMessageTimestamp = $iLastMessageTimestamp;
     }
 
     /**
@@ -240,7 +220,7 @@ class cThreadHeader extends cMessageHeader
      */
     public function setMessageQuantity(int $iMessageQuantity): void
     {
-        $this->m_iMessageQuantity = intval($iMessageQuantity);
+        $this->m_iMessageQuantity = $iMessageQuantity;
     }
 
     /**
@@ -261,7 +241,7 @@ class cThreadHeader extends cMessageHeader
      */
     public function setViews(int $iViews): void
     {
-        $this->m_iViews = intval($iViews);
+        $this->m_iViews = $iViews;
     }
 
     /**
@@ -282,7 +262,7 @@ class cThreadHeader extends cMessageHeader
      */
     public function setThreadMsgRead(bool $bThreadMsgRead): void
     {
-        $this->m_bThreadMsgRead = $bThreadMsgRead ? true : false;
+        $this->m_bThreadMsgRead = $bThreadMsgRead;
     }
 
     /**
@@ -303,7 +283,7 @@ class cThreadHeader extends cMessageHeader
      */
     public function setLastMsgRead(bool $bLastMsgRead): void
     {
-        $this->m_bLastMsgRead = $bLastMsgRead ? true : false;
+        $this->m_bLastMsgRead = $bLastMsgRead;
     }
 
     /**
@@ -314,7 +294,7 @@ class cThreadHeader extends cMessageHeader
      * @param int $iLastOnlineTimestamp last online timestamp for user
      * @param string $sSubjectQuotePrefix quote prefix for a message subject
      * @param ?cParser $objParser message parser
-     * @return array member variables
+     * @return array<string, mixed> member variables
      */
     public function getDataArray(int $iTimeOffset = 0, string $sDateFormat = '', int $iLastOnlineTimestamp = 0, string $sSubjectQuotePrefix = '', ?cParser $objParser = null): array
     {
@@ -322,15 +302,15 @@ class cThreadHeader extends cMessageHeader
         return array_merge(
             cMessageHeader::getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp, '', $objParser),
             ['threadid'	=>	$this->m_iThreadId,
-                                 'active'	=>	intval($this->m_bIsActive),
-                                 'views'	=>	strval($this->m_iViews),
-                                 'fixed'	=>	intval($this->m_bIsFixed),
-                                 'lastid'	=>	$this->m_iLastMessageId,
-                                 'lastdate'	=>	(($this->m_iLastMessageTimestamp > $this->m_iMessageTimestamp) ? date($sDateFormat, ($this->m_iLastMessageTimestamp + $iTimeOffset)) : 0),
-                                 'lastnew'	=>	(($iLastOnlineTimestamp > $this->m_iLastMessageTimestamp) ? 0 : 1),
-                                 'msgquan'	=>	strval($this->m_iMessageQuantity),
-                                 'thread_msg_read'	=>	intval($this->m_bThreadMsgRead),
-                                 'last_msg_read'	=>	intval($this->m_bLastMsgRead)]
+            'active'	=>	(int) $this->m_bIsActive,
+            'views'	    =>	(string) $this->m_iViews,
+            'fixed'	    =>	(int) $this->m_bIsFixed,
+            'lastid'	=>	$this->m_iLastMessageId,
+            'lastdate'	=>	(($this->m_iLastMessageTimestamp > $this->m_iMessageTimestamp) ? date($sDateFormat, ($this->m_iLastMessageTimestamp + $iTimeOffset)) : 0),
+            'lastnew'	=>	(($iLastOnlineTimestamp > $this->m_iLastMessageTimestamp) ? 0 : 1),
+            'msgquan'	=>	(string) $this->m_iMessageQuantity,
+            'thread_msg_read'	=>	(int) $this->m_bThreadMsgRead,
+            'last_msg_read'	    =>	(int) $this->m_bLastMsgRead]
         );
     }
 }

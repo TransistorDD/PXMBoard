@@ -1,8 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Admin/cAdminAction.php');
-require_once(SRCDIR . '/Model/cBoard.php');
-require_once(SRCDIR . '/Enum/eBoardStatus.php');
+namespace PXMBoard\Controller\Admin;
+
+use PXMBoard\Enum\eBoardStatus;
+use PXMBoard\Model\cBoard;
+
 /**
  * save the board data
  *
@@ -48,11 +50,11 @@ class cAdminActionBoardsave extends cAdminAction
         // Board status - validate and set enum
         $iStatus = $this->m_objInputHandler->getIntFormVar('status', true, true, true);
         try {
-            $eStatus = BoardStatus::from($iStatus);
+            $eStatus = eBoardStatus::from($iStatus);
             $objBoard->setStatus($eStatus);
-        } catch (ValueError $e) {
+        } catch (\ValueError $e) {
             // Invalid status, default to PUBLIC
-            $objBoard->setStatus(BoardStatus::PUBLIC);
+            $objBoard->setStatus(eBoardStatus::PUBLIC);
         }
 
         $objBoard->setThreadListTimeSpan($this->m_objInputHandler->getIntFormVar('date', true, true, true));

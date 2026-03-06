@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+
+namespace PXMBoard\Validation;
+
 /**
  * holds the validation rules for string input
  *
@@ -67,7 +70,7 @@ final class cStringValidations
             return $sValue;
         }
         $iLimit = self::LIMITS[$sType];
-        if ($iLimit > 0 && mb_strlen($sValue) > $iLimit) {
+        if (mb_strlen($sValue) > $iLimit) {
             $sValue = mb_substr($sValue, 0, $iLimit);
         }
         return $sValue;

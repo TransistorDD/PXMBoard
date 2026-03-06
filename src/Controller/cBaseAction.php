@@ -2,11 +2,19 @@
 
 declare(strict_types=1);
 
-require_once(SRCDIR . '/Model/cUserConfig.php');
-require_once(SRCDIR . '/Enum/eUser.php');
-require_once(SRCDIR . '/Enum/eError.php');
-require_once(SRCDIR . '/Validation/cInputHandler.php');
-require_once(SRCDIR . '/Validation/cServerHandler.php');
+namespace PXMBoard\Controller;
+
+use PXMBoard\Enum\eBoardStatus;
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eUserStatus;
+use PXMBoard\Model\cBoard;
+use PXMBoard\Model\cBoardList;
+use PXMBoard\Model\cConfig;
+use PXMBoard\Model\cSkin;
+use PXMBoard\Model\cUserConfig;
+use PXMBoard\Parser\cParser;
+use PXMBoard\Validation\cInputHandler;
+use PXMBoard\Validation\cServerHandler;
 
 /**
  * Abstract base class for all board actions.
@@ -70,10 +78,10 @@ abstract class cBaseAction
      * Subclasses render the error in their own output format
      * (template, JSON, HTML string).
      *
-     * @param eError $error the error that caused the permission failure
+     * @param eErrorKeys $error the error that caused the permission failure
      * @return void
      */
-    abstract protected function _handlePermissionError(eError $error): void;
+    abstract protected function _handlePermissionError(eErrorKeys $error): void;
 
     /**
      * Validate the CSRF token submitted with the current request.
@@ -99,7 +107,7 @@ abstract class cBaseAction
         if (empty($sToken) || empty($this->m_sCsrfToken)
             || !hash_equals($this->m_sCsrfToken, $sToken)
         ) {
-            $this->_handlePermissionError(eError::CSRF_TOKEN_INVALID);
+            $this->_handlePermissionError(eErrorKeys::CSRF_TOKEN_INVALID);
             return false;
         }
         return true;
@@ -159,7 +167,7 @@ abstract class cBaseAction
     protected function _requireAuthentication(): bool
     {
         if (!is_object($this->m_objActiveUser)) {
-            $this->_handlePermissionError(eError::NOT_LOGGED_IN);
+            $this->_handlePermissionError(eErrorKeys::NOT_LOGGED_IN);
             return false;
         }
         return true;
@@ -173,7 +181,7 @@ abstract class cBaseAction
     protected function _requireNotAuthenticated(): bool
     {
         if (is_object($this->m_objActiveUser)) {
-            $this->_handlePermissionError(eError::ALREADY_LOGGED_IN);
+            $this->_handlePermissionError(eErrorKeys::ALREADY_LOGGED_IN);
             return false;
         }
         return true;
@@ -191,15 +199,15 @@ abstract class cBaseAction
     protected function _requireReadableBoard(): bool
     {
         if (!is_object($this->m_objActiveBoard)) {
-            $this->_handlePermissionError(eError::BOARD_ID_MISSING);
+            $this->_handlePermissionError(eErrorKeys::BOARD_ID_MISSING);
             return false;
         }
 
         $eStatus = $this->m_objActiveBoard->getStatus();
 
-        if ($eStatus === BoardStatus::CLOSED) {
+        if ($eStatus === eBoardStatus::CLOSED) {
             if (!$this->m_objActiveUser?->isAdmin() && !$this->m_objActiveUser?->isModerator($this->m_objActiveBoard->getId())) {
-                $this->_handlePermissionError(eError::BOARD_CLOSED);
+                $this->_handlePermissionError(eErrorKeys::BOARD_CLOSED);
                 return false;
             }
         }
@@ -232,7 +240,7 @@ abstract class cBaseAction
 
         if (!$eStatus->isWritable()) {
             if (!$this->m_objActiveUser?->isAdmin() && !$this->m_objActiveUser?->isModerator($this->m_objActiveBoard->getId())) {
-                $this->_handlePermissionError(eError::BOARD_READONLY);
+                $this->_handlePermissionError(eErrorKeys::BOARD_READONLY);
                 return false;
             }
         }
@@ -259,7 +267,7 @@ abstract class cBaseAction
     protected function _requireBoard(): bool
     {
         if (!is_object($this->m_objActiveBoard)) {
-            $this->_handlePermissionError(eError::BOARD_ID_MISSING);
+            $this->_handlePermissionError(eErrorKeys::BOARD_ID_MISSING);
             return false;
         }
         return true;
@@ -277,7 +285,7 @@ abstract class cBaseAction
             return false;
         }
         if (!$this->m_objActiveUser?->isPostAllowed()) {
-            $this->_handlePermissionError(eError::NOT_AUTHORIZED);
+            $this->_handlePermissionError(eErrorKeys::NOT_AUTHORIZED);
             return false;
         }
         return true;
@@ -295,7 +303,7 @@ abstract class cBaseAction
             return false;
         }
         if (!$this->m_objActiveUser?->isAdmin() && !$this->m_objActiveUser?->isModerator($this->m_objActiveBoard->getId())) {
-            $this->_handlePermissionError(eError::NOT_AUTHORIZED);
+            $this->_handlePermissionError(eErrorKeys::NOT_AUTHORIZED);
             return false;
         }
         return true;
@@ -313,7 +321,7 @@ abstract class cBaseAction
             return false;
         }
         if (!$this->m_objActiveUser?->isAdmin()) {
-            $this->_handlePermissionError(eError::NOT_AUTHORIZED);
+            $this->_handlePermissionError(eErrorKeys::NOT_AUTHORIZED);
             return false;
         }
         return true;
@@ -322,13 +330,10 @@ abstract class cBaseAction
     /**
      * Get board list array for templates.
      *
-     * @return array board list data array
+     * @return list<array<string, mixed>> board list data array
      */
     protected function _getBoardListArray(): array
     {
-        require_once(SRCDIR . '/Model/cBoardList.php');
-        require_once(SRCDIR . '/Parser/cParser.php');
-
         $objParser = new cParser();
         $objBoardList = new cBoardList();
         $objBoardList->loadBasicData();
@@ -351,7 +356,7 @@ abstract class cBaseAction
     {
         $objUser = new cUserConfig();
         if ($objUser->loadDataById($iUserId)) {
-            if ($objUser->getStatus() === UserStatus::ACTIVE) {
+            if ($objUser->getStatus() === eUserStatus::ACTIVE) {
                 $this->m_objActiveUser = $objUser;
 
                 if ($this->m_objConfig->getOnlineTime() > 0) {
@@ -369,7 +374,6 @@ abstract class cBaseAction
      */
     protected function _loadActiveBoard(int $iBoardId): void
     {
-        require_once(SRCDIR . '/Model/cBoard.php');
         $objBoard = new cBoard();
         if ($objBoard->loadDataById($iBoardId)) {
             $this->m_objActiveBoard = $objBoard;

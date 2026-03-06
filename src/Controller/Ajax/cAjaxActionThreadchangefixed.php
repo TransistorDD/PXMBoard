@@ -1,7 +1,11 @@
 <?php
 
-require_once(SRCDIR . '/Controller/Ajax/cAjaxAction.php');
-require_once(SRCDIR . '/Model/cThread.php');
+namespace PXMBoard\Controller\Ajax;
+
+use PXMBoard\Enum\eErrorKeys;
+use PXMBoard\Enum\eSuccessKeys;
+use PXMBoard\Model\cThread;
+
 /**
  * Ajax-Action: Toggle thread fixed status
  *
@@ -36,14 +40,14 @@ class cAjaxActionThreadchangefixed extends cAjaxAction
         // Input-Validierung
         $iThreadId = $this->m_objInputHandler->getIntFormVar('id', true, true, true);
         if ($iThreadId <= 0) {
-            $this->_setJsonError(eError::INVALID_THREAD_ID, 400);
+            $this->_setJsonError(eErrorKeys::INVALID_THREAD_ID, 400);
             return;
         }
 
         // Load thread
         $objThread = new cThread();
         if (!$objThread->loadDataById($iThreadId, $iBoardId)) {
-            $this->_setJsonError(eError::INVALID_THREAD_ID, 404);
+            $this->_setJsonError(eErrorKeys::INVALID_THREAD_ID, 404);
             return;
         }
 
@@ -52,7 +56,7 @@ class cAjaxActionThreadchangefixed extends cAjaxAction
         $objThread->updateIsFixed($bNewFixed);
 
         // Success response
-        $eMessage = $bNewFixed ? eSuccessMessage::THREAD_FIXED : eSuccessMessage::THREAD_UNFIXED;
+        $eMessage = $bNewFixed ? eSuccessKeys::THREAD_FIXED : eSuccessKeys::THREAD_UNFIXED;
         $this->_setJsonSuccess($eMessage, ['isFixed' => $bNewFixed]);
     }
 }

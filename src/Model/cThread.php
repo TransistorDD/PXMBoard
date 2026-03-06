@@ -1,6 +1,10 @@
 <?php
 
-require_once(SRCDIR . '/Model/cMessageHeader.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+use PXMBoard\Enum\eMessageStatus;
+
 /**
  * thread handling
  *
@@ -11,33 +15,16 @@ require_once(SRCDIR . '/Model/cMessageHeader.php');
  */
 class cThread
 {
-    protected int $m_iBoardId;					// board id
-    protected int $m_iId;						// thread id
-    protected bool $m_bIsActive;				// thread status
-    protected bool $m_bIsFixed;					// is the thread fixed on top of the threadlist?
-    protected int $m_iLastMessageId;			// last message id
-    protected int $m_iLastMessageTimestamp;		// last message timestamp
-    protected int $m_iMessageQuantity;			// quantity of messages in this thread
-    protected int $m_iViews;					// views for this thread
-    protected array $m_arrThreadMessages;		// message headers of the thread
-
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-
-        $this->m_iBoardId = 0;
-        $this->m_iId = 0;
-        $this->m_bIsActive = false;
-        $this->m_bIsFixed = false;
-        $this->m_iLastMessageId = 0;
-        $this->m_iLastMessageTimestamp = 0;
-        $this->m_iMessageQuantity = 0;
-        $this->m_iViews = 0;
-    }
+    protected int $m_iBoardId = 0;					// board id
+    protected int $m_iId = 0;						// thread id
+    protected bool $m_bIsActive = false;			// thread status
+    protected bool $m_bIsFixed = false;				// is the thread fixed on top of the threadlist?
+    protected int $m_iLastMessageId = 0;			// last message id
+    protected int $m_iLastMessageTimestamp = 0;		// last message timestamp
+    protected int $m_iMessageQuantity = 0;			// quantity of messages in this thread
+    protected int $m_iViews = 0;					// views for this thread
+    /** @var array<mixed> */
+    protected array $m_arrThreadMessages = [];		// message headers of the thread
 
     /**
      * get data from database by thread and board id
@@ -48,14 +35,9 @@ class cThread
      */
     public function loadDataById(int $iThreadId, int $iBoardId): bool
     {
-
         $bReturn = false;
-        $iThreadId = intval($iThreadId);
-        $iBoardId = intval($iBoardId);
 
         if ($iThreadId > 0) {
-
-
             if ($objResultSet = cDBFactory::getInstance()->executeQuery('SELECT t_boardid,'.
                                                         't_id,'.
                                                         't_active,'.
@@ -83,15 +65,14 @@ class cThread
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
-        $this->m_iBoardId = intval($objResultRow->t_boardid);
-        $this->m_iId = intval($objResultRow->t_id);
-        $this->m_bIsActive = $objResultRow->t_active ? true : false;
-        $this->m_iLastMessageId = intval($objResultRow->t_lastmsgid);
-        $this->m_iLastMessageTimestamp = intval($objResultRow->t_lastmsgtstmp);
-        $this->m_iMessageQuantity = intval($objResultRow->t_msgquantity);
-        $this->m_iViews = intval($objResultRow->t_views);
-        $this->m_bIsFixed = $objResultRow->t_fixed ? true : false;
+        $this->m_iBoardId = (int) $objResultRow->t_boardid;
+        $this->m_iId = (int) $objResultRow->t_id;
+        $this->m_bIsActive = (bool) $objResultRow->t_active;
+        $this->m_iLastMessageId = (int) $objResultRow->t_lastmsgid;
+        $this->m_iLastMessageTimestamp = (int) $objResultRow->t_lastmsgtstmp;
+        $this->m_iMessageQuantity = (int) $objResultRow->t_msgquantity;
+        $this->m_iViews = (int) $objResultRow->t_views;
+        $this->m_bIsFixed = (bool) $objResultRow->t_fixed;
 
         return true;
     }
@@ -124,8 +105,6 @@ class cThread
      */
     public function updateIsActive(bool $bIsActive): bool
     {
-
-
         if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_thread SET t_active='.intval($bIsActive)." WHERE t_id=$this->m_iId")) {
             return false;
         }
@@ -151,8 +130,6 @@ class cThread
      */
     public function updateIsFixed(bool $bIsFixed): bool
     {
-
-
         if (!cDBFactory::getInstance()->executeQuery('UPDATE pxm_thread SET t_fixed='.intval($bIsFixed)." WHERE t_id=$this->m_iId")) {
             return false;
         }
@@ -167,8 +144,6 @@ class cThread
      */
     public function deleteData(): bool
     {
-
-
         if (cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_message WHERE m_threadid=$this->m_iId")
             && cDBFactory::getInstance()->executeQuery("DELETE FROM pxm_thread WHERE t_id=$this->m_iId")) {
 
@@ -185,9 +160,6 @@ class cThread
      */
     public function deleteSubThread(int $iMessageId): bool
     {
-
-        $iMessageId = intval($iMessageId);
-
         $bReturn = false;
         $bClosed = false;
         if ($this->m_bIsActive) {
@@ -226,7 +198,6 @@ class cThread
      */
     public function deleteMessageTree(int $iMessageId): bool
     {
-        $iMessageId = intval($iMessageId);
         if ($iMessageId <= 0) {
             return false;
         }
@@ -249,12 +220,6 @@ class cThread
      */
     public function extractSubThread(int $iMessageId): bool
     {
-
-        $iMessageId = intval($iMessageId);
-
-        $bReturn = false;
-        $bClosed = false;
-
         $bReturn = false;
         $bClosed = false;
         if ($this->m_bIsActive) {
@@ -265,8 +230,6 @@ class cThread
         $this->m_arrThreadMessages = $this->getThreadMessageIdArray();
 
         if (isset($this->m_arrThreadMessages[0]) && !in_array($iMessageId, $this->m_arrThreadMessages[0])) {// root message not allowed
-
-
             if (cDBFactory::getInstance()->executeQuery("INSERT INTO pxm_thread (t_boardid,t_active,t_lastmsgtstmp) VALUES ($this->m_iBoardId,1,0)")) {
                 if (($iNewThreadId = cDBFactory::getInstance()->getInsertId('pxm_thread', 't_id')) > 0) {
 
@@ -289,15 +252,14 @@ class cThread
     /**
      * get the ids of the messages in this thread
      *
-     * @return array ids of the messages in this thread
+     * @return array<int, list<int>> ids of the messages in this thread
      */
     public function getThreadMessageIdArray(): array
     {
-
         $arrThreadMessageIds = [];
         if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT m_id,m_parentid FROM pxm_message WHERE m_threadid=$this->m_iId")) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                $arrThreadMessageIds[intval($objResultRow->m_parentid)][] = intval($objResultRow->m_id);
+                $arrThreadMessageIds[(int) $objResultRow->m_parentid][] = (int) $objResultRow->m_id;
             }
         }
         return $arrThreadMessageIds;
@@ -363,10 +325,8 @@ class cThread
      */
     public function moveThread(int $iDestinationBoardId): bool
     {
-
         $bReturn = false;
 
-        $iDestinationBoardId = intval($iDestinationBoardId);
         if ($iDestinationBoardId > 0) {
             if ($objResultSet = cDBFactory::getInstance()->executeQuery("UPDATE pxm_thread SET t_boardid=$iDestinationBoardId WHERE t_id=$this->m_iId")) {
                 if ($objResultSet->getAffectedRows() > 0) {
@@ -384,28 +344,24 @@ class cThread
      * @param string $sDateFormat php date format
      * @param int $iLastOnlineTimestamp last online timestamp for user
      * @param int $iCurrentUserId current user id for draft visibility (0 = guest)
-     * @return array member variables
+     * @return array<string, mixed> member variables
      */
     public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, int $iCurrentUserId = 0): array
     {
-
-        require_once(SRCDIR . '/Enum/eMessage.php');
-        $iCurrentUserId = intval($iCurrentUserId);
-
         if ($this->m_iId > 0) {
+            $sStatusFilter = '(m_status='.eMessageStatus::PUBLISHED->value.' OR (m_status='.eMessageStatus::DRAFT->value.' AND m_userid='.$iCurrentUserId.'))';
+//            if ($iCurrentUserId > 0) {
+//                $sQuery = 'SELECT m_id,m_parentid,m_subject,m_tstmp,m_userid,m_username,m_userhighlight,' .
+//                    '(mr.mr_messageid IS NOT NULL) AS is_read ' .
+//                    'FROM pxm_message ' .
+//                    'LEFT JOIN pxm_message_read mr ON mr.mr_messageid = m_id AND mr.mr_userid = ' . $iCurrentUserId . ' ' .
+//                    "WHERE m_threadid=$this->m_iId AND " . $sStatusFilter . ' ORDER BY m_tstmp DESC';
+//            } else {
+//                $sQuery = "SELECT m_id,m_parentid,m_subject,m_tstmp,m_userid,m_username,m_userhighlight FROM pxm_message WHERE m_threadid=$this->m_iId AND " . $sStatusFilter . ' ORDER BY m_tstmp DESC';
+//            }
 
 
-            $sStatusFilter = '(m_status='.MessageStatus::PUBLISHED->value.' OR (m_status='.MessageStatus::DRAFT->value.' AND m_userid='.$iCurrentUserId.'))';
-            if ($iCurrentUserId > 0) {
-                $sQuery = 'SELECT m_id,m_parentid,m_subject,m_tstmp,m_userid,m_username,m_userhighlight,' .
-                          '(mr.mr_messageid IS NOT NULL) AS is_read ' .
-                          'FROM pxm_message ' .
-                          'LEFT JOIN pxm_message_read mr ON mr.mr_messageid = m_id AND mr.mr_userid = ' . $iCurrentUserId . ' ' .
-                          "WHERE m_threadid=$this->m_iId AND " . $sStatusFilter . ' ORDER BY m_tstmp DESC';
-            } else {
-                $sQuery = "SELECT m_id,m_parentid,m_subject,m_tstmp,m_userid,m_username,m_userhighlight FROM pxm_message WHERE m_threadid=$this->m_iId AND " . $sStatusFilter . ' ORDER BY m_tstmp DESC';
-            }
-            if ($objResultSet = cDBFactory::getInstance()->executeQuery($sQuery)) {
+            if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT m_id,m_parentid,m_subject,m_tstmp,m_userid,m_username,m_userhighlight,m_status FROM pxm_message WHERE m_threadid=$this->m_iId AND ".$sStatusFilter.' ORDER BY m_tstmp DESC')) {
 
                 $objParser = null;	// message parser not needed
 
@@ -419,6 +375,8 @@ class cThread
                     $objMessageHeader->setAuthorId($objResultRow->m_userid);
                     $objMessageHeader->setAuthorUserName($objResultRow->m_username);
                     $objMessageHeader->setAuthorHighlightUser($objResultRow->m_userhighlight);
+                    $objMessageHeader->setStatus(eMessageStatus::tryFrom((int) $objResultRow->m_status) ?? eMessageStatus::PUBLISHED);
+
                     if ($iCurrentUserId > 0) {
                         $objMessageHeader->setIsRead((bool)$objResultRow->is_read);
                     } else {
@@ -433,30 +391,29 @@ class cThread
                     $objResultSet->freeResult();
                     unset($objResultSet);
 
-
                     // increment thread view count
                     cDBFactory::getInstance()->executeQuery("UPDATE pxm_thread SET t_views=t_views+1 WHERE t_id=$this->m_iId");
                     ++$this->m_iViews;
-                    return ['id'		=>	$this->m_iId,
-                                 'active'	=>	$this->m_bIsActive,
-                                 'fixed'	=>	$this->m_bIsFixed,
-                                 'views'	=>	$this->m_iViews,
-                                 'msg'		=>	$this->getMessageTreeArray(0)];
+                    return ['id'	=>	$this->m_iId,
+                            'active' =>	$this->m_bIsActive,
+                            'fixed'	=>	$this->m_bIsFixed,
+                            'views'	=>	$this->m_iViews,
+                            'msg'	=>	$this->getMessageTreeArray(0)];
                 }
             }
         }
-        return ['id'		=>	$this->m_iId,
-                     'active'	=>	$this->m_bIsActive,
-                     'fixed'	=>	$this->m_bIsFixed,
-                     'views'	=>	$this->m_iViews];
+        return ['id'	=>	$this->m_iId,
+                'active' =>	$this->m_bIsActive,
+                'fixed'	=>	$this->m_bIsFixed,
+                'views'	=>	$this->m_iViews];
     }
 
     /**
      * build the message header tree
      *
      * @param int $iParentId parent id
-     * @param string $sImages image tags
-     * @return array message header tree
+     * @param string $sTreeLines image chars
+     * @return array<mixed> message header tree
      */
     private function getMessageTreeArray(int $iParentId, string $sTreeLines = ''): array
     {

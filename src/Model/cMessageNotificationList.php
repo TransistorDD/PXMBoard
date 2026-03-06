@@ -1,6 +1,9 @@
 <?php
 
-require_once(SRCDIR . '/Model/cScrollList.php');
+namespace PXMBoard\Model;
+
+use PXMBoard\Database\cDBFactory;
+
 /**
  * message notification subscription list handling
  *
@@ -25,12 +28,11 @@ class cMessageNotificationList extends cScrollList
      */
     public function __construct(int $iUserId, int $iTimeOffset = 0, string $sDateFormat = '')
     {
-
-        $this->m_iUserId = intval($iUserId);
-        $this->m_iTimeOffset = intval($iTimeOffset);
-        $this->m_sDateFormat = $sDateFormat;
-
         parent::__construct();
+
+        $this->m_iUserId = $iUserId;
+        $this->m_iTimeOffset = $iTimeOffset;
+        $this->m_sDateFormat = $sDateFormat;
     }
 
     /**
@@ -58,14 +60,13 @@ class cMessageNotificationList extends cScrollList
      */
     protected function _setDataFromDb(object $objResultRow): bool
     {
-
-        $this->m_arrResultList[] = ['messageid'		=> $objResultRow->mn_messageid,
-                                         'threadid'			=> $objResultRow->m_threadid,
-                                         'subject'			=> $objResultRow->m_subject,
-                                         'boardid'			=> $objResultRow->b_id,
-                                         'boardname'		=> $objResultRow->b_name,
-                                         'date'				=> date($this->m_sDateFormat, ($objResultRow->m_tstmp + $this->m_iTimeOffset)),
-                                         'notification_active'	=> true];
+        $this->m_arrResultList[] = ['messageid'		    => $objResultRow->mn_messageid,
+                                    'threadid'			=> $objResultRow->m_threadid,
+                                    'subject'			=> $objResultRow->m_subject,
+                                    'boardid'			=> $objResultRow->b_id,
+                                    'boardname'		    => $objResultRow->b_name,
+                                    'date'				=> date($this->m_sDateFormat, ($objResultRow->m_tstmp + $this->m_iTimeOffset)),
+                                    'notification_active'	=> true];
         return true;
     }
 
@@ -76,10 +77,9 @@ class cMessageNotificationList extends cScrollList
      */
     public function countNotifications(): int
     {
-
         if ($objResultSet = cDBFactory::getInstance()->executeQuery("SELECT count(*) AS notifcount FROM pxm_message_notification WHERE mn_userid=$this->m_iUserId")) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
-                return intval($objResultRow->notifcount);
+                return (int) $objResultRow->notifcount;
             }
         }
         return 0;

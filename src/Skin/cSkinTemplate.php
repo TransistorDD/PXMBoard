@@ -1,5 +1,7 @@
 <?php
 
+namespace PXMBoard\Skin;
+
 /**
  * abstraction layer for output (interface)
  *
@@ -56,7 +58,7 @@ abstract class cSkinTemplate
     /**
      * add data to the template
      *
-     * @param array $arrData key - value pairs
+     * @param array<string, mixed> $arrData key - value pairs
      * @return bool success / failure
      */
     public function addData(array $arrData): bool
@@ -67,7 +69,7 @@ abstract class cSkinTemplate
     /**
      * add data to the template (internal recursive template method)
      *
-     * @param array $arrData key - value pairs
+     * @param array<string, mixed> $arrData key - value pairs
      * @param string $sSubst subst string for integer keys
      * @return bool success / failure
      */
