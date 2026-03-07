@@ -73,6 +73,55 @@ class cThreadTest extends IntegrationTestCase
     }
 
     /**
+     * Test getDataArray uses DB read status for logged-in users
+     * A message pre-marked as read should have new=0; an unread message should have new=1.
+     *
+     * @return void
+     */
+    public function test_getDataArray_setsNewFlag_basedOnReadStatus(): void
+    {
+        $iUserId   = $this->insertUser();
+        $iBoardId  = $this->insertBoard();
+        $iThreadId = $this->insertThread($iBoardId);
+        $iMsgRead  = $this->insertMessage($iThreadId, ['m_userid' => $iUserId, 'm_subject' => 'Read message']);
+        $iMsgUnread = $this->insertMessage($iThreadId, ['m_userid' => $iUserId, 'm_parentid' => $iMsgRead, 'm_subject' => 'Unread message']);
+
+        // Pre-mark only the first message as read
+        \cMessageReadTracker::markAsRead($iUserId, $iMsgRead);
+
+        $objThread = new \cThread();
+        $objThread->loadDataById($iThreadId, $iBoardId);
+
+        $arrData = $objThread->getDataArray(0, 'd.m.Y', 0, $iUserId);
+
+        // Flatten the message tree into a map keyed by id
+        $arrMsgMap = [];
+        $this->flattenMsgTree($arrData['msg'] ?? [], $arrMsgMap);
+
+        $this->assertArrayHasKey($iMsgRead, $arrMsgMap, 'Read message should be in tree');
+        $this->assertArrayHasKey($iMsgUnread, $arrMsgMap, 'Unread message should be in tree');
+        $this->assertSame(0, $arrMsgMap[$iMsgRead]['new'], 'Pre-read message should have new=0');
+        $this->assertSame(1, $arrMsgMap[$iMsgUnread]['new'], 'Unread message should have new=1');
+    }
+
+    /**
+     * Recursively flatten a message tree into a map keyed by message id.
+     *
+     * @param array<int,mixed> $arrMessages
+     * @param array<int,mixed> $arrMap (out)
+     * @return void
+     */
+    private function flattenMsgTree(array $arrMessages, array &$arrMap): void
+    {
+        foreach ($arrMessages as $arrMsg) {
+            $arrMap[(int)$arrMsg['id']] = $arrMsg;
+            if (!empty($arrMsg['msg'])) {
+                $this->flattenMsgTree($arrMsg['msg'], $arrMap);
+            }
+        }
+    }
+
+    /**
      * Test thread pinned status
      *
      * @return void
