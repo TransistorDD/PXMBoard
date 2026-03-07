@@ -9,10 +9,20 @@
     "build:css": "tailwindcss -i css/src/input.css -o public/css/pxmboard.css --minify",
     "build:libs": "cp node_modules/alpinejs/dist/cdn.min.js public/js/alpine.min.js && cp node_modules/htmx.org/dist/htmx.min.js public/js/htmx.min.js",
     "build": "npm run build:css && npm run build:libs && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "node tests/E2E/fixtures/reset-db.js && playwright test",
+    "test:e2e:ui": "node tests/E2E/fixtures/reset-db.js && playwright test --ui",
+    "test:e2e:headed": "node tests/E2E/fixtures/reset-db.js && playwright test --headed",
+    "test:e2e:desktop": "node tests/E2E/fixtures/reset-db.js && playwright test --project='Desktop Chrome' --project='Desktop Chrome Dark' --project='Desktop Safari' --project='Desktop Safari Dark'",
+    "test:e2e:mobile": "node tests/E2E/fixtures/reset-db.js && playwright test --project='Mobile Safari – iPhone 14 Pro' --project='Mobile Safari – iPhone 14 Pro Dark' --project='Mobile Chrome – Pixel 7' --project='Mobile Chrome – Pixel 7 Dark'",
+    "test:e2e:pwa": "node tests/E2E/fixtures/reset-db.js && playwright test tests/E2E/specs/07_pwa.spec.js",
+    "test:e2e:reset-db": "node tests/E2E/fixtures/reset-db.js",
+    "test:e2e:report": "playwright show-report reports/playwright-html"
   },
   "devDependencies": {
+    "@playwright/test": "^1.51.0",
     "@tailwindcss/cli": "^4.2.1",
+    "mysql2": "^3.11.0",
     "tailwindcss": "^4.2.1",
     "vite": "^7.3.1"
   },

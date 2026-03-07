@@ -2,7 +2,7 @@ CREATE TABLE `pxm_badword` (
   `bw_name` char(20) NOT NULL default '',
   `bw_replacement` char(20) NOT NULL default '',
   PRIMARY KEY  (`bw_name`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `pxm_badword` (`bw_name`, `bw_replacement`) VALUES ('fuck', '****');
 # --------------------------------------------------------
@@ -20,7 +20,7 @@ CREATE TABLE `pxm_board` (
   `b_embed_external` BOOLEAN NOT NULL default TRUE COMMENT 'Einbettung externer Inhalte (Bilder, YouTube, Twitch)',
   `b_replacetext` tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY  (`b_id`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 # --------------------------------------------------------
 
 CREATE TABLE `pxm_configuration` (
@@ -46,7 +46,7 @@ CREATE TABLE `pxm_configuration` (
   `c_quotesubject` varchar(10) NOT NULL default 'Re:',
   `c_skindir` varchar(100) NOT NULL default '',
   PRIMARY KEY  (`c_id`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `pxm_configuration` (`c_id`, `c_quickpost`, `c_directregistration`, `c_uniquemail`, `c_dateformat`, `c_timeoffset`, `c_onlinetime`, `c_closethreads`, `c_usrperpage`, `c_msgheaderperpage`, `c_privatemsgperpage`, `c_thrdperpage`, `c_mailwebmaster`, `c_maxprofilepicsize`, `c_maxprofilepicwidth`, `c_maxprofilepicheight`, `c_profileimgdir`, `c_usesignatures`, `c_skinid`, `c_quotesubject`, `c_skindir`) VALUES (1, 1, 1, 1, 'j.m.Y H:i', 0, 300, 0, 10, 50, 10, 20, '', 50000, 200, 250, 'images/profile/', 1, 1, 'Re:', 'skins/');
 # --------------------------------------------------------
@@ -54,7 +54,7 @@ INSERT INTO `pxm_configuration` (`c_id`, `c_quickpost`, `c_directregistration`, 
 CREATE TABLE `pxm_forbiddenmail` (
   `fm_adress` char(100) NOT NULL default '',
   PRIMARY KEY  (`fm_adress`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 # --------------------------------------------------------
 
 CREATE TABLE `pxm_message` (
@@ -79,7 +79,7 @@ CREATE TABLE `pxm_message` (
   KEY `m_username` (`m_username`,`m_tstmp`),
   KEY `m_status` (`m_status`),
   FULLTEXT KEY `m_search` (`m_subject`,`m_body`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 # --------------------------------------------------------
 
 CREATE TABLE `pxm_message_read` (
@@ -89,7 +89,7 @@ CREATE TABLE `pxm_message_read` (
   PRIMARY KEY (`mr_userid`,`mr_messageid`),
   KEY `idx_user_timestamp` (`mr_userid`,`mr_timestamp`),
   KEY `idx_messageid` (`mr_messageid`)
-) ENGINE=InnoDB COMMENT='Tracks read messages per user (no foreign keys for performance). PRIMARY KEY is optimal for LEFT JOIN queries in cThreadList.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tracks read messages per user (no foreign keys for performance). PRIMARY KEY is optimal for LEFT JOIN queries in cThreadList.';
 # --------------------------------------------------------
 
 CREATE TABLE `pxm_message_notification` (
@@ -106,7 +106,7 @@ CREATE TABLE `pxm_moderator` (
   `mod_boardid` int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`mod_userid`,`mod_boardid`),
   KEY `mod_boardid` (`mod_boardid`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 # --------------------------------------------------------
 
 CREATE TABLE `pxm_template` (
@@ -115,7 +115,7 @@ CREATE TABLE `pxm_template` (
   `te_name` varchar(50) NOT NULL default '',
   `te_description` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`te_id`)
-) ENGINE=InnoDB COMMENT='Text templates for emails and application messages';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Text templates for emails and application messages';
 
 INSERT INTO `pxm_template` (`te_id`, `te_message`, `te_name`, `te_description`) VALUES (1, 'PXMBoard Registrierung', 'registration mail subject', 'subject of the registration mail'),
 (2, 'Sie wurden registriert.\nIhr Nickname lautet: %nickname%\nIhr Passwort lautet: %password%', 'registration mail body', 'body of the registration mail\navailable placeholders: %password%,%nickname%'),
@@ -147,7 +147,7 @@ CREATE TABLE `pxm_priv_message` (
   KEY `p_tstmp` (`p_tstmp`),
   KEY `p_inbox` ( `p_fromuserid` , `p_touserid` , `p_tostate` , `p_tstmp` ),
   KEY `p_outbox` ( `p_touserid` , `p_fromuserid` , `p_fromstate` , `p_tstmp` )
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 # --------------------------------------------------------
 
 CREATE TABLE `pxm_profile_accept` (
@@ -155,7 +155,7 @@ CREATE TABLE `pxm_profile_accept` (
   `pa_type` enum('s','a','i') NOT NULL default 's',
   `pa_length` smallint(5) unsigned NOT NULL default '0',
   PRIMARY KEY  (`pa_name`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `pxm_profile_accept` (`pa_name`, `pa_type`, `pa_length`) VALUES ('url', 's', 100),
 ('hobby', 's', 100);
@@ -174,7 +174,7 @@ CREATE TABLE `pxm_search` (
 PRIMARY KEY ( `se_id` ) ,
 INDEX ( `se_tstmp` ) ,
 INDEX `idx_ratelimit` ( `se_ipaddress`, `se_tstmp` )
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 # --------------------------------------------------------
 
 CREATE TABLE `pxm_skin` (
@@ -182,7 +182,7 @@ CREATE TABLE `pxm_skin` (
   `s_fieldname` varchar(15) NOT NULL default '',
   `s_fieldvalue` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`s_id`,`s_fieldname`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `pxm_skin` (`s_id`, `s_fieldname`, `s_fieldvalue`) VALUES
 (1, 'name', 'PXM Skin'),
@@ -194,7 +194,7 @@ CREATE TABLE `pxm_textreplacement` (
   `tr_name` char(20) NOT NULL default '',
   `tr_replacement` char(255) NOT NULL default '',
   PRIMARY KEY  (`tr_name`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `pxm_textreplacement` (`tr_name`, `tr_replacement`) VALUES (':-)', '<img src="images/smiley.gif"/>');
 # --------------------------------------------------------
@@ -211,14 +211,14 @@ CREATE TABLE `pxm_thread` (
   PRIMARY KEY  (`t_id`),
   KEY `threadlist_lastmsgtstmp` ( `t_boardid` , `t_fixed` , `t_lastmsgtstmp` ),
   KEY `t_lastmsgtstmp` (`t_lastmsgtstmp`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 # --------------------------------------------------------
 
 CREATE TABLE `pxm_user` (
   `u_id` int(10) unsigned NOT NULL auto_increment,
   `u_username` varchar(30) NOT NULL default '',
   `u_password` varchar(255) NOT NULL default '',
-  `u_passwordkey` char(32) NOT NULL default '',
+  `u_passwordkey` char(32) NULL DEFAULT NULL COMMENT 'Password recovery key (hex-encoded 16 random bytes)',
   `u_firstname` varchar(30) NOT NULL default '',
   `u_lastname` varchar(30) NOT NULL default '',
   `u_city` varchar(30) NOT NULL default '',
@@ -250,7 +250,7 @@ CREATE TABLE `pxm_user` (
   UNIQUE KEY `u_username` (`u_username`),
   UNIQUE KEY `u_passwordkey` (`u_passwordkey`),
   KEY `u_lastonlinetstmp` (`u_lastonlinetstmp`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 # --------------------------------------------------------
 
@@ -261,7 +261,7 @@ CREATE TABLE `pxm_user` (
 CREATE TABLE `pxm_user_login_ticket` (
   `ult_id` int(10) unsigned NOT NULL auto_increment,
   `ult_userid` int(10) unsigned NOT NULL,
-  `ult_token` varchar(32) NOT NULL,
+  `ult_token` char(32) NOT NULL,
   `ult_useragent` varchar(255) NOT NULL default '',
   `ult_ipaddress` varchar(45) NOT NULL default '',
   `ult_created_timestamp` int(10) unsigned NOT NULL,
@@ -271,7 +271,7 @@ CREATE TABLE `pxm_user_login_ticket` (
   KEY `idx_userid` (`ult_userid`),
   KEY `idx_last_used` (`ult_last_used_timestamp`),
   CONSTRAINT `fk_login_ticket_user` FOREIGN KEY (`ult_userid`) REFERENCES `pxm_user` (`u_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 # --------------------------------------------------------
 
@@ -287,9 +287,7 @@ CREATE TABLE `pxm_notification` (
   `n_title` varchar(255) NOT NULL,
   `n_message` text NOT NULL,
   `n_link` varchar(255) NOT NULL default '',
-  `n_related_userid` int(10) unsigned default NULL,
   `n_related_messageid` int(10) unsigned default NULL,
-  `n_related_threadid` int(10) unsigned default NULL,
   `n_related_pmid` int(10) unsigned default NULL,
   `n_created_timestamp` int(10) unsigned NOT NULL,
   `n_read_timestamp` int(10) unsigned default NULL,
@@ -298,5 +296,5 @@ CREATE TABLE `pxm_notification` (
   KEY `idx_created` (`n_created_timestamp`),
   KEY `idx_type` (`n_type`),
   CONSTRAINT `fk_notification_user` FOREIGN KEY (`n_userid`) REFERENCES `pxm_user` (`u_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

@@ -17,7 +17,7 @@ use PXMBoard\Parser\cParser;
 class cMessageHeader
 {
     protected int $m_iId = 0;					// message id
-    protected mixed $m_objAuthor;			    // author (user)
+    protected cUser $m_objAuthor;			    // author (user)
     protected string $m_sSubject = '';			// message subject
     protected int $m_iMessageTimestamp = 0;		// date of the message
     protected eMessageStatus $m_eStatus = eMessageStatus::PUBLISHED;	// message status
@@ -193,11 +193,9 @@ class cMessageHeader
      * @param object $objAuthor author (user)
      * @return void
      */
-    public function setAuthor(object $objAuthor): void
+    public function setAuthor(cUser $objAuthor): void
     {
-        if (strcasecmp(get_class($objAuthor), 'cuser') == 0 || is_subclass_of($objAuthor, 'cUser')) {
-            $this->m_objAuthor = $objAuthor;
-        }
+        $this->m_objAuthor = $objAuthor;
     }
 
     /**

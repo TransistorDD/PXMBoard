@@ -39,9 +39,7 @@ class cActionPrivatemessagesave extends cPublicAction
      */
     public function performAction(): void
     {
-
         $objActiveUser = $this->getActiveUser();
-        $iLastOnline = $objActiveUser->getLastOnlineTimestamp();
 
         $iDestinationId = $this->m_objInputHandler->getIntFormVar('toid', true, true, true);
         if ($iDestinationId > 0) {

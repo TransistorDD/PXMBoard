@@ -942,6 +942,11 @@
    * #thread-container simultaneously. Highlights the message in the tree.
    * Used by threadlist subject and last-reply links.
    *
+   * NOTE: Do NOT add hx-sync="#message-container:..." to thread tree links
+   * (thread.tpl). htmx.ajax() registers internal request state on the target
+   * element but does not clean it up after completion. hx-sync would find this
+   * stale state, fire htmx:abort, and block the next declarative request.
+   *
    * @param {number} brdid  - board id
    * @param {number} msgid  - message id to display and highlight
    * @param {number} thrdid - thread id for the tree

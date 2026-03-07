@@ -35,13 +35,15 @@
         "dev-setup": [
             "@composer install",
             "@php -r \"if (!file_exists('phpunit.xml')) { copy('phpunit.xml.dist', 'phpunit.xml'); echo 'phpunit.xml created — edit database credentials before running tests.\\n'; } else { echo 'phpunit.xml already exists, skipping.\\n'; }\"",
+            "@php -r \"if (!file_exists('config/pxmboard-config.e2e.php')) { copy('config/pxmboard-config.e2e.example.php', 'config/pxmboard-config.e2e.php'); echo 'config/pxmboard-config.e2e.php created — edit E2E database credentials before running E2E tests.\\n'; } else { echo 'config/pxmboard-config.e2e.php already exists, skipping.\\n'; }\"",
             "npm install",
-            "npm run build"
+            "npm run build",
+            "npx playwright install chromium webkit"
         ],
         "serve": "php -S localhost:8000 -t public"
     },
     "scripts-descriptions": {
-        "dev-setup": "Sets up the local development environment (PHP vendors, phpunit config, and frontend assets)."
+        "dev-setup": "Sets up the local development environment: PHP vendors, phpunit.xml, E2E config placeholders, npm packages, frontend asset build, and Playwright browser binaries (Chromium + WebKit). Run once after cloning. After setup: fill in DB credentials in phpunit.xml and config/pxmboard-config.e2e.php."
     },
     "config": {
         "optimize-autoloader": true,

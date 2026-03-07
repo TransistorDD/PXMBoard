@@ -19,7 +19,7 @@ skins/pxm/cache/*
 !skins/pxm/cache/DELETEME
 
 # Legacy skins (maintained separately or to be removed)
-skins/pp/
+pp/
 
 # Legacy CSS / JS
 css/deprecated/
@@ -49,3 +49,6 @@ node_modules/
 .phpunit.result.cache
 /coverage/
 /reports/
+
+# Playwright E2E
+config/pxmboard-config.e2e.php

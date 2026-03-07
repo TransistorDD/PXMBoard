@@ -16,11 +16,13 @@ if (!file_exists(__DIR__ . '/pxmboard-basedir.php')) {
 require_once(__DIR__ . '/pxmboard-basedir.php');	// defines BASEDIR
 define('SRCDIR', BASEDIR . '/src');
 
-if (!file_exists(BASEDIR . '/config/pxmboard-config.php')) {
+// Allow overriding the config file for isolated test environments (E2E/integration tests).
+$sConfigFile = getenv('PXMBOARD_CONFIG') ?: BASEDIR . '/config/pxmboard-config.php';
+if (!file_exists($sConfigFile)) {
     die('This board is not properly installed. Run public/install/install.php first.');
 }
 // read configuration
-$arrConfig        = require(BASEDIR . '/config/pxmboard-config.php');
+$arrConfig        = require($sConfigFile);
 $arrDatabase      = $arrConfig['database'];
 $arrTemplateTypes = $arrConfig['template_types'];
 $arrSearchEngine  = $arrConfig['search_engine'] ?? ['type' => 'MySql'];

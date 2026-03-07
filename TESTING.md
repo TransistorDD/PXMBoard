@@ -235,12 +235,14 @@ After a test run:
 PXMBoard/
 ├── coverage/           # HTML coverage report
 │   └── index.html     # Open in browser
-├── reports/           # All generated reports (gitignored)
-│   ├── testdox.txt    # PHPUnit: --testdox-text reports/testdox.txt
-│   ├── testdox.html   # PHPUnit: --testdox-html reports/testdox.html
-│   ├── junit.xml      # PHPUnit: --log-junit reports/junit.xml
-│   └── phpstan.txt    # PHPStan: vendor/bin/phpstan analyse --output-file reports/phpstan.txt
-└── .phpunit.cache/    # PHPUnit cache (safe to ignore)
+├── reports/                      # All generated reports (gitignored)
+│   ├── testdox.txt               # PHPUnit: --testdox-text reports/testdox.txt
+│   ├── testdox.html              # PHPUnit: --testdox-html reports/testdox.html
+│   ├── junit.xml                 # PHPUnit: --log-junit reports/junit.xml
+│   ├── phpstan.txt               # PHPStan: vendor/bin/phpstan analyse --output-file reports/phpstan.txt
+│   ├── playwright-html/          # Playwright HTML report
+│   └── playwright-artifacts/     # Playwright screenshots & traces (failed tests only)
+└── .phpunit.cache/               # PHPUnit cache (safe to ignore)
 ```
 
 ## Installing Xdebug / PCOV (for Coverage)
@@ -306,3 +308,191 @@ test:
     reports:
       junit: junit.xml
 ```
+
+---
+
+## E2E Tests (Playwright)
+
+End-to-end tests run against a real PHP server and a dedicated E2E database.
+Playwright drives a real browser and tests the complete request-response cycle
+including HTMX navigation flows.
+
+### One-Time Setup
+
+`composer dev-setup` handles most steps automatically (npm install, Playwright browser binaries).
+Two manual steps remain afterwards:
+
+**1. Create the E2E database:**
+```sql
+CREATE DATABASE pxmboard_e2e CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL ON pxmboard_e2e.* TO 'pxmboard'@'localhost';
+```
+
+**2. Fill in the E2E config** (`config/pxmboard-config.e2e.php` was created from the example by `composer dev-setup`):
+```bash
+# Edit config/pxmboard-config.e2e.php: set DB host, name, user, password to match pxmboard_e2e
+```
+
+**3. Set environment variables for the DB reset script** in `~/.bashrc`:
+```bash
+export E2E_DB_SOCKET=/run/mysqld/mysqld.sock   # Linux (Unix socket, recommended)
+# export E2E_DB_HOST=127.0.0.1                 # alternative: TCP
+export E2E_DB_USER=your_db_user
+export E2E_DB_PASS='your_db_password'
+# E2E_DB_NAME=pxmboard_e2e is the default, no need to set it
+```
+
+> `PXMBOARD_CONFIG` does **not** need to be set manually. Playwright sets it
+> exclusively for the PHP subprocess it starts. Your shell session is not affected.
+
+### PHP Server Lifecycle
+
+Playwright fully manages the PHP development server on port 8001 — starting it
+via `webServer` in `playwright.config.js` and stopping it via `global-teardown.js`
+after every test run. **No manual server start is required.**
+
+### Typical Test Workflow
+
+```bash
+# All tests (all 8 browser projects, headless)
+npm run test:e2e
+
+# Desktop Chrome only (faster for development cycles)
+npx playwright test --project='Desktop Chrome'
+
+# Single spec file
+npx playwright test tests/E2E/specs/03_auth.spec.js --project='Desktop Chrome'
+
+# Reset the E2E database without running tests
+npm run test:e2e:reset-db
+```
+
+Every `test:e2e*` script resets the E2E database to a clean seed state before launching Playwright.
+
+### All npm Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run test:e2e` | All 8 projects (headless) |
+| `npm run test:e2e:ui` | Interactive Playwright UI mode |
+| `npm run test:e2e:headed` | Headed (visible browser windows) |
+| `npm run test:e2e:desktop` | Desktop Chrome + Safari (light + dark) |
+| `npm run test:e2e:mobile` | Mobile iPhone 14 Pro + Pixel 7 (light + dark) |
+| `npm run test:e2e:pwa` | PWA / Service Worker spec only |
+| `npm run test:e2e:reset-db` | Reset E2E DB without running tests |
+| `npm run test:e2e:report` | Open HTML report in browser (after a test run) |
+
+### Results and Artifacts
+
+| Path | Content |
+|------|---------|
+| `reports/playwright-html/index.html` | Full HTML report with screenshots and traces |
+| `reports/playwright-artifacts/` | Screenshots and traces of failed tests |
+
+**Open the HTML report:**
+```bash
+npm run test:e2e:report
+# opens http://localhost:9323 — shows screenshots and step-by-step traces
+```
+
+**Alternative: VS Code Playwright Extension** (`ms-playwright.playwright`, recommended in `.vscode/extensions.json`)
+— shows results, screenshots and traces directly in the VS Code Testing sidebar without a browser server.
+
+### Debugging
+
+**Headed + SlowMo** — watch what the browser does:
+
+Uncomment the prepared line in the `use` block of `playwright.config.js`:
+```js
+// launchOptions: { slowMo: 1500 },
+```
+Then:
+```bash
+npx playwright test tests/E2E/specs/06_private-messages.spec.js \
+    --project='Desktop Chrome' --headed
+```
+**Re-comment before committing.**
+
+**Step-by-step debug mode** (pauses at every action):
+```bash
+PWDEBUG=1 npx playwright test tests/E2E/specs/... --headed
+```
+
+**After an aborted debug run** (teardown hook did not run):
+```bash
+pkill -f "php -S 127.0.0.1:8001"
+npm run test:e2e:reset-db
+```
+
+### Playwright Projects
+
+| Project | Browser | Viewport | Color scheme |
+|---------|---------|----------|--------------|
+| Desktop Chrome | Chromium | 1280×720 | light |
+| Desktop Chrome Dark | Chromium | 1280×720 | dark |
+| Desktop Safari | WebKit | 1280×720 | light |
+| Desktop Safari Dark | WebKit | 1280×720 | dark |
+| Mobile Safari – iPhone 14 Pro | WebKit | 393×852 | light |
+| Mobile Safari – iPhone 14 Pro Dark | WebKit | 393×852 | dark |
+| Mobile Chrome – Pixel 7 | Chromium | 412×915 | light |
+| Mobile Chrome – Pixel 7 Dark | Chromium | 412×915 | dark |
+
+### Directory Structure
+
+```
+tests/E2E/
+├── fixtures/
+│   ├── e2e-seed.sql        # Full schema + deterministic test data
+│   ├── reset-db.js         # Drops, re-creates and seeds the E2E DB
+│   └── auth.js             # Login helpers
+├── pages/                  # Page Object Models
+│   ├── BoardPage.js        # Board list, login/logout
+│   ├── ThreadListPage.js   # Thread list (#threadlist-container)
+│   ├── ThreadPage.js       # Thread view (#thread-container)
+│   └── MessagePage.js      # Compose / reply form
+└── specs/
+    ├── 01_board-list.spec.js       # Board list, login form
+    ├── 02_navigation.spec.js       # HTMX navigation flow
+    ├── 03_auth.spec.js             # Login / logout / access control
+    ├── 04_post-message.spec.js     # Post / reply / draft
+    ├── 05_search.spec.js           # Full-text search
+    ├── 06_private-messages.spec.js # PM inbox / outbox / send
+    └── 07_pwa.spec.js              # Service Worker, manifest, dark mode
+```
+
+### Seed Data
+
+| Resource | Details |
+|----------|---------|
+| Users | `Webmaster` (admin, password `test1234`), `Tester` (password `test5678`) |
+| Boards | `Test` (id=1), `Test2` (id=2) |
+| Threads | Thread 1 with 3 messages (published), Thread 4 pinned |
+| PM | 1 unread PM from Webmaster to Tester |
+
+### Architecture: HTMX-First Testing
+
+Tests always navigate via **full board URLs**, never via direct partial URLs.
+HTMX loads the thread list and messages as partials into their respective containers
+(`#threadlist-container`, `#message-container`) — exactly as a real user would see them.
+
+```js
+// Correct: full URL, then wait for HTMX swap
+await page.goto(`/pxmboard.php?mode=board&brdid=1&thrdid=1&msgid=1`);
+await page.locator('#message-container').waitFor({ state: 'visible' });
+
+// Wrong: load partial directly (bypasses session/layout context)
+await page.goto(`/pxmboard.php?mode=message&brdid=1&msgid=1`);
+```
+
+### Keeping DB Schema in Sync
+
+Every change to the application DB schema must be applied to all schema files:
+
+| File | Purpose |
+|------|---------|
+| `install/sql/pxmboard-mysql.sql` | Production install schema |
+| `install/sql/upgrade-X.Y.Z.sql` | Incremental migration |
+| `tests/E2E/fixtures/e2e-seed.sql` | E2E schema + seed data |
+| `tests/bootstrap.php` | PHPUnit integration test schema |
+
+A story that changes the DB schema is not complete until all four files are updated and the tests are green.
