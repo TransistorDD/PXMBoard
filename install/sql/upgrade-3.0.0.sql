@@ -16,6 +16,43 @@
 --
 
 -- ============================================================================
+-- ENGINE AND CHARACTER SET CONVERSION: MyISAM -> InnoDB, charset -> utf8mb4
+-- ============================================================================
+-- Legacy PXMBoard installations used TYPE=MyISAM (old MySQL syntax) or
+-- ENGINE=MyISAM with latin1/utf8 charset. This section converts all existing
+-- tables to ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci.
+--
+-- InnoDB is required for:
+-- - Foreign key constraints (pxm_user_login_ticket, pxm_notification)
+-- - ACID-compliant transactions used in the codebase
+-- - Consistent row-level locking behaviour
+--
+-- utf8mb4 is required for:
+-- - Full Unicode support (4-byte characters, emojis)
+-- - Correct FULLTEXT indexing in MySQL 5.6+ / MariaDB 10+
+--
+-- CONVERT TO CHARACTER SET re-encodes existing column definitions AND stored
+-- data, so this must run before any structural changes below.
+--
+-- NOTE: These ALTER TABLE operations rebuild each table. On large forums this
+-- may take several minutes per table. A backup before running is recommended.
+
+ALTER TABLE `pxm_badword`        ENGINE=InnoDB, CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `pxm_board`          ENGINE=InnoDB, CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `pxm_configuration`  ENGINE=InnoDB, CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `pxm_forbiddenmail`  ENGINE=InnoDB, CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `pxm_message`        ENGINE=InnoDB, CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `pxm_moderator`      ENGINE=InnoDB, CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `pxm_notification`   ENGINE=InnoDB, CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `pxm_priv_message`   ENGINE=InnoDB, CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `pxm_profile_accept` ENGINE=InnoDB, CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `pxm_search`         ENGINE=InnoDB, CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `pxm_skin`           ENGINE=InnoDB, CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `pxm_textreplacement` ENGINE=InnoDB, CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `pxm_thread`         ENGINE=InnoDB, CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `pxm_user`           ENGINE=InnoDB, CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- ============================================================================
 -- PASSWORD HASHING: Extend password field for bcrypt
 -- ============================================================================
 -- This extends the u_password field to support bcrypt hashes (60 chars)
@@ -113,7 +150,7 @@ CREATE TABLE IF NOT EXISTS `pxm_message_read` (
   PRIMARY KEY (`mr_userid`, `mr_messageid`),
   INDEX `idx_user_timestamp` (`mr_userid`, `mr_timestamp`),
   INDEX `idx_messageid` (`mr_messageid`)
-) ENGINE=InnoDB
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Tracks read messages per user (no foreign keys for performance). PRIMARY KEY optimal for LEFT JOIN queries.';
 
 -- ============================================================================
@@ -456,7 +493,7 @@ ALTER TABLE `pxm_configuration`
 -- - pxm_user: u_password extended, u_passwordkey to CHAR(32) with UNIQUE constraint, u_notification_unread_count added, u_priv_message_unread_count added, u_ticket removed, u_frame_top and u_frame_bottom dropped, u_status: DISABLED_BY_MOD (4) merged into DISABLED (3), boolean columns converted to BOOLEAN, u_parseimg renamed to u_embed_external, u_replacetext and u_showsignatures removed
 -- - pxm_user_login_ticket: new table for multi-device login support with User-Agent and IP tracking
 -- - pxm_template: renamed from pxm_notification (columns renamed n_* -> te_*)
--- - pxm_message: m_notification -> m_notify_on_reply, added m_status with index, added m_parentid index, added separate FULLTEXT indexes m_search_subject and m_search_body for weighted search scoring
+-- - pxm_message: m_notification -> m_notify_on_reply, added m_status with index, added m_parentid index
 -- - pxm_notification: new table for in-app user notifications
 -- - pxm_message_notification: new table for per-message notification subscriptions
 -- - pxm_message_read: new table for server-side read tracking with idx_messageid for read count queries

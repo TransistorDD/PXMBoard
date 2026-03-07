@@ -19,7 +19,7 @@ skins/pxm/cache/*
 !skins/pxm/cache/DELETEME
 
 # Legacy skins (maintained separately or to be removed)
-skins/pp/
+pp/
 
 # Legacy CSS / JS
 css/deprecated/

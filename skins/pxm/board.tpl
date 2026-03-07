@@ -18,24 +18,28 @@
 			<div id="detail-page">
 
 				<!-- Nachricht (per HTMX geladen wenn msgid vorhanden) -->
-				<div id="message-container" class="m-3"
-					 {if isset($config.msgid) && $config.msgid > 0}
-					 hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$config.msgid}"
-					 hx-trigger="load"
-					 hx-swap="innerHTML"
-					 {/if}>
+				<div id="message-container" class="m-3">
+					{if isset($config.msgid) && $config.msgid > 0}
+					<div hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$config.msgid}"
+						 hx-trigger="load"
+						 hx-target="#message-container"
+						 hx-swap="innerHTML">
+					</div>
+					{/if}
 				</div>
 
 				<!-- Teiler H2: Nachricht / Thread-Baum (nur Stacked) -->
 				<div class="htmx-divider" data-divider="h2"></div>
 
 				<!-- Thread-Baum (per HTMX geladen wenn thrdid vorhanden) -->
-				<div id="thread-container" class="m-3 rounded-lg bg-surface-primary border border-border-light"
-					 {if isset($config.thrdid) && $config.thrdid > 0}
-					 hx-get="pxmboard.php?mode=thread&brdid={$config.board.id}&thrdid={$config.thrdid}"
-					 hx-trigger="load"
-					 hx-swap="innerHTML"
-					 {/if}>
+				<div id="thread-container" class="m-3 rounded-lg bg-surface-primary border border-border-light">
+					{if isset($config.thrdid) && $config.thrdid > 0}
+					<div hx-get="pxmboard.php?mode=thread&brdid={$config.board.id}&thrdid={$config.thrdid}"
+						 hx-trigger="load"
+						 hx-target="#thread-container"
+						 hx-swap="innerHTML">
+					</div>
+					{/if}
 				</div>
 
 			</div>

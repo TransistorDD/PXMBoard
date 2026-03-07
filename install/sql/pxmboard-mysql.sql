@@ -89,7 +89,7 @@ CREATE TABLE `pxm_message_read` (
   PRIMARY KEY (`mr_userid`,`mr_messageid`),
   KEY `idx_user_timestamp` (`mr_userid`,`mr_timestamp`),
   KEY `idx_messageid` (`mr_messageid`)
-) ENGINE=InnoDB COMMENT='Tracks read messages per user (no foreign keys for performance). PRIMARY KEY is optimal for LEFT JOIN queries in cThreadList.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tracks read messages per user (no foreign keys for performance). PRIMARY KEY is optimal for LEFT JOIN queries in cThreadList.';
 # --------------------------------------------------------
 
 CREATE TABLE `pxm_message_notification` (
@@ -115,7 +115,7 @@ CREATE TABLE `pxm_template` (
   `te_name` varchar(50) NOT NULL default '',
   `te_description` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`te_id`)
-) ENGINE=InnoDB COMMENT='Text templates for emails and application messages';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Text templates for emails and application messages';
 
 INSERT INTO `pxm_template` (`te_id`, `te_message`, `te_name`, `te_description`) VALUES (1, 'PXMBoard Registrierung', 'registration mail subject', 'subject of the registration mail'),
 (2, 'Sie wurden registriert.\nIhr Nickname lautet: %nickname%\nIhr Passwort lautet: %password%', 'registration mail body', 'body of the registration mail\navailable placeholders: %password%,%nickname%'),
@@ -218,7 +218,7 @@ CREATE TABLE `pxm_user` (
   `u_id` int(10) unsigned NOT NULL auto_increment,
   `u_username` varchar(30) NOT NULL default '',
   `u_password` varchar(255) NOT NULL default '',
-  `u_passwordkey` char(32) NOT NULL default '',
+  `u_passwordkey` char(32) NULL DEFAULT NULL COMMENT 'Password recovery key (hex-encoded 16 random bytes)',
   `u_firstname` varchar(30) NOT NULL default '',
   `u_lastname` varchar(30) NOT NULL default '',
   `u_city` varchar(30) NOT NULL default '',
@@ -261,7 +261,7 @@ CREATE TABLE `pxm_user` (
 CREATE TABLE `pxm_user_login_ticket` (
   `ult_id` int(10) unsigned NOT NULL auto_increment,
   `ult_userid` int(10) unsigned NOT NULL,
-  `ult_token` varchar(32) NOT NULL,
+  `ult_token` char(32) NOT NULL,
   `ult_useragent` varchar(255) NOT NULL default '',
   `ult_ipaddress` varchar(45) NOT NULL default '',
   `ult_created_timestamp` int(10) unsigned NOT NULL,
@@ -287,9 +287,7 @@ CREATE TABLE `pxm_notification` (
   `n_title` varchar(255) NOT NULL,
   `n_message` text NOT NULL,
   `n_link` varchar(255) NOT NULL default '',
-  `n_related_userid` int(10) unsigned default NULL,
   `n_related_messageid` int(10) unsigned default NULL,
-  `n_related_threadid` int(10) unsigned default NULL,
   `n_related_pmid` int(10) unsigned default NULL,
   `n_created_timestamp` int(10) unsigned NOT NULL,
   `n_read_timestamp` int(10) unsigned default NULL,
