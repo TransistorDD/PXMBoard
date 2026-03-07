@@ -29,12 +29,12 @@ use PXMBoard\Validation\cServerHandler;
  */
 abstract class cBaseAction
 {
-    protected mixed $m_objConfig;
-    protected mixed $m_objInputHandler;
+    protected cConfig $m_objConfig;
+    protected cInputHandler $m_objInputHandler;
     protected cServerHandler $m_objServerHandler;
     protected ?cUserConfig $m_objActiveUser;
-    protected mixed $m_objActiveBoard;
-    protected mixed $m_objActiveSkin;
+    protected ?cBoard $m_objActiveBoard;
+    protected ?cSkin $m_objActiveSkin;
     protected ?string $m_sCsrfToken = null;
 
     /**

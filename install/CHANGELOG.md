@@ -1,10 +1,10 @@
 # Changelog
 
-## [3.0.0-alpha] (unreleased - in development) - 2026-02-10 
+## [3.0.0-alpha] (unreleased - in development) - 2026-02-10
 
 ### System Requirements
 
-- **PHP:** 8.5+
+- **PHP:** ≥ 8.4
 - **MySQL:** 5.6+ / **MariaDB:** 10.0.5+
 - **Database engine:** InnoDB (previously MyISAM)
 - **Character set:** utf8mb4
@@ -13,52 +13,47 @@
 
 ### 🔒 Security
 
-- **CRITICAL:** Password hashing migrated from MD5 to bcrypt. Existing passwords are automatically migrated on the next successful login.
-- **CRITICAL:** Login tickets and password recovery tokens are now generated using a cryptographically secure random source.
-- **CSRF protection:** All state-changing actions are protected by a session-scoped CSRF token. Token is delivered via `X-CSRF-Token` HTTP header (htmx/fetch) or as a hidden POST field.
-- SQL escaping improved: database-specific escape functions are now used instead of `addslashes()`.
+- **CRITICAL:** Password hashing migrated from MD5 to bcrypt. Existing passwords are migrated automatically on next login.
+- **CRITICAL:** Login tickets and password recovery tokens now use a cryptographically secure random source.
+- **CSRF protection** added for all state-changing actions.
+- XSS fixes in template rendering.
 
 ### ✨ New Features
 
-- **PWA support:** PXMBoard can be installed as a Progressive Web App on Android Chrome and iOS Safari 16.4+.
-- **New default skin (pxm):** HTMX-based skin with SPA-like navigation (no full page reloads). Two layout modes: two-column desktop and stacked. Includes dark mode and mobile support.
-- **Multi-device login:** Users can remain logged in on multiple devices simultaneously. A device management screen shows active sessions (user agent, IP, last used); individual devices can be logged out remotely. Admin DB Clean removes tickets inactive for more than 180 days. Password changes invalidate all active login tickets.
-- **In-app notifications:** Notification badge for replies and private messages. Notification center with clickable entries and direct links. Automatic cleanup (mark as read after 7 days, delete after 90 days).
-- **Message subscriptions:** Users can subscribe to individual messages via a bell icon in the message footer. Own posts are subscribed automatically. All subscribers receive a notification when a reply is posted.
-- **@mentions:** Users can mention other users with @-syntax in the editor (autocomplete after 2 characters). Mentioned users receive a notification with a direct link. Maximum 10 mentions per message.
-- **Rich-text editor (Tiptap):** WYSIWYG editor with Bold, Italic, Underline, Strikethrough, Links, Images, Blockquotes, Spoiler (members only), Member-only content, YouTube and Twitch video embeds. Backwards-compatible with the existing PXM message format.
-- **Server-side read tracking:** Cross-device read status for logged-in users. Visual indicators in the thread list and message view. Guests continue to use browser-based tracking.
-- **Message drafts:** Posts (public and private) can be saved as drafts visible only to the author. A separate drafts list is available for navigation.
-- **AJAX moderation actions:** Admin/moderator actions (delete message, delete subthread, extract subthread, delete thread) now run via AJAX without a page reload. Confirmation dialogs use the native HTML `<dialog>` element instead of `confirm()`.
-- **Mobile view:** New view management with automatic detection based on viewport width and a manual toggle in the settings dropdown. Thread list and message tree adapt to the mobile layout.
-- **Online list and user search:** Now open in a modal dialog and are fully functional in mobile view.
-- **Cookie-only sessions:** Session IDs are no longer passed via forms or URLs. Sessions are exclusively managed via cookies.
-- **ElasticSearch support (optional):** Full-text search can use ElasticSearch instead of MySQL FULLTEXT. Configured via `pxmboard-config.php`; MySQL remains the default and requires no configuration changes.
+- **New default skin (pxm):** HTMX-based skin with SPA-like navigation (no full page reloads). Two layout modes: two-column desktop and stacked. Dark mode and mobile support included.
+- **PWA support:** PXMBoard can be installed as an app on Android (Chrome) and iOS (Safari 16.4+).
+- **Multi-device login:** Users can stay logged in on multiple devices simultaneously. A device management screen allows remote logout of individual sessions. Password changes invalidate all active sessions.
+- **In-app notifications:** Notification badge and notification centre for replies and private messages. Automatic cleanup after 90 days.
+- **Message subscriptions:** Subscribe to threads via a bell icon. Own posts are subscribed automatically; all subscribers are notified on reply.
+- **@mentions:** Mention users with @-syntax in the editor (autocomplete after 2 characters). Mentioned users receive a direct-link notification.
+- **Rich-text editor (Tiptap):** WYSIWYG editor with bold, italic, underline, strikethrough, links, images, blockquotes, spoiler tags, member-only content, and YouTube/Twitch embeds. Backwards-compatible with the existing PXM message format.
+- **Server-side read tracking:** Cross-device read status for logged-in users. Visual indicators in thread list and message view.
+- **Message drafts:** Public and private posts can be saved as drafts. A separate drafts list is available.
+- **AJAX moderation actions:** Moderator actions (delete message, delete/extract subthread, delete thread) now execute without a page reload.
+- **Mobile view:** Automatic detection based on viewport width with a manual toggle in the settings menu. Thread list and message tree adapt to mobile layout.
+- **ElasticSearch support (optional):** Full-text search can use ElasticSearch instead of MySQL FULLTEXT. Configured via `pxmboard-config.php`; MySQL remains the default.
+- **Internationalisation (i18n):** Interface texts are now translatable. German and English are included.
 
 ### ❌ Removed Features
 
-- **Banner system:** Completely removed. The `pxm_banner` database table and all related admin pages and templates have been removed.
+- **Banner system:** Completely removed.
 - **Flat message view:** Removed.
 - **Guest posting:** Removed.
 
-### ⚠️ Breaking Changes
+### ⚠️ Breaking Changes (upgrade from 2.x)
 
-The following changes require action when upgrading from 2.x:
-
-- **Database engine and charset:** All tables migrated from MyISAM to InnoDB with the utf8mb4 character set (handled by `upgrade-3.0.0.sql`).
-- **`pxm_notification` table renamed to `pxm_template`** (e-mail templates). A new `pxm_notification` table has been created for in-app notifications.
-- **`u_ticket` column removed** from `pxm_user`, replaced by the new `pxm_user_login_ticket` table supporting multi-device login.
-- **SKIN CHANGE — Thread list template** (`threadlist.tpl`): Layout changed from `<table>` to CSS Grid. Desktop: 7-column grid; Mobile: compact 3-column card view with a colored status indicator. Custom skins based on the table layout must be updated.
-- **SKIN CHANGE — Templates consolidated:** Overall template count reduced from 41 to 31. 13 redundant per-action error and confirm templates have been removed. Use `error.tpl` and `confirm.tpl` for all error and confirmation output. Three new reusable partials added: `partial_inline_errors.tpl`, `partial_pm_tabs.tpl`, `partial_editor.tpl`.
-- **SKIN CHANGE — Error system:** The `pxm_error` database table and its admin interface have been removed. Error messages are now defined in a PHP enum. Skins must not reference the old error admin pages.
-- **SKIN CHANGE — Edit button renamed:** The message save form submit button has been renamed from `btn_save` to `btn_edit`.
+- **Database engine and charset:** All tables migrated from MyISAM to InnoDB with utf8mb4 (handled by `upgrade-3.0.0.sql`).
+- **`pxm_notification` table renamed to `pxm_template`** (e-mail templates). A new `pxm_notification` table is now used for in-app notifications.
+- **`u_ticket` column removed** from `pxm_user`, replaced by the new `pxm_user_login_ticket` table.
+- **SKIN CHANGE — Thread list template** (`threadlist.tpl`): Layout changed from `<table>` to CSS Grid. Custom skins based on the table layout must be updated.
+- **SKIN CHANGE — Templates consolidated:** Template count reduced from 41 to 31. Error and confirmation output now uses the shared `error.tpl` and `confirm.tpl`. New partials: `partial_inline_errors.tpl`, `partial_pm_tabs.tpl`, `partial_editor.tpl`.
+- **SKIN CHANGE — Error system:** The `pxm_error` database table and its admin interface have been removed. Error messages are now defined in code; skins must not reference the old error admin pages.
+- **SKIN CHANGE — Edit button renamed:** The message save button has been renamed from `btn_save` to `btn_edit`.
 
 ### 🔧 Improvements
 
+- **Database layer:** Migrated from `mysqli` to PDO.
 - **Smarty:** Updated from 2.6.18 to 5.7.
-- **PHP 8.5 compatibility:** Reference assignments and return-by-reference removed; visibility modifiers added throughout.
-- **Automated tests:** PHPUnit test suite introduced with unit and integration tests covering actions, parsers, validators, and core models.
-- **Dependency management:** PHP dependencies are now managed via Composer; JavaScript dependencies via npm.
 
 ---
 

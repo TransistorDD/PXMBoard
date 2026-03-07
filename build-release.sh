@@ -31,7 +31,6 @@ rsync -a \
   --exclude '*.sh' \
   --exclude 'phpunit.xml' \
   --exclude 'phpstan.neon' \
-  --exclude 'phpstan_bericht.txt' \
   --exclude 'package.json' \
   --exclude 'package-lock.json' \
   --exclude 'vite.config.js' \
@@ -39,10 +38,14 @@ rsync -a \
   --exclude 'composer.lock' \
   --exclude 'Agents.md' \
   --exclude 'TESTING.md' \
-  --exclude 'install.txt' \
+  --exclude 'playwright.config.js' \
+  --exclude 'pint.json' \
+  --exclude 'phpunit.xml.dist' \
+  --exclude 'config/pxmboard-config.e2e.example.php' \
   --exclude '.phpunit.cache/' \
   --exclude '.phpunit.result.cache' \
   --exclude 'config/pxmboard-config.php' \
+  --exclude 'public/pxmboard-basedir.php' \
   --exclude 'skins/pxm/cache/*' \
   . "$DEPLOY_DIR/"
 

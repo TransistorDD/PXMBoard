@@ -49,3 +49,6 @@ node_modules/
 .phpunit.result.cache
 /coverage/
 /reports/
+
+# Playwright E2E
+config/pxmboard-config.e2e.php
