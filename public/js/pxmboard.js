@@ -895,8 +895,9 @@
   // THREAD + MESSAGE DUAL LOADING
   // ====================================================================
 
-  // Tracks which message is currently shown in #message-container
+  // Tracks which message/thread is currently shown
   var currentMsgId = 0;
+  var currentThrdId = 0;
   // Direct reference to the currently highlighted row (avoids O(n) iteration)
   var _highlightedRow = null;
 
@@ -947,6 +948,7 @@
    */
   window.loadThreadAndMessage = function (brdid, msgid, thrdid) {
     currentMsgId = msgid;
+    currentThrdId = thrdid;
     htmx.ajax('GET',
       'pxmboard.php?mode=message&brdid=' + brdid + '&msgid=' + msgid,
       { target: '#message-container', swap: 'innerHTML' }
@@ -969,6 +971,7 @@
       // Thread already loaded: only fetch the message.
       // The thread tree's hx-indicator spinner handles load feedback.
       currentMsgId = msgid;
+      currentThrdId = thrdid;
       htmx.ajax('GET',
         'pxmboard.php?mode=message&brdid=' + brdid + '&msgid=' + msgid,
         { target: '#message-container', swap: 'innerHTML' }
@@ -1304,6 +1307,21 @@
       if (evt.detail.requestConfig && evt.detail.requestConfig.verb === 'post') {
         var threadEl = document.querySelector('#thread-container > div[data-thrdid]');
         if (threadEl) threadEl.setAttribute('data-thrdid', '0');
+      }
+      // Update threadlist row when a message is read:
+      // - remove htmx-thread-row--unread (bold subject) for the active thread
+      // - hide the "Neue Antwort" dot when the last message of the thread is loaded
+      if (currentThrdId > 0) {
+        var threadRow = document.getElementById('thread_' + currentThrdId);
+        if (threadRow) {
+          if (currentMsgId > 0 && threadRow.dataset.msgid == currentMsgId) {
+            threadRow.classList.remove('htmx-thread-row--unread');
+          }
+          if (currentMsgId > 0 && threadRow.dataset.lastid == currentMsgId) {
+            var dot = threadRow.querySelector('.htmx-col-lastpost .text-accent-danger');
+            if (dot) dot.remove();
+          }
+        }
       }
     }
   });
