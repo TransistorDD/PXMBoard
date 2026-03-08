@@ -57,6 +57,40 @@ class cMessageReadTrackerTest extends IntegrationTestCase
     }
 
     /**
+     * Test markThreadAsRead marks all messages in the thread as read
+     *
+     * @return void
+     */
+    public function test_markThreadAsRead_marksAllMessagesInThread(): void
+    {
+        $iUserId   = $this->insertUser();
+        $iBoardId  = $this->insertBoard();
+        $iThreadId = $this->insertThread($iBoardId);
+        $iMsgId1   = $this->insertMessage($iThreadId, ['m_userid' => $iUserId]);
+        $iMsgId2   = $this->insertMessage($iThreadId, ['m_userid' => $iUserId, 'm_parentid' => $iMsgId1]);
+        $iMsgId3   = $this->insertMessage($iThreadId, ['m_userid' => $iUserId, 'm_parentid' => $iMsgId1]);
+
+        $bResult = \cMessageReadTracker::markThreadAsRead($iUserId, $iThreadId);
+
+        $this->assertTrue($bResult);
+
+        foreach ([$iMsgId1, $iMsgId2, $iMsgId3] as $iMsgId) {
+            $iCount = \cMessageReadTracker::getReadCount($iMsgId);
+            $this->assertSame(1, $iCount, "Message $iMsgId should be marked as read");
+        }
+    }
+
+    /**
+     * Test markThreadAsRead with invalid userId returns false
+     *
+     * @return void
+     */
+    public function test_markThreadAsRead_withInvalidUserId_returnsFalse(): void
+    {
+        $this->assertFalse(\cMessageReadTracker::markThreadAsRead(0, 1));
+    }
+
+    /**
      * Test cleanup removes old entries and returns deleted count
      *
      * @return void

@@ -2,6 +2,7 @@
 
 namespace PXMBoard\Controller\Board;
 
+use PXMBoard\Model\cMessageReadTracker;
 use PXMBoard\Model\cThread;
 
 /**
@@ -51,6 +52,13 @@ class cActionThread extends cPublicAction
                 $iLastOnline,
                 $iCurrentUserId
             )]);
+
+//            if ($iCurrentUserId > 0) {
+//                cMessageReadTracker::markAsRead(
+//                    $iCurrentUserId,
+////                    $objThread->getId()
+//                );
+//            }
         }
     }
 }

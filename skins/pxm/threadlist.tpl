@@ -11,7 +11,7 @@
 
 <!-- Thread-Zeilen -->
 {foreach from=$thread item=thread}
-<div class="htmx-thread-row {if $thread.fixed == 1}htmx-thread-row-pinned{elseif $thread.active == 1}htmx-thread-row-active{else}htmx-thread-row-closed{/if}{if $config.logedin == 1 && $thread.thread_msg_read == 0} htmx-thread-row--unread{/if}" id="thread_{$thread.threadid}" data-brdid="{$config.board.id}" data-msgid="{$thread.id}" data-thrdid="{$thread.threadid}">
+<div class="htmx-thread-row {if $thread.fixed == 1}htmx-thread-row-pinned{elseif $thread.active == 1}htmx-thread-row-active{else}htmx-thread-row-closed{/if}{if $config.logedin == 1 && $thread.thread_msg_read == 0} htmx-thread-row--unread{/if}" id="thread_{$thread.threadid}" data-brdid="{$config.board.id}" data-msgid="{$thread.id}" data-thrdid="{$thread.threadid}" data-lastid="{$thread.lastid}">
 	<span class="htmx-col-status" title="{if $thread.fixed == 1}Angepinnt{elseif $thread.active == 1}Aktiv{else}Geschlossen{/if}">
 		<span class="thread-status-icon">
 			{if $thread.fixed == 1}<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>

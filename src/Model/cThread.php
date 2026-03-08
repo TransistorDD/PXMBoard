@@ -350,7 +350,17 @@ class cThread
     {
         if ($this->m_iId > 0) {
             $sStatusFilter = '(m_status='.eMessageStatus::PUBLISHED->value.' OR (m_status='.eMessageStatus::DRAFT->value.' AND m_userid='.$iCurrentUserId.'))';
-            if ($objResultSet = cDB::getInstance()->executeQuery("SELECT m_id,m_parentid,m_subject,m_tstmp,m_userid,m_username,m_userhighlight,m_status FROM pxm_message WHERE m_threadid=$this->m_iId AND ".$sStatusFilter.' ORDER BY m_tstmp DESC')) {
+            if ($iCurrentUserId > 0) {
+                $sQuery = "SELECT m_id,m_parentid,m_subject,m_tstmp,m_userid,m_username,m_userhighlight,m_status,".
+                    "(mr.mr_messageid IS NOT NULL) AS is_read ".
+                    "FROM pxm_message ".
+                    "LEFT JOIN pxm_message_read mr ON mr.mr_messageid = m_id AND mr.mr_userid = ".$iCurrentUserId." ".
+                    "WHERE m_threadid=$this->m_iId AND ".$sStatusFilter." ORDER BY m_tstmp DESC";
+            } else {
+                $sQuery = "SELECT m_id,m_parentid,m_subject,m_tstmp,m_userid,m_username,m_userhighlight,m_status FROM pxm_message WHERE m_threadid=$this->m_iId AND ".$sStatusFilter." ORDER BY m_tstmp DESC";
+            }
+
+            if ($objResultSet = cDB::getInstance()->executeQuery($sQuery)) {
 
                 $objParser = null;	// message parser not needed
 
@@ -365,6 +375,12 @@ class cThread
                     $objMessageHeader->setAuthorUserName($objResultRow->m_username);
                     $objMessageHeader->setAuthorHighlightUser($objResultRow->m_userhighlight);
                     $objMessageHeader->setStatus(eMessageStatus::tryFrom((int) $objResultRow->m_status) ?? eMessageStatus::PUBLISHED);
+
+                    if ($iCurrentUserId > 0) {
+                        $objMessageHeader->setIsRead((bool)$objResultRow->is_read);
+                    } else {
+                        $objMessageHeader->setIsRead(null);
+                    }
 
                     $this->m_arrThreadMessages[$objResultRow->m_parentid][]	= $objMessageHeader->getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp, '', $objParser);
                 }
