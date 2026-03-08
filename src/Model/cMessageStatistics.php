@@ -3,6 +3,8 @@
 namespace PXMBoard\Model;
 
 use PXMBoard\Database\cDB;
+use PXMBoard\Enum\eBoardStatus;
+use PXMBoard\Enum\eMessageStatus;
 
 /**
  * message statistics
@@ -78,7 +80,22 @@ class cMessageStatistics
     {
         $arrBoardMessages = [];
 
-        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT m_id,m_parentid,t_boardid,t_id,t_active,m_subject,m_tstmp,m_userid,m_username,m_usermail,m_userhighlight FROM pxm_board,pxm_thread,pxm_message WHERE b_id=t_boardid AND t_id=m_threadid AND b_status!=5 AND m_tstmp>'.intval($iTimeSpan)." ORDER BY $sAttribute $sOrder", $iLimit)) {
+        // Use a subquery to force the optimizer to leverage the m_tstmp index for early-exit
+        // before joining against the small pxm_board/pxm_thread tables.
+        $iInnerLimit = $iLimit * 5;
+        $sSql = 'SELECT m.m_id,m.m_parentid,t.t_boardid,t.t_id,t.t_active,m.m_subject,m.m_tstmp,m.m_userid,m.m_username,m.m_usermail,m.m_userhighlight'
+            . ' FROM (SELECT m_id,m_parentid,m_threadid,m_subject,m_tstmp,m_userid,m_username,m_usermail,m_userhighlight'
+            . ' FROM pxm_message'
+            . ' WHERE m_tstmp>' . (int) $iTimeSpan
+            . ' AND m_status=' . eMessageStatus::PUBLISHED->value
+            . ' ORDER BY m_tstmp ' . $sOrder
+            . ' LIMIT ' . $iInnerLimit . ') m'
+            . ' INNER JOIN pxm_thread t ON t.t_id=m.m_threadid'
+            . ' INNER JOIN pxm_board b ON b.b_id=t.t_boardid'
+            . ' WHERE b.b_status!=' . eBoardStatus::CLOSED->value
+            . ' ORDER BY m.' . $sAttribute . ' ' . $sOrder;
+
+        if ($objResultSet = cDB::getInstance()->executeQuery($sSql, $iLimit)) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
 
                 $objBoardMessage = new cBoardMessage();
