@@ -303,15 +303,15 @@ class cPrivateMessage extends cMessage
      *
      * @param int $iTimeOffset time offset in seconds
      * @param string $sDateFormat php date format
-     * @param int $iLastOnlineTimestamp last online timestamp for user
+     * @param int $iLastLoginTimestamp last login timestamp for user
      * @param string $sSubjectQuotePrefix prefix for quoted subject
      * @param ?cParser $objParser message parser
      * @return array<string, mixed> member variables
      */
-    public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, string $sSubjectQuotePrefix = '', ?cParser $objParser = null): array
+    public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastLoginTimestamp, string $sSubjectQuotePrefix = '', ?cParser $objParser = null): array
     {
         return array_merge(
-            cMessage::getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp, $sSubjectQuotePrefix, $objParser),
+            cMessage::getDataArray($iTimeOffset, $sDateFormat, $iLastLoginTimestamp, $sSubjectQuotePrefix, $objParser),
             ['read' => ($this->m_eToState->isRead() ? '1' : '0')]
         );
     }

@@ -126,7 +126,7 @@ class cActionMessagesave extends cPublicAction
                 $objBoardMessage->setBody($sBody);
                 $objBoardMessage->setMessageTimestamp($this->m_objConfig->getAccessTimestamp());
                 $objBoardMessage->setIp($this->m_objServerHandler->getRemoteAddr());
-                $objBoardMessage->setNotifyOnReply($this->m_objInputHandler->getIntFormVar('notify_on_reply', true, true, true));
+                $objBoardMessage->setNotifyOnReply((bool)$this->m_objInputHandler->getIntFormVar('notify_on_reply', true, true, true));
 
                 $objBoardMessage->setStatus($eMessageStatus);
                 $iReturn = $objBoardMessage->insertData(

@@ -86,12 +86,15 @@ session_set_cookie_params($arrSessionCookieParams);
 // Initialize session
 $objSession = new cSession($sSessionName);
 
-// Get UserID from session
+// Get UserID and last-login timestamp from session
 $iUserId = 0;
+$iLastLoginTimestamp = 0;
 $sCsrfToken = '';
 if ($objSession->sessionDataAvailable()) {
     $objSession->startSession();
     $iUserId = (int) $objSession->getSessionVar('userid');
+    // Stable last-login timestamp frozen at login time for is_new / lastnew computation
+    $iLastLoginTimestamp = (int) $objSession->getSessionVar('last_login_tstmp');
     $sCsrfToken = $objSession->ensureCsrfToken();
 } else {
     // Try auto-login via ticket cookie
@@ -99,7 +102,10 @@ if ($objSession->sessionDataAvailable()) {
         $objUser = new cUserConfig();
         if ($objUser->loadDataByTicket($sLoginTicket) && ($objUser->getStatus() === eUserStatus::ACTIVE)) {
             $objSession->startSession();
+            // Capture old u_lastonlinetstmp NOW, before _loadActiveUser() updates the DB
+            $iLastLoginTimestamp = $objUser->getLastOnlineTimestamp();
             $objSession->setSessionVar('userid', $objUser->getId());
+            $objSession->setSessionVar('last_login_tstmp', $iLastLoginTimestamp);
             $iUserId = $objUser->getId();
             $sCsrfToken = $objSession->ensureCsrfToken();
         } else {
@@ -161,6 +167,7 @@ try {
     if (class_exists($sFqcn)) {
         $objAction = new $sFqcn($objConfig, $iUserId, $iBoardId);
         $objAction->setCsrfToken($sCsrfToken);
+        $objAction->setLastLoginTimestamp($iLastLoginTimestamp);
     } else {														// invalid action -> show error
         $objAction = new cActionError($objConfig, $iUserId, $iBoardId);
     }
@@ -184,9 +191,13 @@ if ($objAction->validateBasePermissionsAndConditions()) {
     // Update session based on action result
     $objActiveUser = $objAction->getActiveUser();
     if ($objActiveUser) {
-        // User is logged in - store UserID in session
-        $objSession->startSession();
-        $objSession->setSessionVar('userid', $objActiveUser->getId());
+        if ($iUserId === 0) {
+            // Fresh form-login: start new session, store user and freeze login timestamp.
+            $objSession->startSession();
+            $objSession->setSessionVar('userid', $objActiveUser->getId());
+            $objSession->setSessionVar('last_login_tstmp', $objActiveUser->getLastOnlineTimestamp());
+        }
+        // else: session already open, userid and last_login_tstmp already set correctly
     } elseif ($objSession->sessionDataAvailable()) {
         // No active user but session exists - destroy it
         $objSession->destroySession();

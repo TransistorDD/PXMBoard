@@ -115,15 +115,15 @@ class cBoardList
      *
      * @param int $iTimeOffset time offset in seconds
      * @param string $sDateFormat php date format
-     * @param int $iLastOnlineTimestamp last online timestamp for user
+     * @param int $iLastLoginTimestamp last login timestamp for user
      * @param object $objParser message parser (for signature)
      * @return list<array<string, mixed>> member variables
      */
-    public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, object $objParser): array
+    public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastLoginTimestamp, object $objParser): array
     {
         $arrOutput = [];
         foreach ($this->m_arrBoards as $objBoard) {
-            $arrOutput[] = $objBoard->getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp, $objParser);
+            $arrOutput[] = $objBoard->getDataArray($iTimeOffset, $sDateFormat, $iLastLoginTimestamp, $objParser);
         }
         return $arrOutput;
     }

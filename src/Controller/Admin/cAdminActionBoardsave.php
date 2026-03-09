@@ -59,8 +59,8 @@ class cAdminActionBoardsave extends cAdminAction
 
         $objBoard->setThreadListTimeSpan($this->m_objInputHandler->getIntFormVar('date', true, true, true));
         $objBoard->setThreadListSortMode($this->m_objInputHandler->getStringFormVar('sort', 'sortmode', true, true, 'trim'));
-        $objBoard->setEmbedExternal($this->m_objInputHandler->getIntFormVar('embed_external', true, true, true));
-        $objBoard->setDoTextReplacements($this->m_objInputHandler->getIntFormVar('repl', true, true, true));
+        $objBoard->setEmbedExternal((bool)$this->m_objInputHandler->getIntFormVar('embed_external', true, true, true));
+        $objBoard->setDoTextReplacements((bool)$this->m_objInputHandler->getIntFormVar('repl', true, true, true));
 
         $objBoard->setModeratorsByUserName(explode("\n", $this->m_objInputHandler->getStringFormVar('mod', '', true, true, 'trim')));
 

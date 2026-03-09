@@ -110,7 +110,7 @@
 			<div class="px-3 py-2 text-xs font-semibold uppercase tracking-wide bg-surface-secondary text-content-secondary border-b border-border-light">Neueste Beitr&auml;ge</div>
 			{foreach from=$newestmessages.msg item=msg}
 			<div class="px-3 py-2 text-sm border-b border-border-light hover:bg-hover-bg">
-				<a href="pxmboard.php?mode=board&brdid={$msg.thread.brdid}&thrdid={$msg.thread.id}&msgid={$msg.id}" class="hover:underline text-link">{$msg.subject}</a>
+				<a href="pxmboard.php?mode=board&brdid={$msg.thread.brdid}&thrdid={$msg.thread.id}&msgid={$msg.id}" class="htmx-content-link">{$msg.subject}</a>
 				von <span class="{if $msg.user.highlight == 1}font-medium text-accent-deep{else}text-content-secondary{/if}">{$msg.user.username}</span>
 				am {$msg.date} Uhr
 			</div>

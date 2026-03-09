@@ -55,7 +55,7 @@ class cAdminActionUsersave extends cAdminAction
                 $objUser->setFirstName($this->m_objInputHandler->getStringFormVar('fname', 'firstname', true, true, 'trim'));
                 $objUser->setLastName($this->m_objInputHandler->getStringFormVar('lname', 'lastname', true, true, 'trim'));
                 $objUser->setSignature($this->m_objInputHandler->getStringFormVar('signature', 'signature', true, true, 'rtrim'));
-                $objUser->setHighlightUser($this->m_objInputHandler->getIntFormVar('high', true, true, true));
+                $objUser->setHighlightUser((bool)$this->m_objInputHandler->getIntFormVar('high', true, true, true));
 
                 foreach ($arrSlotList as $sKey => $arrVal) {
                     if ($arrVal[0] == 'i') {
@@ -77,16 +77,16 @@ class cAdminActionUsersave extends cAdminAction
                     // Invalid status, default to ACTIVE
                     $objUser->setStatus(eUserStatus::ACTIVE);
                 }
-                $objUser->setPostAllowed($this->m_objInputHandler->getIntFormVar('post', true, true, true));
-                $objUser->setEditAllowed($this->m_objInputHandler->getIntFormVar('edit', true, true, true));
-                $objUser->setAdmin($this->m_objInputHandler->getIntFormVar('admin', true, true, true));
+                $objUser->setPostAllowed((bool)$this->m_objInputHandler->getIntFormVar('post', true, true, true));
+                $objUser->setEditAllowed((bool)$this->m_objInputHandler->getIntFormVar('edit', true, true, true));
+                $objUser->setAdmin((bool)$this->m_objInputHandler->getIntFormVar('admin', true, true, true));
 
-                $objUser->setIsVisible($this->m_objInputHandler->getIntFormVar('visible', true, true, true));
+                $objUser->setIsVisible((bool)$this->m_objInputHandler->getIntFormVar('visible', true, true, true));
                 $objUser->setSkinId($this->m_objInputHandler->getIntFormVar('skinid', true, true, true));
                 $objUser->setThreadListSortMode($this->m_objInputHandler->getStringFormVar('sort', 'sortmode', true, true, 'trim'));
                 $objUser->setTimeOffset($this->m_objInputHandler->getIntFormVar('toff', true, true));
-                $objUser->setEmbedExternal($this->m_objInputHandler->getIntFormVar('embed_external', true, true, true));
-                $objUser->setSendPrivateMessageNotification($this->m_objInputHandler->getIntFormVar('privnot', true, true, true));
+                $objUser->setEmbedExternal((bool)$this->m_objInputHandler->getIntFormVar('embed_external', true, true, true));
+                $objUser->setSendPrivateMessageNotification((bool)$this->m_objInputHandler->getIntFormVar('privnot', true, true, true));
 
                 $objUser->setModeratedBoardsById($this->m_objInputHandler->getArrFormVar('mod', true, true, true, 'intval'));
 

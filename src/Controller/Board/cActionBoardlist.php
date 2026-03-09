@@ -36,10 +36,10 @@ class cActionBoardlist extends cPublicAction
     {
         $this->m_objTemplate = $this->_getTemplateObject('boardlist');
 
-        $iLastOnlineTimestamp = 0;
+        $iLastLoginTimestamp = 0;
 
         if ($objActiveUser = $this->getActiveUser()) {
-            $iLastOnlineTimestamp = $objActiveUser->getLastOnlineTimestamp();
+            $iLastLoginTimestamp = $this->_getLastLoginTimestamp();
         }
 
         $this->m_objTemplate->addData($this->getContextDataArray(['propicdir' => $this->m_objConfig->getProfileImgDirectory()]));
@@ -52,7 +52,7 @@ class cActionBoardlist extends cPublicAction
         $this->m_objTemplate->addData(['boards' => ['board' => $objBoardList->getDataArray(
             $this->m_objConfig->getTimeOffset() * 3600,
             $this->m_objConfig->getDateFormat(),
-            $iLastOnlineTimestamp,
+            $iLastLoginTimestamp,
             $objMessageParser
         )]]);
 
@@ -73,7 +73,7 @@ class cActionBoardlist extends cPublicAction
             $arrBoardMessages[] = $objBoardMessage->getDataArray(
                 $this->m_objConfig->getTimeOffset() * 3600,
                 $this->m_objConfig->getDateFormat(),
-                $iLastOnlineTimestamp,
+                $iLastLoginTimestamp,
                 '',
                 $objMessageParser
             );

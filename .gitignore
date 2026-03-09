@@ -52,3 +52,4 @@ node_modules/
 
 # Playwright E2E
 config/pxmboard-config.e2e.php
+.playwright-mcp

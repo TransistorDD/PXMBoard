@@ -532,11 +532,11 @@ class cBoard
      *
      * @param int $iTimeOffset time offset in seconds
      * @param string $sDateFormat php date format
-     * @param int $iLastOnlineTimestamp last online timestamp for user
+     * @param int $iLastLoginTimestamp last login timestamp for user
      * @param object $objParser message parser (for signature)
      * @return array<string, mixed> member variables
      */
-    public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, object $objParser): array
+    public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastLoginTimestamp, object $objParser): array
     {
         $arrModerators = [];
         reset($this->m_arrModerators);
@@ -549,7 +549,7 @@ class cBoard
                 'desc'		=>	$this->m_sDescription,
                 'position'	=>	$this->m_iPosition,
                 'lastmsg'	=>	(($this->m_iLastMessageTimestamp > 0) ? date($sDateFormat, ($this->m_iLastMessageTimestamp + $iTimeOffset)) : 0),
-                'new'		=>	(($iLastOnlineTimestamp > $this->m_iLastMessageTimestamp) ? 0 : 1),
+                'new'		=>	(($iLastLoginTimestamp > $this->m_iLastMessageTimestamp) ? 0 : 1),
                 'status'	=>	$this->m_eStatus->value,
                 'status_label'	=>	$this->m_eStatus->getLabel(),
                 'moderator' =>	$arrModerators];

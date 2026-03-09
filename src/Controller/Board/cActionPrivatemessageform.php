@@ -36,7 +36,7 @@ class cActionPrivatemessageform extends cPublicAction
     {
 
         $objActiveUser = $this->getActiveUser();
-        $iLastOnline = $objActiveUser->getLastOnlineTimestamp();
+        $iLastLogin = $this->_getLastLoginTimestamp();
         $iDestinationId = $this->m_objInputHandler->getIntFormVar('toid', true, true, true);
         if ($iDestinationId > 0) {
             $objDestinationUser = new cUser();
@@ -67,7 +67,7 @@ class cActionPrivatemessageform extends cPublicAction
                             $this->m_objTemplate->addData(['msg' => $objMessage->getDataArray(
                                 $this->m_objConfig->getTimeOffset() * 3600,
                                 $this->m_objConfig->getDateFormat(),
-                                $iLastOnline,
+                                $iLastLogin,
                                 $this->m_objConfig->getQuoteSubject(),
                                 $objPxmParser
                             )]);
@@ -84,7 +84,7 @@ class cActionPrivatemessageform extends cPublicAction
                             $this->m_objTemplate->addData(['msg' => $objPrivateMessage->getDataArray(
                                 $this->m_objConfig->getTimeOffset() * 3600,
                                 $this->m_objConfig->getDateFormat(),
-                                $iLastOnline,
+                                $iLastLogin,
                                 $this->m_objConfig->getQuoteSubject(),
                                 $objPxmParser
                             )]);

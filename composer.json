@@ -40,13 +40,14 @@
             "npm run build",
             "npx playwright install chromium webkit"
         ],
-        "serve": "php -S localhost:8000 -t public"
+        "serve": "php -d display_errors=1 -d error_reporting=E_ALL -S 127.0.0.1:8000 -t public"
     },
     "scripts-descriptions": {
         "dev-setup": "Sets up the local development environment: PHP vendors, phpunit.xml, E2E config placeholders, npm packages, frontend asset build, and Playwright browser binaries (Chromium + WebKit). Run once after cloning. After setup: fill in DB credentials in phpunit.xml and config/pxmboard-config.e2e.php."
     },
     "config": {
         "optimize-autoloader": true,
+        "process-timeout": 0,
         "allow-plugins": {
             "php-http/discovery": false
         }

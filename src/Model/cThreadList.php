@@ -158,15 +158,15 @@ class cThreadList extends cScrollList
      *
      * @param int $iTimeOffset time offset in seconds
      * @param string $sDateFormat php date format
-     * @param int $iLastOnlineTimestamp last online timestamp for user
+     * @param int $iLastLoginTimestamp last login timestamp for user
      * @return list<array<string, mixed>> member variables
      */
-    public function getDataArray(int $iTimeOffset = 0, string $sDateFormat = '', int $iLastOnlineTimestamp = 0): array
+    public function getDataArray(int $iTimeOffset = 0, string $sDateFormat = '', int $iLastLoginTimestamp = 0): array
     {
         // TODO: Vererbung mit unterschiedlicher Methodensignatur optimieren
         $arrOutput = [];
         foreach ($this->m_arrResultList as $objThreadHeader) {
-            $arrOutput[] = $objThreadHeader->getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp);
+            $arrOutput[] = $objThreadHeader->getDataArray($iTimeOffset, $sDateFormat, $iLastLoginTimestamp);
         }
         return $arrOutput;
     }

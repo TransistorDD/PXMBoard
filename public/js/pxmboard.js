@@ -927,10 +927,10 @@
       var container = document.getElementById('thread-container');
       if (!container) return;
       var row = container.querySelector('.htmx-thread-msg-row[data-msgid="' + currentMsgId + '"]')
-             || container.querySelector('.htmx-thread-root-header[data-msgid="' + currentMsgId + '"]');
+        || container.querySelector('.htmx-thread-root-header[data-msgid="' + currentMsgId + '"]');
       if (row) {
         row.classList.add('htmx-msg-selected');
-        row.classList.add('is-read');
+        row.classList.add('htmx-msg-read');
         _highlightedRow = row;
         row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
@@ -966,23 +966,18 @@
   };
 
   /**
-   * Load message (and thread only if not already loaded).
-   * Used when navigating from search results.
+   * Side-effect handler for message link clicks (threadlist, search results).
+   * The message itself is loaded by HTMX (hx-get + hx-push-url on the <a>).
+   * This handler additionally loads the thread tree only if not already loaded
+   * (smart caching), and handles the mobile page switch.
+   * IMPORTANT: Does NOT return false — HTMX must still process the click.
    */
-  window.loadMessageSmart = function (brdid, msgid, thrdid) {
+  window.handleCachedThreadLoad = function (brdid, msgid, thrdid) {
+    currentMsgId = msgid;
+    currentThrdId = thrdid;
     var threadEl = document.querySelector('#thread-container > div[data-thrdid]');
     var loadedThrdId = threadEl ? threadEl.getAttribute('data-thrdid') : null;
-    if (loadedThrdId && loadedThrdId == thrdid) {
-      // Thread already loaded: only fetch the message.
-      // The thread tree's hx-indicator spinner handles load feedback.
-      currentMsgId = msgid;
-      currentThrdId = thrdid;
-      htmx.ajax('GET',
-        'pxmboard.php?mode=message&brdid=' + brdid + '&msgid=' + msgid,
-        { target: '#message-container', swap: 'innerHTML' }
-      );
-    } else {
-      // Thread needs loading: show the threadlist status spinner.
+    if (!loadedThrdId || loadedThrdId != thrdid) {
       var row = document.getElementById('thread_' + thrdid);
       if (row) {
         var icon = row.querySelector('.thread-status-icon');
@@ -990,19 +985,22 @@
         if (icon) icon.hidden = true;
         if (spinner) spinner.hidden = false;
       }
-      loadThreadAndMessage(brdid, msgid, thrdid);
+      htmx.ajax('GET',
+        'pxmboard.php?mode=thread&brdid=' + brdid + '&thrdid=' + thrdid,
+        { target: '#thread-container', swap: 'innerHTML' }
+      );
     }
     if (isMobileView()) showMobileDetailPage();
   };
 
   /**
-   * Load only the thread tree into #thread-container (no message panel update).
-   * Used by the reply-count link in the threadlist.
-   *
-   * @param {number} brdid  - board id
-   * @param {number} thrdid - thread id
+   * Side-effect handler for threadlist reply-count link clicks.
+   * The thread tree is loaded by HTMX (hx-get on the <a>).
+   * This handler shows the status spinner and handles the mobile page switch.
    */
-  window.loadThreadOnly = function (brdid, thrdid) {
+  window.handleReplyCountClick = function (thrdid) {
+    currentMsgId = 0;
+    currentThrdId = thrdid;
     var row = document.getElementById('thread_' + thrdid);
     if (row) {
       var icon = row.querySelector('.thread-status-icon');
@@ -1010,11 +1008,6 @@
       if (icon) icon.hidden = true;
       if (spinner) spinner.hidden = false;
     }
-    currentMsgId = 0;
-    htmx.ajax('GET',
-      'pxmboard.php?mode=thread&brdid=' + brdid + '&thrdid=' + thrdid,
-      { target: '#thread-container', swap: 'innerHTML' }
-    );
     if (isMobileView()) showMobileDetailPage();
   };
 
@@ -1027,7 +1020,7 @@
    */
   function showMobileDetailPage() {
     var el = document.getElementById('board-layout');
-    if (el) el.classList.add('mobile-show-detail');
+    if (el) el.classList.add('htmx-board-detail');
   }
   window.showMobileDetailPage = showMobileDetailPage;
 
@@ -1036,7 +1029,7 @@
    */
   function showMobileThreadlistPage() {
     var el = document.getElementById('board-layout');
-    if (el) el.classList.remove('mobile-show-detail');
+    if (el) el.classList.remove('htmx-board-detail');
   }
   window.showMobileThreadlistPage = showMobileThreadlistPage;
 
@@ -1047,7 +1040,7 @@
    */
   window.mobileGoBack = function () {
     var el = document.getElementById('board-layout');
-    if (el && el.classList.contains('mobile-show-detail')) {
+    if (el && el.classList.contains('htmx-board-detail')) {
       showMobileThreadlistPage();
     } else {
       window.location.href = 'pxmboard.php';
@@ -1087,20 +1080,18 @@
       var row = e.target.closest('.htmx-thread-row');
       if (!row) return;
 
-      // Allow clicks on explicit links (lastpost, replies, author profile) to work normally
+      // Allow clicks on any link to be handled by HTMX + their onclick handlers
       var clickedLink = e.target.closest('a');
-      if (clickedLink && !clickedLink.classList.contains('htmx-col-subject')) {
-        return; // Let the link handler work
-      }
+      if (clickedLink) return;
 
-      // Prevent the default subject link behavior (we handle it via card click)
+      // Row background click (no link): manually load thread+message
       e.preventDefault();
-      e.stopPropagation();
 
       var brdid = row.getAttribute('data-brdid');
       var msgid = row.getAttribute('data-msgid');
       var thrdid = row.getAttribute('data-thrdid');
       if (brdid && msgid && thrdid) {
+        history.pushState(null, '', 'pxmboard.php?mode=board&brdid=' + brdid + '&thrdid=' + thrdid + '&msgid=' + msgid);
         loadThreadAndMessage(+brdid, +msgid, +thrdid);
       }
     });
@@ -1123,7 +1114,7 @@
     detailPage.addEventListener('touchstart', function (e) {
       if (!isMobileView()) return;
       var boardLayout = document.getElementById('board-layout');
-      if (!boardLayout || !boardLayout.classList.contains('mobile-show-detail')) return;
+      if (!boardLayout || !boardLayout.classList.contains('htmx-board-detail')) return;
 
       _swipe = {
         startX: e.touches[0].clientX,
@@ -1180,7 +1171,7 @@
             boardLayout.style.transform = 'translateX(-100%)';
             boardLayout.addEventListener('transitionend', function cleanup() {
               boardLayout.removeEventListener('transitionend', cleanup);
-              boardLayout.style.transform = ''; // CSS class .mobile-show-detail takes over
+              boardLayout.style.transform = ''; // CSS class .htmx-board-detail takes over
             });
           }
         } else {
@@ -1288,7 +1279,7 @@
 
   // After thread tree loads: reset all status spinners, invalidate cached row ref, apply highlight
   document.addEventListener('htmx:afterSwap', function (evt) {
-    if (evt.detail.target.id === 'thread-container') {
+    if (evt.detail.target && evt.detail.target.id === 'thread-container') {
       document.querySelectorAll('.thread-status-spinner').forEach(function (s) { s.hidden = true; });
       document.querySelectorAll('.thread-status-icon').forEach(function (i) { i.hidden = false; });
       _highlightedRow = null;
@@ -1298,7 +1289,7 @@
 
   // After message container loads: update thread highlight and move dropdown options
   document.addEventListener('htmx:afterSwap', function (evt) {
-    if (evt.detail.target.id === 'message-container') {
+    if (evt.detail.target && evt.detail.target.id === 'message-container') {
       var elt = evt.detail.elt;
       if (elt && elt.dataset && elt.dataset.msgid) {
         currentMsgId = parseInt(elt.dataset.msgid, 10);
@@ -1308,7 +1299,7 @@
         MessageMove.updateDropdownOptions();
       }
       // After a form submission (POST) the thread tree is stale — invalidate the
-      // cached thread ID so loadMessageSmart forces a fresh reload on next click.
+      // cached thread ID so handleThreadlistClick forces a fresh reload on next click.
       if (evt.detail.requestConfig && evt.detail.requestConfig.verb === 'post') {
         var threadEl = document.querySelector('#thread-container > div[data-thrdid]');
         if (threadEl) threadEl.setAttribute('data-thrdid', '0');
@@ -1320,7 +1311,7 @@
         var threadRow = document.getElementById('thread_' + currentThrdId);
         if (threadRow) {
           if (currentMsgId > 0 && threadRow.dataset.msgid == currentMsgId) {
-            threadRow.classList.remove('htmx-thread-row--unread');
+            threadRow.classList.add('htmx-msg-read');
           }
           if (currentMsgId > 0 && threadRow.dataset.lastid == currentMsgId) {
             var dot = threadRow.querySelector('.htmx-col-lastpost .text-accent-danger');
@@ -1333,6 +1324,7 @@
 
   // Update header badge counts after each HTMX swap
   document.addEventListener('htmx:afterSwap', function (event) {
+    if (!event.detail.target) return;
     var d = event.detail.target.querySelector('#badge-data');
     if (!d) return;
     var pm = parseInt(d.dataset.pm) || 0;

@@ -34,7 +34,7 @@ class cActionPrivatemessage extends cPublicAction
     {
 
         $objActiveUser = $this->getActiveUser();
-        $iLastOnline = $objActiveUser->getLastOnlineTimestamp();
+        $iLastLogin = $this->_getLastLoginTimestamp();
 
         $iMessageId = $this->m_objInputHandler->getIntFormVar('msgid', true, true, true);
 
@@ -59,7 +59,7 @@ class cActionPrivatemessage extends cPublicAction
                 $this->m_objTemplate->addData(['msg' => $objPrivateMessage->getDataArray(
                     $this->m_objConfig->getTimeOffset() * 3600,
                     $this->m_objConfig->getDateFormat(),
-                    $iLastOnline,
+                    $iLastLogin,
                     '',
                     $objPxmParser
                 )]);

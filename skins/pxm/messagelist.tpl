@@ -2,7 +2,7 @@
   Message List Template (Partial) - PXM Skin
 
   Search results, loaded into #threadlist-container.
-  Clicking a result loads thread+message via loadMessageSmart().
+  Clicking a result loads thread+message via HTMX (hx-get) + handleCachedThreadLoad().
 
   Parameters:
   - $config.items: Total result count
@@ -48,8 +48,12 @@
 	{foreach from=$thread.messages item=result}
 					<div class="py-2 pr-4 text-sm" style="border-bottom: 1px solid var(--color-border-light); padding-left: 2.5rem;">
 						<a href="pxmboard.php?mode=board&brdid={$result.boardid}&thrdid={$result.threadid}&msgid={$result.id}"
-						   onclick="loadMessageSmart({$result.boardid}, {$result.id}, {$result.threadid}); return false;"
-						   class="hover:underline" style="color: var(--color-link);">{$result.subject}</a>
+					   hx-get="pxmboard.php?mode=message&brdid={$result.boardid}&msgid={$result.id}"
+					   hx-target="#message-container"
+					   hx-swap="innerHTML"
+					   hx-push-url="pxmboard.php?mode=board&brdid={$result.boardid}&thrdid={$result.threadid}&msgid={$result.id}"
+					   onclick="handleCachedThreadLoad({$result.boardid},{$result.id},{$result.threadid})"
+					   class="hover:underline htmx-content-link">{$result.subject}</a>
 						von <span class="{if $result.user.highlight == 1}font-medium{/if}" {if $result.user.highlight == 1}style="color: var(--color-accent-deep);"{/if}>{$result.user.username}</span>
 						<span class="text-xs" style="color: var(--color-content-secondary);">am {$result.date}</span>
 						{if $result.score>0}<span class="text-xs ml-1" style="color: var(--color-content-secondary);">(Relevanz: {$result.score})</span>{/if}
@@ -82,8 +86,12 @@
 	{foreach from=$msg item=result}
 			<div class="px-4 py-2 text-sm" style="border-bottom: 1px solid var(--color-border-light);" onmouseover="this.style.backgroundColor='var(--color-hover-bg)'" onmouseout="this.style.backgroundColor='transparent'">
 				<a href="pxmboard.php?mode=board&brdid={$result.boardid}&thrdid={$result.threadid}&msgid={$result.id}"
-				   onclick="loadMessageSmart({$result.boardid}, {$result.id}, {$result.threadid}); return false;"
-				   class="hover:underline" style="color: var(--color-link);">{$result.subject}</a>
+				   hx-get="pxmboard.php?mode=message&brdid={$result.boardid}&msgid={$result.id}"
+				   hx-target="#message-container"
+				   hx-swap="innerHTML"
+				   hx-push-url="pxmboard.php?mode=board&brdid={$result.boardid}&thrdid={$result.threadid}&msgid={$result.id}"
+				   onclick="handleCachedThreadLoad({$result.boardid},{$result.id},{$result.threadid})"
+				   class="hover:underline htmx-content-link">{$result.subject}</a>
 				von <span class="{if $result.user.highlight == 1}font-medium{/if}" {if $result.user.highlight == 1}style="color: var(--color-accent-deep);"{/if}>{$result.user.username}</span>
 				<span class="text-xs" style="color: var(--color-content-secondary);">am {$result.date}</span>
 				{if $result.score>0}<span class="text-xs ml-1" style="color: var(--color-content-secondary);">(Relevanz: {$result.score})</span>{/if}

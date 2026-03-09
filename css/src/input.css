@@ -277,10 +277,6 @@ button:focus:not(:focus-visible) {
     background-color: var(--color-hover-bg);
   }
 
-  .htmx-thread-row--unread .htmx-col-subject {
-    font-weight: 600;
-  }
-
   .htmx-thread-row-pinned {
     --thread-status-color: var(--color-status-pinned);
   }
@@ -302,6 +298,7 @@ button:focus:not(:focus-visible) {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: var(--color-link);
   }
 
   .htmx-col-author {
@@ -310,24 +307,40 @@ button:focus:not(:focus-visible) {
     white-space: nowrap;
   }
 
-  /* Read tracking: visited links appear dimmer (works for all users, primary
-     indicator for non-logged-in users who have no server-side read status) */
+  /* Read tracking:
+     - Guests: browser :visited dims the subject link naturally
+     - Logged-in: htmx-msg-read class dims the subject server-confirmed
+       (works cross-device, overrides :link state on fresh browsers) */
   a.htmx-col-subject:visited {
     color: var(--color-content-secondary);
   }
 
-  .htmx-thread-msg-row a:visited,
-  .htmx-thread-msg-row.is-read,
-  .htmx-thread-root-header.is-read {
+  .htmx-thread-row.htmx-msg-read .htmx-col-subject {
     color: var(--color-content-secondary);
   }
-  .htmx-thread-msg-row.is-read .htmx-msg-meta .text-accent-danger,
-  .htmx-thread-root-header.is-read .htmx-msg-meta .text-accent-danger {
-    display: none;
+
+  .htmx-thread-msg-row.htmx-msg-read,
+  .htmx-thread-root-header.htmx-msg-read {
+    color: var(--color-content-secondary);
   }
-  .htmx-thread-msg-row.is-read > span.font-semibold,
-  .htmx-thread-root-header.is-read > span.font-semibold {
-    font-weight: normal;
+
+  /* Read tracking for thread tree links:
+     - Guests: browser :visited dims the link naturally
+     - Logged-in: htmx-msg-read class dims the link server-confirmed */
+  .htmx-thread-msg-row a {
+    color: var(--color-link);
+  }
+
+  .htmx-thread-msg-row a:visited,
+  .htmx-thread-msg-row.htmx-msg-read a,
+  .htmx-thread-root-header a:visited,
+  .htmx-thread-root-header.htmx-msg-read a {
+    color: var(--color-content-secondary);
+  }
+
+  .htmx-thread-msg-row.htmx-msg-read .htmx-msg-meta .text-accent-danger,
+  .htmx-thread-root-header.htmx-msg-read .htmx-msg-meta .text-accent-danger {
+    display: none;
   }
 
   /* --- Thread Tree --- */
@@ -388,6 +401,20 @@ button:focus:not(:focus-visible) {
   }
 
   .htmx-thread-root-header a:hover {
+    text-decoration: underline;
+  }
+
+  /* --- Content links (lastpost in threadlist, newest messages in boardlist) ---
+     Use these instead of text-link utility so :visited can apply. --- */
+  .htmx-content-link {
+    color: var(--color-link);
+  }
+
+  .htmx-content-link:visited {
+    color: var(--color-content-secondary);
+  }
+
+  .htmx-content-link:hover {
     text-decoration: underline;
   }
 
@@ -1027,7 +1054,7 @@ html.is-mobile .htmx-board-layout {
   transition: transform 0.3s ease;
 }
 
-html.is-mobile .htmx-board-layout.mobile-show-detail {
+html.is-mobile .htmx-board-layout.htmx-board-detail {
   transform: translateX(-100%);
 }
 

@@ -5,7 +5,7 @@
 ### System Requirements
 
 - **PHP:** ≥ 8.4
-- **MySQL:** 5.6+ / **MariaDB:** 10.0.5+
+- **MySQL:** 8.4+ / **MariaDB:** 10.11+ / **PostgreSQL:** 14+
 - **Database engine:** InnoDB (previously MyISAM)
 - **Character set:** utf8mb4
 

@@ -36,9 +36,9 @@ class cActionMessageform extends cPublicAction
         $iMessageId = $this->m_objInputHandler->getIntFormVar('msgid', true, true, true);
 
         $arrAdditionalConfig = ['quickpost' => $this->m_objConfig->useQuickPost()];
-        $iLastOnline = 0;
+        $iLastLogin = 0;
         if ($objActiveUser = $this->getActiveUser()) {
-            $iLastOnline = $objActiveUser->getLastOnlineTimestamp();
+            $iLastLogin = $this->_getLastLoginTimestamp();
         }
 
         if ($iMessageId > 0) {
@@ -62,7 +62,7 @@ class cActionMessageform extends cPublicAction
                     $this->m_objTemplate->addData(['msg' => $objMessage->getDataArray(
                         $this->m_objConfig->getTimeOffset() * 3600,
                         $this->m_objConfig->getDateFormat(),
-                        $iLastOnline,
+                        $iLastLogin,
                         $this->m_objConfig->getQuoteSubject(),
                         $objPxmParser
                     )]);

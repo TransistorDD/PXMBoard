@@ -291,23 +291,23 @@ class cThreadHeader extends cMessageHeader
      *
      * @param int $iTimeOffset time offset in seconds
      * @param string $sDateFormat php date format
-     * @param int $iLastOnlineTimestamp last online timestamp for user
+     * @param int $iLastLoginTimestamp last login timestamp for user
      * @param string $sSubjectQuotePrefix quote prefix for a message subject
      * @param ?cParser $objParser message parser
      * @return array<string, mixed> member variables
      */
-    public function getDataArray(int $iTimeOffset = 0, string $sDateFormat = '', int $iLastOnlineTimestamp = 0, string $sSubjectQuotePrefix = '', ?cParser $objParser = null): array
+    public function getDataArray(int $iTimeOffset = 0, string $sDateFormat = '', int $iLastLoginTimestamp = 0, string $sSubjectQuotePrefix = '', ?cParser $objParser = null): array
     {
         // TODO: Vererbung mit unterschiedlicher Methodensignatur optimieren
         return array_merge(
-            cMessageHeader::getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp, '', $objParser),
+            cMessageHeader::getDataArray($iTimeOffset, $sDateFormat, $iLastLoginTimestamp, '', $objParser),
             ['threadid'	=>	$this->m_iThreadId,
             'active'	=>	(int) $this->m_bIsActive,
             'views'	    =>	(string) $this->m_iViews,
             'fixed'	    =>	(int) $this->m_bIsFixed,
             'lastid'	=>	$this->m_iLastMessageId,
             'lastdate'	=>	(($this->m_iLastMessageTimestamp > $this->m_iMessageTimestamp) ? date($sDateFormat, ($this->m_iLastMessageTimestamp + $iTimeOffset)) : 0),
-            'lastnew'	=>	(($iLastOnlineTimestamp > $this->m_iLastMessageTimestamp) ? 0 : 1),
+            'lastnew'	=>	(($iLastLoginTimestamp > $this->m_iLastMessageTimestamp) ? 0 : 1),
             'msgquan'	=>	(string) $this->m_iMessageQuantity,
             'thread_msg_read'	=>	(int) $this->m_bThreadMsgRead,
             'last_msg_read'	    =>	(int) $this->m_bLastMsgRead]

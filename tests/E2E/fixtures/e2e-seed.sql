@@ -319,21 +319,29 @@ INSERT INTO `pxm_textreplacement` (`tr_name`, `tr_replacement`) VALUES (':-)', '
 -- Users
 -- Admin: username=Webmaster  password=test1234
 -- User:  username=Tester     password=test5678
+--
+-- Tester's u_lastonlinetstmp is set to 30 minutes ago so that messages
+-- posted more recently will have is_new=1 in the E2E read-tracking tests.
+-- The value is frozen as last_login_tstmp in the session the moment Tester
+-- logs in (pxmboard.php saves getLastOnlineTimestamp() – which returns the
+-- loaded DB value, not the value written by updateLastOnlineTimestamp(),
+-- because that method intentionally leaves the in-memory field unchanged).
 INSERT INTO `pxm_user`
   (`u_id`, `u_username`, `u_password`, `u_passwordkey`, `u_privatemail`,
-   `u_registrationmail`, `u_registrationtstmp`, `u_status`, `u_admin`,
-   `u_post`, `u_edit`, `u_visible`, `u_skinid`)
+   `u_registrationmail`, `u_registrationtstmp`, `u_lastonlinetstmp`,
+   `u_status`, `u_admin`, `u_post`, `u_edit`, `u_visible`, `u_skinid`)
 VALUES
   (1, 'Webmaster',
    '$2y$12$YBhtXvFqa1E/JqFmbtQFROWcsqvNRVQ3vJvO.TQH6/.Z8ztQotUDG',
    'e2e0000000000000000000000000001',
    'webmaster@example.com', 'webmaster@example.com',
-   UNIX_TIMESTAMP(), 1, TRUE, TRUE, TRUE, TRUE, 1),
+   UNIX_TIMESTAMP(), 0, 1, TRUE, TRUE, TRUE, TRUE, 1),
   (2, 'Tester',
    '$2y$12$.vdRfkVtESu7aFw7F7CpI.YPmcqTNct0pvoHWwBu.sYW7/FPQkm.a',
    'e2e0000000000000000000000000002',
    'tester@example.com', 'tester@example.com',
-   UNIX_TIMESTAMP(), 1, FALSE, TRUE, TRUE, TRUE, 1);
+   UNIX_TIMESTAMP(), UNIX_TIMESTAMP() - 1800,
+   1, FALSE, TRUE, TRUE, TRUE, 1);
 
 -- Boards
 INSERT INTO `pxm_board`
@@ -351,10 +359,15 @@ INSERT INTO `pxm_message` (`m_id`, `m_threadid`, `m_parentid`, `m_userid`, `m_us
 VALUES
   (1, 1, 0, 1, 'Webmaster', 'E2E Testthread', 'Dies ist der Startbeitrag fuer die E2E-Tests.', UNIX_TIMESTAMP() - 7200, '127.0.0.1', 1),
   (2, 1, 1, 2, 'Tester', 'Re: E2E Testthread', 'Antwort vom Tester-Account.', UNIX_TIMESTAMP() - 3700, '127.0.0.1', 1),
-  (3, 1, 1, 1, 'Webmaster', 'Re: E2E Testthread', 'Zweite Antwort vom Webmaster.', UNIX_TIMESTAMP() - 3600, '127.0.0.1', 1);
+  (3, 1, 1, 1, 'Webmaster', 'Re: E2E Testthread', 'Zweite Antwort vom Webmaster.', UNIX_TIMESTAMP() - 3600, '127.0.0.1', 1),
+  -- m_id=5: posted 15 min ago – AFTER Tester's last login (30 min ago) → is_new=1 for Tester
+  (5, 1, 2, 1, 'Webmaster', 'Neue Antwortnachricht', 'Diese Nachricht wurde nach dem letzten Login des Testers erstellt.', UNIX_TIMESTAMP() - 900, '127.0.0.1', 1);
 
 -- Update board lastmsgtstmp
-UPDATE `pxm_board` SET `b_lastmsgtstmp` = UNIX_TIMESTAMP() - 3600 WHERE `b_id` = 1;
+UPDATE `pxm_board` SET `b_lastmsgtstmp` = UNIX_TIMESTAMP() - 900 WHERE `b_id` = 1;
+
+-- Update thread 1 stats to reflect the new message (m_id=5)
+UPDATE `pxm_thread` SET `t_lastmsgtstmp` = UNIX_TIMESTAMP() - 900, `t_lastmsgid` = 5, `t_msgquantity` = 4 WHERE `t_id` = 1;
 
 -- Thread 2: pinned thread for navigation tests
 INSERT INTO `pxm_thread` (`t_id`, `t_boardid`, `t_active`, `t_fixed`, `t_lastmsgtstmp`, `t_lastmsgid`, `t_msgquantity`, `t_views`)

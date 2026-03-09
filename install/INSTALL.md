@@ -5,11 +5,10 @@
 | Component | Minimum version |
 |-----------|----------------|
 | PHP | 8.4 |
-| MySQL / MariaDB | MySQL 5.6 / MariaDB 10.0.5 |
-| PHP extensions | `mysqli`, `mbstring`, `json` |
+| MySQL / MariaDB | MySQL 8.4 / MariaDB 10.11 |
+| PostgreSQL (alternative) | 14 |
+| PHP extensions | `pdo`, `pdo_mysql` / `pdo_pgsql`, `mbstring`, `json` |
 | PHP extensions (optional) | `xsl` (XSLT template support), `gd` (profile images) |
-
-PostgreSQL is experimentally supported as an alternative to MySQL.
 
 ---
 

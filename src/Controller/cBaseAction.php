@@ -38,6 +38,13 @@ abstract class cBaseAction
     protected ?string $m_sCsrfToken = null;
 
     /**
+     * Last-login timestamp for this session, used to compute is_new / lastnew signals.
+     * Set from session via setLastLoginTimestamp(). 0 for guests and on the first
+     * request of a fresh login (before the session has been written).
+     */
+    protected int $m_iLastLoginTimestamp = 0;
+
+    /**
      * Constructor
      *
      * @param cConfig $objConfig configuration data of the board
@@ -130,6 +137,38 @@ abstract class cBaseAction
     public function setCsrfToken(string $sToken): void
     {
         $this->m_sCsrfToken = $sToken;
+    }
+
+    /**
+     * Store the last-login timestamp for this session.
+     * Called by pxmboard.php after instantiating the action with the value
+     * read from $_SESSION['last_login_tstmp'].
+     *
+     * @param int $iTimestamp Unix timestamp of the user's previous last-online time
+     * @return void
+     */
+    public function setLastLoginTimestamp(int $iTimestamp): void
+    {
+        $this->m_iLastLoginTimestamp = $iTimestamp;
+    }
+
+    /**
+     * Return the effective last-login timestamp for is_new / lastnew computations.
+     *
+     * Returns the session-stored last-login timestamp when available (> 0).
+     * Falls back to the active user's last-online timestamp, which is the correct
+     * value on the very first request of a fresh login (before the session has been
+     * written back), because updateLastOnlineTimestamp() is not called in that case.
+     * Returns 0 for guests.
+     *
+     * @return int Unix timestamp
+     */
+    protected function _getLastLoginTimestamp(): int
+    {
+        if ($this->m_iLastLoginTimestamp > 0) {
+            return $this->m_iLastLoginTimestamp;
+        }
+        return $this->m_objActiveUser?->getLastOnlineTimestamp() ?? 0;
     }
 
     /**

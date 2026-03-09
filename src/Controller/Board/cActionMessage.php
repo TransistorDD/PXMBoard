@@ -2,6 +2,7 @@
 
 namespace PXMBoard\Controller\Board;
 
+use PXMBoard\Database\cDB;
 use PXMBoard\Enum\eErrorKeys;
 use PXMBoard\Model\cBoardMessage;
 use PXMBoard\Model\cMessageReadTracker;
@@ -42,20 +43,21 @@ class cActionMessage extends cPublicAction
             if ($objBoardMessage->loadDataById($iMessageId, $objActiveBoard->getId())) {
 
                 // Track read status for logged-in users
+                $objReadTracker = new cMessageReadTracker(cDB::getInstance());
                 if (($objActiveUser = $this->getActiveUser()) && $objActiveUser->getId() > 0) {
-                    cMessageReadTracker::markAsRead(
+                    $objReadTracker->markAsRead(
                         $objActiveUser->getId(),
                         $objBoardMessage->getId()
                     );
                 }
 
                 // Get read count
-                $iReadCount = cMessageReadTracker::getReadCount($objBoardMessage->getId());
+                $iReadCount = $objReadTracker->getReadCount($objBoardMessage->getId());
 
-                $iLastOnlineTimestamp = 0;
+                $iLastLoginTimestamp = 0;
                 $bEditAllowed = false;
                 if ($objActiveUser = $this->getActiveUser()) {
-                    $iLastOnlineTimestamp = $objActiveUser->getLastOnlineTimestamp();
+                    $iLastLoginTimestamp = $this->_getLastLoginTimestamp();
                     $bEditAllowed = ($objActiveUser->isEditAllowed() &&  $objBoardMessage->getAuthorId() == $objActiveUser->getId());
                 }
 
@@ -71,7 +73,7 @@ class cActionMessage extends cPublicAction
                 $arrMessageData = $objBoardMessage->getDataArray(
                     $this->m_objConfig->getTimeOffset() * 3600,
                     $this->m_objConfig->getDateFormat(),
-                    $iLastOnlineTimestamp,
+                    $iLastLoginTimestamp,
                     '',
                     $objPxmParser
                 );

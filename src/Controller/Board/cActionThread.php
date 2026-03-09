@@ -2,7 +2,6 @@
 
 namespace PXMBoard\Controller\Board;
 
-use PXMBoard\Model\cMessageReadTracker;
 use PXMBoard\Model\cThread;
 
 /**
@@ -40,25 +39,18 @@ class cActionThread extends cPublicAction
 
             // Get current user id for draft visibility
             $iCurrentUserId = 0;
-            $iLastOnline = 0;
+            $iLastLogin = 0;
             if ($objActiveUser = $this->getActiveUser()) {
                 $iCurrentUserId = $objActiveUser->getId();
-                $iLastOnline = $objActiveUser->getLastOnlineTimestamp();
+                $iLastLogin = $this->_getLastLoginTimestamp();
             }
 
             $this->m_objTemplate->addData(['thread' => $objThread->getDataArray(
                 $this->m_objConfig->getTimeOffset() * 3600,
                 $this->m_objConfig->getDateFormat(),
-                $iLastOnline,
+                $iLastLogin,
                 $iCurrentUserId
             )]);
-
-//            if ($iCurrentUserId > 0) {
-//                cMessageReadTracker::markAsRead(
-//                    $iCurrentUserId,
-////                    $objThread->getId()
-//                );
-//            }
         }
     }
 }

@@ -90,16 +90,16 @@ class cMessage extends cMessageHeader
      *
      * @param int $iTimeOffset time offset in seconds
      * @param string $sDateFormat php date format
-     * @param int $iLastOnlineTimestamp last online timestamp for user
+     * @param int $iLastLoginTimestamp last login timestamp for user
      * @param string $sSubjectQuotePrefix prefix for quoted subject
      * @param ?cParser $objParser message parser
      * @return array<string, mixed> member variables
      */
-    public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, string $sSubjectQuotePrefix = '', ?cParser $objParser = null): array
+    public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastLoginTimestamp, string $sSubjectQuotePrefix = '', ?cParser $objParser = null): array
     {
         // TODO: Vererbung mit unterschiedlicher Methodensignatur optimieren
         return array_merge(
-            cMessageHeader::getDataArray($iTimeOffset, $sDateFormat, $iLastOnlineTimestamp, $sSubjectQuotePrefix, $objParser),
+            cMessageHeader::getDataArray($iTimeOffset, $sDateFormat, $iLastLoginTimestamp, $sSubjectQuotePrefix, $objParser),
             ['_body'	=>	$objParser->parse($this->getBody()),
              'ip'		=>	$this->m_sIp]
         );

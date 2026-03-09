@@ -51,7 +51,7 @@ class cAdminActionUserform extends cAdminAction
                 $this->m_sOutput .= $this->_getHiddenCsrfField();
 
                 $this->m_sOutput .= "<div class=\"pxm-admin-card\"><div class=\"pxm-admin-card__header\">profile</div><div class=\"pxm-admin-card__body\">\n";
-                $this->m_sOutput .= "<div class=\"pxm-form-group\"><label>ID</label><div class=\"pxm-field\">$iUserId".$this->_getHiddenField('usrid', $iUserId)."</div></div>\n";
+                $this->m_sOutput .= "<div class=\"pxm-form-group\"><label>ID</label><div class=\"pxm-field\">$iUserId".$this->_getHiddenField('usrid', (string)$iUserId)."</div></div>\n";
                 $this->m_sOutput .= $this->_getTextField('nick', $this->m_objInputHandler->getInputSize('username'), $objUser->getUserName(), 'username');
                 $this->m_sOutput .= $this->_getTextField('fname', $this->m_objInputHandler->getInputSize('firstname'), $objUser->getFirstName(), 'firstname');
                 $this->m_sOutput .= $this->_getTextField('lname', $this->m_objInputHandler->getInputSize('lastname'), $objUser->getLastName(), 'lastname');

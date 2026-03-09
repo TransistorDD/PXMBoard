@@ -190,7 +190,7 @@ class cMessageHeader
     /**
      * set author (user)
      *
-     * @param object $objAuthor author (user)
+     * @param cUser $objAuthor author (user)
      * @return void
      */
     public function setAuthor(cUser $objAuthor): void
@@ -320,18 +320,19 @@ class cMessageHeader
      *
      * @param int $iTimeOffset time offset in seconds
      * @param string $sDateFormat php date format
-     * @param int $iLastOnlineTimestamp last online timestamp for user
+     * @param int $iLastLoginTimestamp last login timestamp for user
      * @param string $sSubjectQuotePrefix prefix for quoted subject
      * @param ?cParser $objParser message parser
      * @return array<string, mixed> member variables
      */
-    public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastOnlineTimestamp, string $sSubjectQuotePrefix = '', ?cParser $objParser = null): array
+    public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastLoginTimestamp, string $sSubjectQuotePrefix = '', ?cParser $objParser = null): array
     {
         // TODO: Vererbung mit unterschiedlicher Methodensignatur optimieren
         return ['id'		=>	$this->m_iId,
                 'subject'	=>	$this->getSubject($sSubjectQuotePrefix),
                 'date'		=>	(($this->m_iMessageTimestamp > 0) ? date($sDateFormat, ($this->m_iMessageTimestamp + $iTimeOffset)) : 0),
-                'new'		=>	$this->m_bIsRead !== null ? ($this->m_bIsRead ? 0 : 1) : (($iLastOnlineTimestamp > $this->m_iMessageTimestamp) ? 0 : 1),
+                'is_read'	=>	($this->m_bIsRead !== null) ? (int) $this->m_bIsRead : 0,
+                'is_new'	=>	($iLastLoginTimestamp > 0 && $this->m_iMessageTimestamp > $iLastLoginTimestamp) ? 1 : 0,
                 'status'	=>	$this->m_eStatus->value,
                 'user'		=>	$this->m_objAuthor->getDataArray($iTimeOffset, $sDateFormat, $objParser)];
     }

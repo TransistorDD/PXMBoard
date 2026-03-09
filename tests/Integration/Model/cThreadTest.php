@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace PXMBoard\Tests\Integration\Model;
 
+use PXMBoard\Database\cDB;
+use PXMBoard\Model\cMessageReadTracker;
 use PXMBoard\Model\cThread;
 use PXMBoard\Tests\TestCase\IntegrationTestCase;
 
@@ -73,12 +75,13 @@ class cThreadTest extends IntegrationTestCase
     }
 
     /**
-     * Test getDataArray uses DB read status for logged-in users
-     * A message pre-marked as read should have new=0; an unread message should have new=1.
+     * Test getDataArray uses DB read status for logged-in users.
+     * is_read reflects whether the user has opened the message.
+     * is_new reflects whether the message was posted after last_online.
      *
      * @return void
      */
-    public function test_getDataArray_setsNewFlag_basedOnReadStatus(): void
+    public function test_getDataArray_setsIsReadAndIsNew_correctly(): void
     {
         $iUserId   = $this->insertUser();
         $iBoardId  = $this->insertBoard();
@@ -87,9 +90,9 @@ class cThreadTest extends IntegrationTestCase
         $iMsgUnread = $this->insertMessage($iThreadId, ['m_userid' => $iUserId, 'm_parentid' => $iMsgRead, 'm_subject' => 'Unread message']);
 
         // Pre-mark only the first message as read
-        \cMessageReadTracker::markAsRead($iUserId, $iMsgRead);
+        (new cMessageReadTracker(cDB::getInstance()))->markAsRead($iUserId, $iMsgRead);
 
-        $objThread = new \cThread();
+        $objThread = new cThread();
         $objThread->loadDataById($iThreadId, $iBoardId);
 
         $arrData = $objThread->getDataArray(0, 'd.m.Y', 0, $iUserId);
@@ -100,8 +103,8 @@ class cThreadTest extends IntegrationTestCase
 
         $this->assertArrayHasKey($iMsgRead, $arrMsgMap, 'Read message should be in tree');
         $this->assertArrayHasKey($iMsgUnread, $arrMsgMap, 'Unread message should be in tree');
-        $this->assertSame(0, $arrMsgMap[$iMsgRead]['new'], 'Pre-read message should have new=0');
-        $this->assertSame(1, $arrMsgMap[$iMsgUnread]['new'], 'Unread message should have new=1');
+        $this->assertSame(1, $arrMsgMap[$iMsgRead]['is_read'], 'Pre-read message should have is_read=1');
+        $this->assertSame(0, $arrMsgMap[$iMsgUnread]['is_read'], 'Unread message should have is_read=0');
     }
 
     /**

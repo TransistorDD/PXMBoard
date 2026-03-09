@@ -32,7 +32,8 @@ class cMessageReadTrackerTest extends IntegrationTestCase
         $iThreadId  = $this->insertThread($iBoardId);
         $iMessageId = $this->insertMessage($iThreadId, ['m_userid' => $iUserId]);
 
-        $bResult = cMessageReadTracker::markAsRead($iUserId, $iMessageId);
+        $objTracker = new cMessageReadTracker(cDB::getInstance());
+        $bResult = $objTracker->markAsRead($iUserId, $iMessageId);
 
         $this->assertTrue($bResult);
     }
@@ -49,9 +50,10 @@ class cMessageReadTrackerTest extends IntegrationTestCase
         $iThreadId  = $this->insertThread($iBoardId);
         $iMessageId = $this->insertMessage($iThreadId, ['m_userid' => $iUserId]);
 
-        cMessageReadTracker::markAsRead($iUserId, $iMessageId);
+        $objTracker = new cMessageReadTracker(cDB::getInstance());
+        $objTracker->markAsRead($iUserId, $iMessageId);
 
-        $iCount = cMessageReadTracker::getReadCount($iMessageId);
+        $iCount = $objTracker->getReadCount($iMessageId);
 
         $this->assertSame(1, $iCount);
     }
@@ -70,12 +72,13 @@ class cMessageReadTrackerTest extends IntegrationTestCase
         $iMsgId2   = $this->insertMessage($iThreadId, ['m_userid' => $iUserId, 'm_parentid' => $iMsgId1]);
         $iMsgId3   = $this->insertMessage($iThreadId, ['m_userid' => $iUserId, 'm_parentid' => $iMsgId1]);
 
-        $bResult = \cMessageReadTracker::markThreadAsRead($iUserId, $iThreadId);
+        $objTracker = new cMessageReadTracker(cDB::getInstance());
+        $bResult = $objTracker->markThreadAsRead($iUserId, $iThreadId);
 
         $this->assertTrue($bResult);
 
         foreach ([$iMsgId1, $iMsgId2, $iMsgId3] as $iMsgId) {
-            $iCount = \cMessageReadTracker::getReadCount($iMsgId);
+            $iCount = $objTracker->getReadCount($iMsgId);
             $this->assertSame(1, $iCount, "Message $iMsgId should be marked as read");
         }
     }
@@ -87,7 +90,8 @@ class cMessageReadTrackerTest extends IntegrationTestCase
      */
     public function test_markThreadAsRead_withInvalidUserId_returnsFalse(): void
     {
-        $this->assertFalse(\cMessageReadTracker::markThreadAsRead(0, 1));
+        $objTracker = new cMessageReadTracker(cDB::getInstance());
+        $this->assertFalse($objTracker->markThreadAsRead(0, 1));
     }
 
     /**
@@ -110,7 +114,8 @@ class cMessageReadTrackerTest extends IntegrationTestCase
         );
 
         // Clean up records older than 60 days
-        $iDeleted = cMessageReadTracker::cleanup(60);
+        $objTracker = new cMessageReadTracker(cDB::getInstance());
+        $iDeleted = $objTracker->cleanup(60);
 
         $this->assertGreaterThanOrEqual(1, $iDeleted);
     }

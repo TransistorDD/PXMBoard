@@ -61,7 +61,7 @@ class cAdminActionBoardform extends cAdminAction
         $this->m_sOutput .= $this->_getHiddenCsrfField();
 
         $this->m_sOutput .= "<div class=\"pxm-admin-card\"><div class=\"pxm-admin-card__header\">$sCardTitle</div><div class=\"pxm-admin-card__body\">\n";
-        $this->m_sOutput .= "<div class=\"pxm-form-group\"><label>ID</label><div class=\"pxm-field\">$iBoardId".$this->_getHiddenField('id', $iBoardId)."</div></div>\n";
+        $this->m_sOutput .= "<div class=\"pxm-form-group\"><label>ID</label><div class=\"pxm-field\">$iBoardId".$this->_getHiddenField('id', (string)$iBoardId)."</div></div>\n";
         $this->m_sOutput .= $this->_getTextField('name', $this->m_objInputHandler->getInputSize('boardname'), $objBoard->getName(), 'boardname');
         $this->m_sOutput .= $this->_getTextField('desc', $this->m_objInputHandler->getInputSize('boarddescription'), $objBoard->getDescription(), 'description');
         $this->m_sOutput .= '<div class="pxm-form-group"><label>last message</label><div class="pxm-field">'.(($objBoard->getLastMessageTimestamp() > 0) ? date($this->m_objConfig->getDateFormat(), ($objBoard->getLastMessageTimestamp() + $this->m_objConfig->getTimeOffset() * 3600)) : 0)."</div></div>\n";

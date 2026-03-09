@@ -50,24 +50,24 @@ class cAdminActionConfigform extends cAdminAction
         $this->m_sOutput .= "</select></div></div>\n";
 
         $this->m_sOutput .= $this->_getCheckboxField('quickpost', '1', 'enable quickpost?', $this->m_objConfig->useQuickPost());
-        $this->m_sOutput .= $this->_getCheckboxField('signatures', '1', 'enable signatures?', $this->m_objConfig->useSignatures(false));
+        $this->m_sOutput .= $this->_getCheckboxField('signatures', '1', 'enable signatures?', $this->m_objConfig->useSignatures());
         $this->m_sOutput .= $this->_getCheckboxField('directregistration', '1', 'enable direct registration?', $this->m_objConfig->useDirectRegistration());
         $this->m_sOutput .= $this->_getCheckboxField('uniquemail', '1', 'unique registration mail adr?', $this->m_objConfig->uniqueRegistrationMails());
         $this->m_sOutput .= '<div class="pxm-form-group"><label>date format (<a href="https://www.php.net/manual/en/datetime.format.php" target="_blank">php style</a>)</label><div class="pxm-field">';
         $this->m_sOutput .= $this->_getTextField('dateformat', $this->m_objInputHandler->getInputSize('dateformat'), $this->m_objConfig->getDateFormat())."</div></div>\n";
-        $this->m_sOutput .= $this->_getTextField('timeoffset', 2, $this->m_objConfig->getTimeOffset(false), 'time offset (hours)');
-        $this->m_sOutput .= $this->_getTextField('onlinetime', 5, $this->m_objConfig->getOnlineTime(), "time for onlinelist (seconds; 0 = don't log online time)");
-        $this->m_sOutput .= $this->_getTextField('threadsizelimit', 5, $this->m_objConfig->getThreadSizeLimit(), 'message limit per thread (0 = no limit)');
-        $this->m_sOutput .= $this->_getTextField('userperpage', 3, $this->m_objConfig->getUserPerPage(), 'user per page (online, search & admin)');
-        $this->m_sOutput .= $this->_getTextField('threadsperpage', 3, $this->m_objConfig->getThreadsPerPage(), 'threads per page (msg index)');
-        $this->m_sOutput .= $this->_getTextField('messageheaderperpage', 3, $this->m_objConfig->getMessageHeaderPerPage(), 'messages per page (search)');
-        $this->m_sOutput .= $this->_getTextField('privatemessagesperpage', 3, $this->m_objConfig->getPrivateMessagesPerPage(), 'private messages per page');
+        $this->m_sOutput .= $this->_getTextField('timeoffset', 2, (string)$this->m_objConfig->getTimeOffset(), 'time offset (hours)');
+        $this->m_sOutput .= $this->_getTextField('onlinetime', 5, (string)$this->m_objConfig->getOnlineTime(), "time for onlinelist (seconds; 0 = don't log online time)");
+        $this->m_sOutput .= $this->_getTextField('threadsizelimit', 5, (string)$this->m_objConfig->getThreadSizeLimit(), 'message limit per thread (0 = no limit)');
+        $this->m_sOutput .= $this->_getTextField('userperpage', 3, (string)$this->m_objConfig->getUserPerPage(), 'user per page (online, search & admin)');
+        $this->m_sOutput .= $this->_getTextField('threadsperpage', 3, (string)$this->m_objConfig->getThreadsPerPage(), 'threads per page (msg index)');
+        $this->m_sOutput .= $this->_getTextField('messageheaderperpage', 3, (string)$this->m_objConfig->getMessageHeaderPerPage(), 'messages per page (search)');
+        $this->m_sOutput .= $this->_getTextField('privatemessagesperpage', 3, (string)$this->m_objConfig->getPrivateMessagesPerPage(), 'private messages per page');
         $this->m_sOutput .= $this->_getTextField('mailwebmaster', $this->m_objInputHandler->getInputSize('email'), $this->m_objConfig->getMailWebmaster(), 'mail webmaster');
         $this->m_sOutput .= $this->_getTextField('quotesubject', $this->m_objInputHandler->getInputSize('quotesubject'), $this->m_objConfig->getQuoteSubject(), 'quote subject');
         $this->m_sOutput .= $this->_getTextField('skindir', $this->m_objInputHandler->getInputSize('directory'), $this->m_objConfig->getSkinDirectory(), 'skin dir');
-        $this->m_sOutput .= $this->_getTextField('imgsize', 10, $this->m_objConfig->getMaxProfileImgSize(), 'max profile img size (byte)');
-        $this->m_sOutput .= $this->_getTextField('imgheight', 5, $this->m_objConfig->getMaxProfileImgHeight(), 'max profile img height (pixel)');
-        $this->m_sOutput .= $this->_getTextField('imgwidth', 5, $this->m_objConfig->getMaxProfileImgWidth(), 'max profile img width (pixel)');
+        $this->m_sOutput .= $this->_getTextField('imgsize', 10, (string)$this->m_objConfig->getMaxProfileImgSize(), 'max profile img size (byte)');
+        $this->m_sOutput .= $this->_getTextField('imgheight', 5, (string)$this->m_objConfig->getMaxProfileImgHeight(), 'max profile img height (pixel)');
+        $this->m_sOutput .= $this->_getTextField('imgwidth', 5, (string)$this->m_objConfig->getMaxProfileImgWidth(), 'max profile img width (pixel)');
         $this->m_sOutput .= $this->_getTextField('imgdir', $this->m_objInputHandler->getInputSize('directory'), $this->m_objConfig->getProfileImgDirectory(), 'profile img dir');
         $this->m_sOutput .= "</div></div>\n";
 

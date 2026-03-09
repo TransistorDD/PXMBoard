@@ -178,7 +178,11 @@ class cAdminActionDbclean extends cAdminAction
         // cleanup old read tracking entries //////////////////////////////////////////
 
         if ($this->m_objInputHandler->getIntFormVar('cleanread', true, true, true) > 0) {
-            $iDeleted = cMessageReadTracker::cleanup(60);
+            $iCleanReadDays = $this->m_objInputHandler->getIntFormVar('cleanread_days', true, true, true);
+            if ($iCleanReadDays <= 0) {
+                $iCleanReadDays = 365;
+            }
+            $iDeleted = (new cMessageReadTracker(cDB::getInstance()))->cleanup($iCleanReadDays);
             $this->m_sOutput .= $this->_getAlert('old read tracking entries deleted: '.$iDeleted, 'success');
         }
 

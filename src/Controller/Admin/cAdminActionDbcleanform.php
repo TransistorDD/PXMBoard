@@ -41,7 +41,12 @@ class cAdminActionDbcleanform extends cAdminAction
         $this->m_sOutput .= $this->_getCheckboxField('nomod', '1', 'delete lost moderators (invalid user or board id)?');
         $this->m_sOutput .= $this->_getCheckboxField('nomsg', '1', 'delete empty threads?');
         $this->m_sOutput .= $this->_getCheckboxField('restrd', '1', 'restore messages and threads?');
-        $this->m_sOutput .= $this->_getCheckboxField('cleanread', '1', 'delete old read tracking entries (>60 days)?');
+        $this->m_sOutput .= "<div class=\"pxm-form-group\">\n";
+        $this->m_sOutput .= "<label for=\"cleanread\">delete old read tracking entries older than</label>\n";
+        $this->m_sOutput .= '<div class="pxm-field">';
+        $this->m_sOutput .= '<input type="checkbox" name="cleanread" id="cleanread" value="1">';
+        $this->m_sOutput .= ' <input type="number" name="cleanread_days" id="cleanread_days" value="365" min="1" max="36500"> days';
+        $this->m_sOutput .= "</div>\n</div>\n";
         $this->m_sOutput .= $this->_getCheckboxField('logintickets', '1', 'delete old login tickets (>180 days / 6 months)?');
         $this->m_sOutput .= "<div class=\"pxm-btn-row\"><button type=\"submit\" class=\"pxm-btn pxm-btn--primary\">clean database</button></div>\n";
         $this->m_sOutput .= "</form>\n</div>\n</div>";

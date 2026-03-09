@@ -1,19 +1,17 @@
 {function name="threadnode"}
-<li><div class="htmx-thread-msg-row{if $msg.status == 0} htmx-msg-draft{/if}" data-msgid="{$msg.id}">
-	<span class="{if $config.logedin == 1 && $msg.new == 1}font-semibold{/if}">
-		<a href="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}&msgid={$msg.id}"
-		   hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$msg.id}"
-		   hx-target="#message-container"
-		   hx-swap="innerHTML"
-		   hx-push-url="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}&msgid={$msg.id}"
-		   onclick="selectMessage({$msg.id})"
-		   name="p{$msg.id}"
-		   data-msgid="{$msg.id}"
-		   class="hover:underline text-link">{$msg.subject}</a>
-	</span>
+<li><div class="htmx-thread-msg-row{if $msg.status == 0} htmx-msg-draft{/if}{if $config.logedin == 1 && $msg.is_read == 1} htmx-msg-read{/if}" data-msgid="{$msg.id}">
+	<a href="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}&msgid={$msg.id}"
+	   hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$msg.id}"
+	   hx-target="#message-container"
+	   hx-swap="innerHTML"
+	   hx-push-url="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}&msgid={$msg.id}"
+	   onclick="selectMessage({$msg.id})"
+	   name="p{$msg.id}"
+	   data-msgid="{$msg.id}"
+	   class="hover:underline">{$msg.subject}</a>
 	<span class="htmx-msg-meta">
 		von <span class="{if $msg.user.highlight == 1}font-medium text-accent-deep{/if}">{$msg.user.username}</span>
-		am {$msg.date} Uhr{if $config.logedin == 1 && $msg.new == 1} <span class="text-xs font-semibold text-accent-danger">(neu)</span>{/if}
+		am {$msg.date} Uhr{if $config.logedin == 1 && $msg.is_new == 1} <span class="text-xs font-semibold text-accent-danger">(neu)</span>{/if}
 	</span>
 </div>
 {if $msg.msg|isset}
@@ -27,20 +25,18 @@
 {assign var="root" value=$thread.msg[0]}
 <div data-thrdid="{$thread.id}">
 	<!-- Thread-Kopf: Wurzelnachricht als Header-Zeile -->
-	<div class="htmx-thread-root-header{if $root.status == 0} htmx-msg-draft{/if}" data-msgid="{$root.id}">
-		<span class="font-semibold">
-			<a href="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}&msgid={$root.id}"
-			   hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$root.id}"
-			   hx-target="#message-container"
-			   hx-swap="innerHTML"
-			   hx-push-url="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}&msgid={$root.id}"
-			   onclick="selectMessage({$root.id})"
-			   data-msgid="{$root.id}"
-			   class="hover:underline">{$root.subject}</a>
-		</span>
+	<div class="htmx-thread-root-header{if $root.status == 0} htmx-msg-draft{/if}{if $config.logedin == 1 && $root.is_read == 1} htmx-msg-read{/if}" data-msgid="{$root.id}">
+		<a href="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}&msgid={$root.id}"
+		   hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$root.id}"
+		   hx-target="#message-container"
+		   hx-swap="innerHTML"
+		   hx-push-url="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.id}&msgid={$root.id}"
+		   onclick="selectMessage({$root.id})"
+		   data-msgid="{$root.id}"
+		   class="hover:underline">{$root.subject}</a>
 		<span class="htmx-msg-meta">
 			von <span class="{if $root.user.highlight == 1}font-medium text-accent-deep{/if}">{$root.user.username}</span>
-			am {$root.date} Uhr{if $config.logedin == 1 && $root.new == 1} <span class="text-xs font-semibold text-accent-danger">(neu)</span>{/if}
+			am {$root.date} Uhr{if $config.logedin == 1 && $root.is_new == 1} <span class="text-xs font-semibold text-accent-danger">(neu)</span>{/if}
 		</span>
 		{if $config.admin == 1 or $config.moderator == 1}
 		<div class="ml-auto">

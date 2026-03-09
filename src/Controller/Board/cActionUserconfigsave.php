@@ -36,7 +36,7 @@ class cActionUserconfigsave extends cPublicAction
 
         $objActiveUser = $this->getActiveUser();
 
-        $objActiveUser->setIsVisible($this->m_objInputHandler->getIntFormVar('visible', true, true, true));
+        $objActiveUser->setIsVisible((bool)$this->m_objInputHandler->getIntFormVar('visible', true, true, true));
         $objSkin = new cSkin();
         if ($objSkin->loadDataById($this->m_objInputHandler->getIntFormVar('skinid', true, true, true))
             && array_intersect($this->m_objConfig->getAvailableTemplateEngines(), $objSkin->getSupportedTemplateEngines())) {
@@ -44,9 +44,9 @@ class cActionUserconfigsave extends cPublicAction
         }
         $objActiveUser->setThreadListSortMode($this->m_objInputHandler->getStringFormVar('sort', 'sortmode', true, true, 'trim'));
         $objActiveUser->setTimeOffset($this->m_objInputHandler->getIntFormVar('toff', true, true));
-        $objActiveUser->setEmbedExternal($this->m_objInputHandler->getIntFormVar('embed_external', true, true, true));
+        $objActiveUser->setEmbedExternal((bool)$this->m_objInputHandler->getIntFormVar('embed_external', true, true, true));
         $objActiveUser->setPrivateMail($this->m_objInputHandler->getStringFormVar('email', 'email', true, true, 'trim'));
-        $objActiveUser->setSendPrivateMessageNotification($this->m_objInputHandler->getIntFormVar('privnotification', true, true, true));
+        $objActiveUser->setSendPrivateMessageNotification((bool)$this->m_objInputHandler->getIntFormVar('privnotification', true, true, true));
 
         if ($objActiveUser->updateData()) {
             $this->m_objTemplate = $this->_getTemplateObject('confirm');

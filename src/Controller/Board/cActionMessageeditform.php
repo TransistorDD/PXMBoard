@@ -39,7 +39,7 @@ class cActionMessageeditform extends cPublicAction
         $bAdminMode = ($objActiveUser->isAdmin() || $objActiveUser->isModerator($objActiveBoard->getId()));
         if ($bAdminMode || $objActiveBoard->isWritable()) {
 
-            $iLastOnline = $objActiveUser->getLastOnlineTimestamp();
+            $iLastLogin = $this->_getLastLoginTimestamp();
             if ($objActiveUser->isEditAllowed()) {
 
                 $iMessageId = $this->m_objInputHandler->getIntFormVar('msgid', true, true, true);
@@ -69,7 +69,7 @@ class cActionMessageeditform extends cPublicAction
                                     $this->m_objTemplate->addData(['msg' => $objBoardMessage->getDataArray(
                                         $this->m_objConfig->getTimeOffset() * 3600,
                                         $this->m_objConfig->getDateFormat(),
-                                        $iLastOnline,
+                                        $iLastLogin,
                                         '',
                                         $objPxmParser
                                     )]);

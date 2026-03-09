@@ -46,7 +46,7 @@ class cActionThreadlist extends cPublicAction
         }
 
         $iUserId = $objActiveUser ? $objActiveUser->getId() : 0;
-        $iLastOnline = $objActiveUser ? $objActiveUser->getLastOnlineTimestamp() : 0;
+        $iLastLogin = $objActiveUser ? $this->_getLastLoginTimestamp() : 0;
 
         $objThreadList = new cThreadList($objActiveBoard->getId(), $this->_getThreadListSortMode(), $this->m_objConfig->getAccessTimestamp() - $objActiveBoard->getThreadListTimeSpan() * 86400 + $this->m_objConfig->getTimeOffset() * 3600, $iUserId);
         $objThreadList->loadData($this->m_objInputHandler->getIntFormVar('page', true, true, true), $this->m_objConfig->getThreadsPerPage());
@@ -56,7 +56,7 @@ class cActionThreadlist extends cPublicAction
         $this->m_objTemplate->addData(['thread' => $objThreadList->getDataArray(
             $this->m_objConfig->getTimeOffset() * 3600,
             $this->m_objConfig->getDateFormat(),
-            $iLastOnline
+            $iLastLogin
         )]);
     }
 

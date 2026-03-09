@@ -33,10 +33,10 @@ class cAdminActionConfigsave extends cAdminAction
         $this->m_sOutput .= $this->_getHead();
 
         $this->m_objConfig->setDefaultSkinId($this->m_objInputHandler->getIntFormVar('skinid', true, true, true));
-        $this->m_objConfig->setUseQuickPost($this->m_objInputHandler->getIntFormVar('quickpost', true, true, true));
-        $this->m_objConfig->setUseSignatures($this->m_objInputHandler->getIntFormVar('signatures', true, true, true));
-        $this->m_objConfig->setUseDirectRegistration($this->m_objInputHandler->getIntFormVar('directregistration', true, true, true));
-        $this->m_objConfig->setUniqueRegistrationMails($this->m_objInputHandler->getIntFormVar('uniquemail', true, true, true));
+        $this->m_objConfig->setUseQuickPost((bool)$this->m_objInputHandler->getIntFormVar('quickpost', true, true, true));
+        $this->m_objConfig->setUseSignatures((bool)$this->m_objInputHandler->getIntFormVar('signatures', true, true, true));
+        $this->m_objConfig->setUseDirectRegistration((bool)$this->m_objInputHandler->getIntFormVar('directregistration', true, true, true));
+        $this->m_objConfig->setUniqueRegistrationMails((bool)$this->m_objInputHandler->getIntFormVar('uniquemail', true, true, true));
 
         $this->m_objConfig->setDateFormat($this->m_objInputHandler->getStringFormVar('dateformat', 'dateformat', true, true, 'trim'));
         $this->m_objConfig->setTimeOffset($this->m_objInputHandler->getIntFormVar('timeoffset', true, true));

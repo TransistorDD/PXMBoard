@@ -36,8 +36,9 @@ security hardening, and a modernised UI — while keeping the original architect
 | Requirement | Version |
 |-------------|---------|
 | PHP | ≥ 8.4 |
-| MySQL / MariaDB | MySQL 5.6 / MariaDB 10.0.5 |
-| PHP extensions | `mysqli`, `mbstring`, `json` |
+| MySQL / MariaDB | MySQL 8.4 / MariaDB 10.11 |
+| PostgreSQL (alternative) | 14 |
+| PHP extensions | `pdo`, `pdo_mysql` / `pdo_pgsql`, `mbstring`, `json` |
 | Composer | ≥ 2.0 |
 | PHP extensions (optional) | `xsl` (XSLT skin) |
 

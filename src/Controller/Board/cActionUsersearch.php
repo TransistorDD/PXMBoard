@@ -38,11 +38,6 @@ class cActionUsersearch extends cPublicAction
             $iIdBoard = 0;
         }
 
-        $iLastOnline = 0;
-        if ($objActiveUser = $this->getActiveUser()) {
-            $iLastOnline = $objActiveUser->getLastOnlineTimestamp();
-        }
-
         $sUserName = $this->m_objInputHandler->getStringFormVar('nick', 'username', true, true, 'trim');
 
         if (empty($sUserName)) {

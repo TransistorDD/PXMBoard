@@ -187,4 +187,120 @@ class cMessageHeaderTest extends TestCase
         $this->assertSame(0, $this->messageHeader->getMessageTimestamp());
         $this->assertSame(0, $this->messageHeader->getAuthorId());
     }
+
+    /**
+     * Test getDataArray contains is_read and is_new fields (not the old 'new' field)
+     *
+     * @return void
+     */
+    public function test_getDataArray_containsIsReadAndIsNewFields(): void
+    {
+        $arrData = $this->messageHeader->getDataArray(0, 'd.m.Y', 0);
+
+        $this->assertArrayHasKey('is_read', $arrData);
+        $this->assertArrayHasKey('is_new', $arrData);
+        $this->assertArrayNotHasKey('new', $arrData);
+    }
+
+    /**
+     * Test getDataArray is_read is 0 when m_bIsRead is null (no DB read status)
+     *
+     * @return void
+     */
+    public function test_getDataArray_isRead_isZero_whenNoDbStatus(): void
+    {
+        $arrData = $this->messageHeader->getDataArray(0, 'd.m.Y', 0);
+
+        $this->assertSame(0, $arrData['is_read']);
+    }
+
+    /**
+     * Test getDataArray is_read is 1 when message has been read (setIsRead true)
+     *
+     * @return void
+     */
+    public function test_getDataArray_isRead_isOne_whenReadTrue(): void
+    {
+        $this->messageHeader->setIsRead(true);
+
+        $arrData = $this->messageHeader->getDataArray(0, 'd.m.Y', 0);
+
+        $this->assertSame(1, $arrData['is_read']);
+    }
+
+    /**
+     * Test getDataArray is_read is 0 when message has not been read (setIsRead false)
+     *
+     * @return void
+     */
+    public function test_getDataArray_isRead_isZero_whenReadFalse(): void
+    {
+        $this->messageHeader->setIsRead(false);
+
+        $arrData = $this->messageHeader->getDataArray(0, 'd.m.Y', 0);
+
+        $this->assertSame(0, $arrData['is_read']);
+    }
+
+    /**
+     * Test getDataArray is_new is 1 when message is newer than last_login
+     *
+     * @return void
+     */
+    public function test_getDataArray_isNew_isOne_whenMessageNewerThanLastLogin(): void
+    {
+        $iLastLoginTimestamp = 1000000;
+        $this->messageHeader->setMessageTimestamp($iLastLoginTimestamp + 100);
+
+        $arrData = $this->messageHeader->getDataArray(0, 'd.m.Y', $iLastLoginTimestamp);
+
+        $this->assertSame(1, $arrData['is_new']);
+    }
+
+    /**
+     * Test getDataArray is_new is 0 when message is older than last_login
+     *
+     * @return void
+     */
+    public function test_getDataArray_isNew_isZero_whenMessageOlderThanLastLogin(): void
+    {
+        $iLastLoginTimestamp = 1000000;
+        $this->messageHeader->setMessageTimestamp($iLastLoginTimestamp - 100);
+
+        $arrData = $this->messageHeader->getDataArray(0, 'd.m.Y', $iLastLoginTimestamp);
+
+        $this->assertSame(0, $arrData['is_new']);
+    }
+
+    /**
+     * Test is_new is 0 when last_login is 0 (guest / no last_login)
+     *
+     * @return void
+     */
+    public function test_getDataArray_isNew_isZero_whenLastLoginIsZero(): void
+    {
+        $this->messageHeader->setMessageTimestamp(time());
+
+        $arrData = $this->messageHeader->getDataArray(0, 'd.m.Y', 0);
+
+        $this->assertSame(0, $arrData['is_new']);
+    }
+
+    /**
+     * Test is_read and is_new are orthogonal (new AND read simultaneously possible)
+     *
+     * @return void
+     */
+    public function test_getDataArray_isReadAndIsNew_areOrthogonal(): void
+    {
+        $iLastLoginTimestamp = 1000000;
+        $this->messageHeader->setMessageTimestamp($iLastLoginTimestamp + 100);
+        $this->messageHeader->setIsRead(true);
+
+        $arrData = $this->messageHeader->getDataArray(0, 'd.m.Y', $iLastLoginTimestamp);
+
+        // Message is both new (posted after last_login) and read (opened by user)
+        $this->assertSame(1, $arrData['is_new']);
+        $this->assertSame(1, $arrData['is_read']);
+    }
 }
