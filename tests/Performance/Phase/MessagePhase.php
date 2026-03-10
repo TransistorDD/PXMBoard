@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+namespace PXMBoard\Tests\Performance\Phase;
+
+use PXMBoard\Tests\Performance\Helper\DataGenerator;
+
 /**
  * Phase 3: Generates messages in pxm_message.
  *

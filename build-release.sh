@@ -41,7 +41,6 @@ rsync -a \
   --exclude 'playwright.config.js' \
   --exclude 'pint.json' \
   --exclude 'phpunit.xml.dist' \
-  --exclude 'config/pxmboard-config.e2e.example.php' \
   --exclude '.phpunit.cache/' \
   --exclude '.phpunit.result.cache' \
   --exclude 'config/pxmboard-config.php' \

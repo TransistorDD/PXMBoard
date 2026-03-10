@@ -15,6 +15,7 @@
     "test:e2e:headed": "node tests/E2E/fixtures/reset-db.js && playwright test --headed",
     "test:e2e:desktop": "node tests/E2E/fixtures/reset-db.js && playwright test --project='Desktop Chrome' --project='Desktop Chrome Dark' --project='Desktop Safari' --project='Desktop Safari Dark'",
     "test:e2e:mobile": "node tests/E2E/fixtures/reset-db.js && playwright test --project='Mobile Safari – iPhone 14 Pro' --project='Mobile Safari – iPhone 14 Pro Dark' --project='Mobile Chrome – Pixel 7' --project='Mobile Chrome – Pixel 7 Dark'",
+    "test:e2e:safari": "node tests/E2E/fixtures/reset-db.js && playwright test --project='Desktop Safari' --project='Desktop Safari Dark' --project='Mobile Safari – iPhone 14 Pro' --project='Mobile Safari – iPhone 14 Pro Dark'",
     "test:e2e:pwa": "node tests/E2E/fixtures/reset-db.js && playwright test tests/E2E/specs/07_pwa.spec.js",
     "test:e2e:reset-db": "node tests/E2E/fixtures/reset-db.js",
     "test:e2e:report": "playwright show-report reports/playwright-html"

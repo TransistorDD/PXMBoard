@@ -1,8 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { loadE2eDbEnv } from './tests/E2E/fixtures/db-helpers.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Expose E2E_DB_* environment variables for spec-level DB access.
+loadE2eDbEnv();
 
 export default defineConfig({
     testDir: './tests/E2E/specs',
@@ -11,8 +15,10 @@ export default defineConfig({
     reporter: [['html', { outputFolder: 'reports/playwright-html' }]],
     // Playwright starts (and owns) a dedicated PHP server on port 8001 that uses
     // the E2E database.  This keeps it completely isolated from the dev server.
+    // Env vars from tests/E2E/.env are forwarded so the static PHP config can
+    // read them via getenv().
     webServer: {
-        command: `PXMBOARD_CONFIG=${path.resolve(__dirname, 'config/pxmboard-config.e2e.php')} php -S 127.0.0.1:8001 -t public/`,
+        command: `PXMBOARD_CONFIG=${path.resolve(__dirname, 'tests/E2E/pxmboard-config.e2e.php')} php -S 127.0.0.1:8001 -t public/`,
         url: 'http://127.0.0.1:8001',
         reuseExistingServer: !process.env.CI,
         stdout: 'ignore',
@@ -29,6 +35,10 @@ export default defineConfig({
         // video: 'on',                        // record video of every test run
     },
     retries: process.env.CI ? 2 : 0,
+    // Run one worker at a time so all projects/specs share the E2E database
+    // sequentially and DB-state race conditions between parallel workers are
+    // impossible.  Override via --workers=N on the command line when needed.
+    workers: 1,
     projects: [
         // --- Desktop (Light) ---
         {

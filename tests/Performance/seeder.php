@@ -3,6 +3,15 @@
 
 declare(strict_types=1);
 
+use PXMBoard\Tests\Performance\Helper\DataGenerator;
+use PXMBoard\Tests\Performance\Helper\DbHelper;
+use PXMBoard\Tests\Performance\Helper\Progress;
+use PXMBoard\Tests\Performance\Phase\MessagePhase;
+use PXMBoard\Tests\Performance\Phase\ReadStatusPhase;
+use PXMBoard\Tests\Performance\Phase\ThreadPhase;
+use PXMBoard\Tests\Performance\Phase\ThreadUpdatePhase;
+use PXMBoard\Tests\Performance\Phase\UserPhase;
+
 /**
  * PXMBoard Seeder — CLI entry point
  *

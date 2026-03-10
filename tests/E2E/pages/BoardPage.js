@@ -25,7 +25,10 @@ export class BoardPage {
         this.registerLink = page.locator('a', { hasText: 'Registrieren' });
         this.forgotPwLink = page.locator('a[href*="mode=usersendpwd"], a[hx-get*="mode=usersendpwd"]');
 
-        // Authenticated-state indicators
+        // Authenticated-state indicators.
+        // The user menu (avatar dropdown) is rendered only for logged-in users
+        // and is always visible in the header (not nested inside another dropdown).
+        this.userMenu = page.locator('header nav a[href*="mode=logout"]').locator('..');
         this.logoutLink = page.locator('a[href*="mode=logout"]');
         this.pmLink = page.locator('a[href*="mode=privatemessagelist"]');
     }
@@ -45,9 +48,10 @@ export class BoardPage {
         await this.usernameInput.fill(username);
         await this.passwordInput.fill(password);
         await this.loginButton.click();
-        // The login form is only rendered when logged out ({if $config.logedin == 0}).
-        // Waiting for it to detach from the DOM is a reliable login-success indicator.
-        await this.usernameInput.waitFor({ state: 'detached', timeout: 8000 });
+        // Wait until the login form detaches – it is only rendered for anonymous
+        // users.  This is a reliable cross-browser signal that the authenticated
+        // page has fully loaded and the session cookie is active.
+        await this.usernameInput.waitFor({ state: 'detached', timeout: 10000 });
     }
 
     /** Click the logout link and wait for the login form to reappear. */

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace PXMBoard\Tests\Performance\Phase;
+
 /**
  * Phase 5: Generates read status entries in pxm_message_read.
  *

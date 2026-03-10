@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace PXMBoard\Tests\Performance\Phase;
+
 /**
  * Phase 4: Updates metadata in pxm_thread and pxm_user.
  *

@@ -77,7 +77,7 @@ $sEncodedPath = rtrim(implode('/', array_map('rawurlencode', explode('/', $sBase
 $arrSessionCookieParams = ['lifetime' => 90 * (24 * 60 * 60),	// 90 days
                             'path' => $sEncodedPath,
                             'domain' => '',	// browser deaulft: Host-only
-                            'secure' => true,
+                            'secure' => $objServerHandler->isHttps(),
                             'httponly' => true,
                             'samesite' => 'Strict'];
 

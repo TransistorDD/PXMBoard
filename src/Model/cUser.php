@@ -687,13 +687,10 @@ class cUser
      */
     public function updateLastOnlineTimestamp(int $iLastOnlineTimestamp): bool
     {
-        $iLastOnlineTimestamp = $iLastOnlineTimestamp;
-
-        if (cDB::getInstance()->executeQuery('UPDATE pxm_user SET u_lastonlinetstmp='.$iLastOnlineTimestamp.' WHERE u_id='.$this->m_iId)) {
-            //TODO $this->m_iLastOnlineTimestamp = $iLastOnlineTimestamp;
-        } else {
+        if (!cDB::getInstance()->executeQuery('UPDATE pxm_user SET u_lastonlinetstmp='.(int) $iLastOnlineTimestamp.' WHERE u_id='.$this->m_iId)) {
             return false;
         }
+        $this->m_iLastOnlineTimestamp = $iLastOnlineTimestamp;
         return true;
     }
 

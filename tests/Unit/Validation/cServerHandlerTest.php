@@ -26,6 +26,7 @@ class cServerHandlerTest extends TestCase
     protected function tearDown(): void
     {
         unset($_SERVER['HTTP_HX_REQUEST']);
+        unset($_SERVER['HTTPS']);
         parent::tearDown();
     }
 
@@ -63,5 +64,50 @@ class cServerHandlerTest extends TestCase
     {
         $_SERVER['HTTP_HX_REQUEST'] = '';
         $this->assertFalse($this->handler->isHtmxRequest());
+    }
+
+    /**
+     * Test isHttps returns true when HTTPS is 'on'
+     */
+    public function test_isHttps_withHttpsOn_returnsTrue(): void
+    {
+        $_SERVER['HTTPS'] = 'on';
+        $this->assertTrue($this->handler->isHttps());
+    }
+
+    /**
+     * Test isHttps returns true when HTTPS is '1'
+     */
+    public function test_isHttps_withHttpsOne_returnsTrue(): void
+    {
+        $_SERVER['HTTPS'] = '1';
+        $this->assertTrue($this->handler->isHttps());
+    }
+
+    /**
+     * Test isHttps returns false when HTTPS is 'off' (IIS convention)
+     */
+    public function test_isHttps_withHttpsOff_returnsFalse(): void
+    {
+        $_SERVER['HTTPS'] = 'off';
+        $this->assertFalse($this->handler->isHttps());
+    }
+
+    /**
+     * Test isHttps returns false when HTTPS is not set
+     */
+    public function test_isHttps_withoutHttps_returnsFalse(): void
+    {
+        unset($_SERVER['HTTPS']);
+        $this->assertFalse($this->handler->isHttps());
+    }
+
+    /**
+     * Test isHttps returns false when HTTPS is empty string
+     */
+    public function test_isHttps_withEmptyString_returnsFalse(): void
+    {
+        $_SERVER['HTTPS'] = '';
+        $this->assertFalse($this->handler->isHttps());
     }
 }

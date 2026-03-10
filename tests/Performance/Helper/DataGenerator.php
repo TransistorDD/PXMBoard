@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace PXMBoard\Tests\Performance\Helper;
+
 /**
  * Generates synthetic test data.
  * No external dependencies — uses only mt_rand and str_* functions.

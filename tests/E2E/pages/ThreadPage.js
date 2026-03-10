@@ -19,13 +19,22 @@ export class ThreadPage {
     }
 
     /**
-     * Navigate directly to a thread and wait for both containers.
+     * Navigate directly to a thread via the canonical deep-link URL and wait
+     * for both containers to become visible.
+     *
+     * Uses `mode=board` with explicit `thrdid` so the server emits the HTMX
+     * load-trigger for `#thread-container`.  Without `thrdid`, the thread tree
+     * is not pre-loaded by the server and the container stays empty (= zero
+     * height on mobile, which Playwright reports as hidden).
      *
      * @param {number} boardId
      * @param {number} messageId
+     * @param {number} threadId   - ID of the thread that contains messageId
      */
-    async goto(boardId, messageId) {
-        await this.page.goto(`/pxmboard.php?mode=message&brdid=${boardId}&msgid=${messageId}`);
+    async goto(boardId, messageId, threadId) {
+        await this.page.goto(
+            `/pxmboard.php?mode=board&brdid=${boardId}&thrdid=${threadId}&msgid=${messageId}`
+        );
         await this.container.waitFor({ state: 'visible', timeout: 10000 });
         await this.messageArea.waitFor({ state: 'visible', timeout: 10000 });
     }

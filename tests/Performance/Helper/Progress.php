@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace PXMBoard\Tests\Performance\Helper;
+
 /**
  * CLI progress display for the seeder.
  *

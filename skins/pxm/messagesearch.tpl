@@ -54,15 +54,8 @@
 			</div>
 		</div>
 
-		<!-- Toggle Switch und Suchbutton in einer Zeile -->
-		<div style="display: flex; align-items: center; justify-content: space-between;">
-			<label class="flex items-center gap-2 cursor-pointer">
-				<span class="toggle-switch">
-					<input type="checkbox" name="group_by_thread" value="1" checked="checked"/>
-					<span class="toggle-switch-track"></span>
-				</span>
-				<span class="font-medium text-xs" style="color: var(--color-content-secondary);">Nach Threads gruppieren</span>
-			</label>
+		<!-- Suchbutton -->
+		<div style="display: flex; justify-content: flex-end;">
 			<button type="submit" class="htmx-btn-primary text-sm px-8 py-2 rounded font-medium">Suchen</button>
 		</div>
 	</div>

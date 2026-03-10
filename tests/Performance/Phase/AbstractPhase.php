@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+namespace PXMBoard\Tests\Performance\Phase;
+
+use PXMBoard\Tests\Performance\Helper\DbHelper;
+use PXMBoard\Tests\Performance\Helper\Progress;
+
 /**
  * Base class for all seeder phases.
  *

@@ -26,7 +26,7 @@ class cMessageSearchList extends cScrollList
     protected int $m_iTimeOffset;			// time offset
     protected string $m_sDateFormat;		// date format
     protected int $m_iCurrentUserId;		// current user id (for draft visibility)
-    protected bool $m_bGroupByThread;		// group results by thread
+
 
     /**
      * Constructor
@@ -54,23 +54,8 @@ class cMessageSearchList extends cScrollList
         $this->m_iTimeOffset = $iTimeOffset;
         $this->m_sDateFormat = $sDateFormat;
         $this->m_iCurrentUserId = $iCurrentUserId;
-        $this->m_bGroupByThread = false;
 
         parent::__construct();
-    }
-
-    /**
-     * Override parent loadData to accept grouping parameter
-     *
-     * @param int $iCurPageId page offset
-     * @param int $iResultRowLimit quantity of entries that should be loaded
-     * @param bool $bGroupByThread group results by thread
-     * @return bool success / failure
-     */
-    public function loadData(int $iCurPageId, int $iResultRowLimit, bool $bGroupByThread = false): bool
-    {
-        $this->m_bGroupByThread = $bGroupByThread;
-        return parent::loadData($iCurPageId, $iResultRowLimit);
     }
 
     /**
@@ -155,7 +140,7 @@ class cMessageSearchList extends cScrollList
         }
 
         // If grouping by thread, load root messages and reorganize data
-        if ($this->m_bGroupByThread && !empty($this->m_arrResultList)) {
+        if (!empty($this->m_arrResultList)) {
             $this->_groupResultsByThread();
         }
 

@@ -8,6 +8,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { openDbConnection } from '../fixtures/db-helpers.js';
 import { BoardPage } from '../pages/BoardPage.js';
 
 async function loginAs(page, username, password) {
@@ -18,6 +19,15 @@ async function loginAs(page, username, password) {
 
 test.describe('PM Inbox (as Tester)', () => {
     test.beforeEach(async ({ page }) => {
+        // Clean up PMs created by the 'can submit a PM to Tester' test across
+        // repeated runs, and reset the unread counter so badge tests stay stable.
+        const conn = await openDbConnection();
+        try {
+            await conn.execute("DELETE FROM pxm_priv_message WHERE p_subject LIKE 'PM E2E%'");
+            await conn.execute('UPDATE pxm_user SET u_priv_message_unread_count = 1 WHERE u_id = 2');
+        } finally {
+            await conn.end();
+        }
         await loginAs(page, 'Tester', 'test5678');
     });
 
@@ -30,11 +40,11 @@ test.describe('PM Inbox (as Tester)', () => {
         // Open the PM modal via the envelope icon in the header.
         await page.locator('a[href*="mode=privatemessagelist"]').click();
 
-        // Wait for the dialog and HTMX content to appear.
-        await page.locator('#htmxModal').waitFor({ state: 'visible', timeout: 10000 });
+        // Wait for the modal close button to become visible.
+        await page.locator('.htmx-close-btn').waitFor({ state: 'visible', timeout: 10000 });
 
-        // The seeded PM subject must be visible inside the modal body.
-        await expect(page.locator('#htmxModalBody').getByText('Willkommen beim E2E-Test')).toBeVisible({ timeout: 5000 });
+        // The beforeEach cleanup ensures the seed PM is always on page 1.
+        await expect(page.locator('#htmxModalBody').getByText('Willkommen beim E2E-Test')).toBeVisible({ timeout: 8000 });
     });
 
     test('PM unread count badge is displayed', async ({ page }) => {
@@ -105,12 +115,12 @@ test.describe('Send PM (as Webmaster)', () => {
 test.describe('PM Outbox', () => {
     test('outbox tab is accessible', async ({ page }) => {
         await loginAs(page, 'Webmaster', 'test1234');
-        // Open PM modal via envelope icon, then click Outbox tab (HTMX).
+        // Open PM modal via envelope icon, then click Outbox tab.
         await page.locator('a[href*="mode=privatemessagelist"]').click();
-        await page.locator('#htmxModal').waitFor({ state: 'visible', timeout: 10000 });
-        // Click the Outbox tab inside the modal (HTMX loads into #htmxModalBody).
+        await page.locator('.htmx-close-btn').waitFor({ state: 'visible', timeout: 10000 });
+        // Wait for the inbox content (tab nav) to finish loading before clicking the outbox tab.
+        await page.locator('#htmxModalBody a[href*="type=outbox"]').waitFor({ state: 'visible', timeout: 8000 });
         await page.locator('#htmxModalBody a[href*="type=outbox"]').click();
-        // Verify the outbox content loaded.
-        await expect(page.locator('#htmxModalBody')).toBeVisible();
+        await expect(page.locator('#htmxModalBody')).toContainText('Gesendete Nachrichten', { timeout: 8000 });
     });
 });

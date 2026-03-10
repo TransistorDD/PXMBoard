@@ -443,14 +443,6 @@ ALTER TABLE `pxm_search`
   ADD INDEX `idx_ratelimit` (`se_ipaddress`, `se_tstmp`);
 
 -- ============================================================================
--- Store the group_by_thread preference as part of the search profile so that
--- pagination does not lose the setting.
--- ============================================================================
-
-ALTER TABLE `pxm_search`
-  ADD COLUMN `se_group_by_thread` BOOLEAN NOT NULL DEFAULT TRUE AFTER `se_ipaddress`;
-
--- ============================================================================
 -- SCHEMA CLEANUP: Remove deprecated parser columns
 -- ============================================================================
 -- Remove b_parsestyle and b_parseurl from pxm_board (no longer used),
@@ -500,7 +492,7 @@ ALTER TABLE `pxm_configuration`
 -- - pxm_configuration: c_banner, c_guestpost, c_countviews, c_quotechar, c_parseurl, c_parsestyle, c_msgperpage columns dropped
 -- - pxm_error: table dropped (replaced by eError PHP enum)
 -- - pxm_skin: names updated, quoteprefix/quotesuffix removed (CSS-based quote styling), frame_top/frame_bottom removed
--- - pxm_search: se_ipaddress added with idx_ratelimit index for search rate limiting, se_group_by_thread added
+-- - pxm_search: se_ipaddress added with idx_ratelimit index for search rate limiting
 -- - Renamed u_nickname to u_username, m_usernickname to m_username, se_nickname to se_username
 -- - pxm_board: b_active replaced with b_status (1=PUBLIC, 2=MEMBERS_ONLY, 3=READONLY_PUBLIC, 4=READONLY_MEMBERS, 5=CLOSED), idx_board_status added, b_parsestyle and b_parseurl removed, b_parseimg renamed to b_embed_external
 --

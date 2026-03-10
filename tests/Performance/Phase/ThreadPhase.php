@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace PXMBoard\Tests\Performance\Phase;
+
 /**
  * Phase 2: Generates thread skeletons in pxm_thread.
  *

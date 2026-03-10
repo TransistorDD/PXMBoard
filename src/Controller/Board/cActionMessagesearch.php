@@ -54,7 +54,6 @@ class cActionMessagesearch extends cPublicAction
             $objSearch->setBoardIds($this->m_objInputHandler->getArrFormVar('sbrdid', true, true, true, 'intval'));
             $objSearch->setSearchDays($this->m_objInputHandler->getIntFormVar('days', true, true, true));
             $objSearch->setTimestamp($this->m_objConfig->getAccessTimestamp());
-            $objSearch->setGroupByThread($this->m_objInputHandler->getIntFormVar('group_by_thread', true, true, true) == 1);
         }
 
         $objSearchProfileList = new cSearchProfileList();
@@ -84,7 +83,7 @@ class cActionMessagesearch extends cPublicAction
             $objMessageSearchList = new cMessageSearchList($objSearch, $this->m_objConfig->getTimeOffset() * 3600, $this->m_objConfig->getDateFormat(), $iIdUser);
 
             // execute search
-            $objMessageSearchList->loadData($this->m_objInputHandler->getIntFormVar('page', true, true, true), $this->m_objConfig->getMessageHeaderPerPage(), $objSearch->getGroupByThread());
+            $objMessageSearchList->loadData($this->m_objInputHandler->getIntFormVar('page', true, true, true), $this->m_objConfig->getMessageHeaderPerPage());
 
             if ($objMessageSearchList->getItemCount() > 500) {
                 $objError = eErrorKeys::RESULT_SET_TOO_LARGE;				// too many results

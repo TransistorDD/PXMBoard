@@ -170,7 +170,6 @@ CREATE TABLE `pxm_search` (
   `se_boardids` VARCHAR(255) NOT NULL,
   `se_tstmp` INT UNSIGNED NOT NULL,
   `se_ipaddress` VARCHAR(45) NOT NULL,
-  `se_group_by_thread` BOOLEAN NOT NULL DEFAULT TRUE,
   PRIMARY KEY (`se_id`),
   INDEX (`se_tstmp`),
   INDEX `idx_ratelimit` (`se_ipaddress`, `se_tstmp`)
@@ -317,15 +316,24 @@ INSERT INTO `pxm_textreplacement` (`tr_name`, `tr_replacement`) VALUES (':-)', '
 -- ============================================================
 
 -- Users
--- Admin: username=Webmaster  password=test1234
--- User:  username=Tester     password=test5678
+-- Admin:      username=Webmaster   password=test1234
+-- User:       username=Tester      password=test5678
+-- ReadTester: username=ReadTester  password=read5678
 --
--- Tester's u_lastonlinetstmp is set to 30 minutes ago so that messages
--- posted more recently will have is_new=1 in the E2E read-tracking tests.
--- The value is frozen as last_login_tstmp in the session the moment Tester
--- logs in (pxmboard.php saves getLastOnlineTimestamp() – which returns the
--- loaded DB value, not the value written by updateLastOnlineTimestamp(),
--- because that method intentionally leaves the in-memory field unchanged).
+-- ReadTester is a dedicated user for spec 08 (read-tracking tests).
+-- No other spec logs in as ReadTester, so u_lastonlinetstmp is never updated
+-- by other tests.  This guarantees a stable last-login context:
+--
+--   u_lastonlinetstmp = UNIX_TIMESTAMP() - 86400  (yesterday / 24 h ago)
+--
+-- At login time pxmboard.php freezes this value as last_login_tstmp in the
+-- session (getLastOnlineTimestamp() returns the in-memory value loaded from
+-- the DB before updateLastOnlineTimestamp() is called, so the session always
+-- sees the seed value, not the freshly-written one).
+--
+-- Message timestamps in the seed:
+--   m_id=1,2,3: UNIX_TIMESTAMP() - 172800  (2 days ago) → is_new = 0
+--   m_id=5:     UNIX_TIMESTAMP()            (now / seed-load time) → is_new = 1
 INSERT INTO `pxm_user`
   (`u_id`, `u_username`, `u_password`, `u_passwordkey`, `u_privatemail`,
    `u_registrationmail`, `u_registrationtstmp`, `u_lastonlinetstmp`,
@@ -341,6 +349,12 @@ VALUES
    'e2e0000000000000000000000000002',
    'tester@example.com', 'tester@example.com',
    UNIX_TIMESTAMP(), UNIX_TIMESTAMP() - 1800,
+   1, FALSE, TRUE, TRUE, TRUE, 1),
+  (3, 'ReadTester',
+   '$2y$12$QJfgMpk72sztSIHC4lPYWO8QbxEOoWxfrq.jmE1TxIlkQrMe/tqMq',
+   'e2e0000000000000000000000000003',
+   'readtester@example.com', 'readtester@example.com',
+   UNIX_TIMESTAMP(), UNIX_TIMESTAMP() - 86400,
    1, FALSE, TRUE, TRUE, TRUE, 1);
 
 -- Boards
@@ -350,24 +364,32 @@ VALUES
   (1, 'Test', 'E2E-Test-Board', 1, 1, 1),
   (2, 'Test2', 'Zweites E2E-Test-Board', 2, 1, 1);
 
--- Thread + 3 messages in board 1
+-- Thread + 4 messages in board 1
 -- Root message: m_id=1, t_id=1 (root message shares ID with thread)
+--
+-- Timestamps chosen relative to ReadTester's u_lastonlinetstmp (yesterday):
+--   m_id=1,2,3: 2 days ago → is_new=0 for ReadTester
+--   m_id=5:     UNIX_TIMESTAMP() + 86400 (tomorrow) → always is_new=1 for ReadTester
+--               Using a future timestamp guarantees is_new=1 regardless of how many
+--               times updateLastOnlineTimestamp() runs within this test suite run.
 INSERT INTO `pxm_thread` (`t_id`, `t_boardid`, `t_active`, `t_fixed`, `t_lastmsgtstmp`, `t_lastmsgid`, `t_msgquantity`, `t_views`)
-VALUES (1, 1, 1, 0, UNIX_TIMESTAMP() - 3600, 3, 3, 42);
+VALUES (1, 1, 1, 0, UNIX_TIMESTAMP() - 172800, 3, 3, 42);
 
 INSERT INTO `pxm_message` (`m_id`, `m_threadid`, `m_parentid`, `m_userid`, `m_username`, `m_subject`, `m_body`, `m_tstmp`, `m_ip`, `m_status`)
 VALUES
-  (1, 1, 0, 1, 'Webmaster', 'E2E Testthread', 'Dies ist der Startbeitrag fuer die E2E-Tests.', UNIX_TIMESTAMP() - 7200, '127.0.0.1', 1),
-  (2, 1, 1, 2, 'Tester', 'Re: E2E Testthread', 'Antwort vom Tester-Account.', UNIX_TIMESTAMP() - 3700, '127.0.0.1', 1),
-  (3, 1, 1, 1, 'Webmaster', 'Re: E2E Testthread', 'Zweite Antwort vom Webmaster.', UNIX_TIMESTAMP() - 3600, '127.0.0.1', 1),
-  -- m_id=5: posted 15 min ago – AFTER Tester's last login (30 min ago) → is_new=1 for Tester
-  (5, 1, 2, 1, 'Webmaster', 'Neue Antwortnachricht', 'Diese Nachricht wurde nach dem letzten Login des Testers erstellt.', UNIX_TIMESTAMP() - 900, '127.0.0.1', 1);
+  (1, 1, 0, 1, 'Webmaster', 'E2E Testthread', 'Dies ist der Startbeitrag fuer die E2E-Tests.', UNIX_TIMESTAMP() - 172800, '127.0.0.1', 1),
+  (2, 1, 1, 2, 'Tester', 'Re: E2E Testthread', 'Antwort vom Tester-Account.', UNIX_TIMESTAMP() - 172700, '127.0.0.1', 1),
+  (3, 1, 1, 1, 'Webmaster', 'Re: E2E Testthread', 'Zweite Antwort vom Webmaster.', UNIX_TIMESTAMP() - 172600, '127.0.0.1', 1),
+  -- m_id=5: posted TOMORROW (seed-load time + 24h) – always AFTER any login timestamp
+  --          that updateLastOnlineTimestamp() could write during this spec run → is_new=1
+  (5, 1, 2, 1, 'Webmaster', 'Neue Antwortnachricht', 'Diese Nachricht wurde nach dem letzten Login von ReadTester erstellt.', UNIX_TIMESTAMP() + 86400, '127.0.0.1', 1);
 
--- Update board lastmsgtstmp
-UPDATE `pxm_board` SET `b_lastmsgtstmp` = UNIX_TIMESTAMP() - 900 WHERE `b_id` = 1;
+-- Update board lastmsgtstmp (matches m_id=5's future timestamp so lastnew is computed correctly)
+UPDATE `pxm_board` SET `b_lastmsgtstmp` = UNIX_TIMESTAMP() + 86400 WHERE `b_id` = 1;
 
 -- Update thread 1 stats to reflect the new message (m_id=5)
-UPDATE `pxm_thread` SET `t_lastmsgtstmp` = UNIX_TIMESTAMP() - 900, `t_lastmsgid` = 5, `t_msgquantity` = 4 WHERE `t_id` = 1;
+-- t_lastmsgtstmp = tomorrow so lastnew=1 for ReadTester even after updateLastOnlineTimestamp() runs
+UPDATE `pxm_thread` SET `t_lastmsgtstmp` = UNIX_TIMESTAMP() + 86400, `t_lastmsgid` = 5, `t_msgquantity` = 4 WHERE `t_id` = 1;
 
 -- Thread 2: pinned thread for navigation tests
 INSERT INTO `pxm_thread` (`t_id`, `t_boardid`, `t_active`, `t_fixed`, `t_lastmsgtstmp`, `t_lastmsgid`, `t_msgquantity`, `t_views`)

@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+namespace PXMBoard\Tests\Performance\Phase;
+
+use PXMBoard\Tests\Performance\Helper\DataGenerator;
+
 /**
  * Phase 1: Generates synthetic users in pxm_user.
  *

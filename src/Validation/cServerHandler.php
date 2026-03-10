@@ -83,4 +83,14 @@ class cServerHandler
     {
         return ($_SERVER['HTTP_HX_REQUEST'] ?? '') === 'true';
     }
+
+    /**
+     * Check whether the current request was made over HTTPS
+     *
+     * @return bool true if HTTPS is active
+     */
+    public function isHttps(): bool
+    {
+        return !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+    }
 }

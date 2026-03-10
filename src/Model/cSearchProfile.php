@@ -23,7 +23,6 @@ class cSearchProfile
     protected int $m_iSearchDays = 0;					// timespan of the search (last x days)
     protected int $m_iSearchTimestamp = 0;				// date of the search
     protected string $m_sIpAddress = '';				// IP address of the searcher
-    protected bool $m_bGroupByThread = true;			// group results by thread
 
     /**
      * get data from database by search id
@@ -36,7 +35,7 @@ class cSearchProfile
         $bReturn = false;
 
         if ($iSearchId > 0) {
-            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT se_id,se_userid,se_message,se_username,se_boardids,se_days,se_tstmp,se_ipaddress,se_group_by_thread FROM pxm_search WHERE se_id='.$iSearchId)) {
+            if ($objResultSet = cDB::getInstance()->executeQuery('SELECT se_id,se_userid,se_message,se_username,se_boardids,se_days,se_tstmp,se_ipaddress FROM pxm_search WHERE se_id='.$iSearchId)) {
                 if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                     $bReturn = $this->_setDataFromDb($objResultRow);
                 }
@@ -63,7 +62,6 @@ class cSearchProfile
         $this->m_iSearchDays = (int) $objResultRow->se_days;
         $this->m_iSearchTimestamp = (int) $objResultRow->se_tstmp;
         $this->m_sIpAddress = $objResultRow->se_ipaddress;
-        $this->m_bGroupByThread = (bool) $objResultRow->se_group_by_thread;
 
         return true;
     }
@@ -75,15 +73,14 @@ class cSearchProfile
      */
     public function insertData(): bool
     {
-        if ($objResultSet = cDB::getInstance()->executeQuery('INSERT INTO pxm_search (se_userid,se_message,se_username,se_boardids,se_days,se_tstmp,se_ipaddress,se_group_by_thread)'.
+        if ($objResultSet = cDB::getInstance()->executeQuery('INSERT INTO pxm_search (se_userid,se_message,se_username,se_boardids,se_days,se_tstmp,se_ipaddress)'.
                                                       " VALUES ($this->m_iIdUser,".
                                                                 cDB::getInstance()->quote($this->m_sSearchMessage).','.
                                                                 cDB::getInstance()->quote($this->m_sSearchUser).','.
                                                                 cDB::getInstance()->quote(implode(',', $this->m_arrBoardIds)).','.
                                                                 $this->m_iSearchDays.','.
                                                                 $this->m_iSearchTimestamp.','.
-                                                                cDB::getInstance()->quote($this->m_sIpAddress).','.
-                                                                ($this->m_bGroupByThread ? 1 : 0).')')) {
+                                                                cDB::getInstance()->quote($this->m_sIpAddress).')')) {
             if ($objResultSet->getAffectedRows() > 0) {
                 $this->m_iId = (int) cDB::getInstance()->getInsertId('pxm_search', 'se_id');
             }
@@ -282,27 +279,6 @@ class cSearchProfile
     }
 
     /**
-     * get group_by_thread preference
-     *
-     * @return bool group by thread
-     */
-    public function getGroupByThread(): bool
-    {
-        return $this->m_bGroupByThread;
-    }
-
-    /**
-     * set group_by_thread preference
-     *
-     * @param bool $bGroupByThread group by thread
-     * @return void
-     */
-    public function setGroupByThread(bool $bGroupByThread): void
-    {
-        $this->m_bGroupByThread = $bGroupByThread;
-    }
-
-    /**
      * Check if rate limit is exceeded for given IP address
      *
      * @param string $sIpAddress IP address to check
@@ -340,7 +316,6 @@ class cSearchProfile
                 'searchstring'	=>	$this->m_sSearchMessage,
                 'username'		=>	$this->m_sSearchUser,
                 'days'			=>	$this->m_iSearchDays,
-                'group_by_thread' =>	$this->m_bGroupByThread,
                 'date'			=>	(($this->m_iSearchTimestamp > 0) ? date($sDateFormat, ($this->m_iSearchTimestamp + $iTimeOffset)) : 0)];
     }
 }

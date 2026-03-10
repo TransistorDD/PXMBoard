@@ -320,30 +320,28 @@ including HTMX navigation flows.
 ### One-Time Setup
 
 `composer dev-setup` handles most steps automatically (npm install, Playwright browser binaries).
-Two manual steps remain afterwards:
+Manual steps required afterwards:
 
-**1. Create the E2E database:**
+**1. Install WebKit system dependencies** (Linux only, requires sudo):
+```bash
+sudo env "PATH=$PATH" npx playwright install-deps webkit
+```
+> `npx playwright install` (called by `composer dev-setup`) installs the browser
+> *binaries*, but on Linux the WebKit engine also needs OS-level libraries
+> (`libgtk-4`, `libgraphene`, etc.) that must be installed via the system package
+> manager. This step is a no-op on macOS and Windows.
+
+**2. Create the E2E database:**
 ```sql
 CREATE DATABASE pxmboard_e2e CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL ON pxmboard_e2e.* TO 'pxmboard'@'localhost';
 ```
 
-**2. Fill in the E2E config** (`config/pxmboard-config.e2e.php` was created from the example by `composer dev-setup`):
+**3. Fill in the E2E credentials** (`tests/E2E/.env` was created from the example by `composer dev-setup`):
 ```bash
-# Edit config/pxmboard-config.e2e.php: set DB host, name, user, password to match pxmboard_e2e
+# Edit tests/E2E/.env: set E2E_DB_HOST, E2E_DB_USER, E2E_DB_PASS, E2E_DB_NAME
+# On Linux with a Unix socket, also set E2E_DB_SOCKET
 ```
-
-**3. Set environment variables for the DB reset script** in `~/.bashrc`:
-```bash
-export E2E_DB_SOCKET=/run/mysqld/mysqld.sock   # Linux (Unix socket, recommended)
-# export E2E_DB_HOST=127.0.0.1                 # alternative: TCP
-export E2E_DB_USER=your_db_user
-export E2E_DB_PASS='your_db_password'
-# E2E_DB_NAME=pxmboard_e2e is the default, no need to set it
-```
-
-> `PXMBOARD_CONFIG` does **not** need to be set manually. Playwright sets it
-> exclusively for the PHP subprocess it starts. Your shell session is not affected.
 
 ### PHP Server Lifecycle
 
@@ -378,6 +376,7 @@ Every `test:e2e*` script resets the E2E database to a clean seed state before la
 | `npm run test:e2e:headed` | Headed (visible browser windows) |
 | `npm run test:e2e:desktop` | Desktop Chrome + Safari (light + dark) |
 | `npm run test:e2e:mobile` | Mobile iPhone 14 Pro + Pixel 7 (light + dark) |
+| `npm run test:e2e:safari` | All 4 Safari/WebKit projects (Desktop + Mobile, light + dark) |
 | `npm run test:e2e:pwa` | PWA / Service Worker spec only |
 | `npm run test:e2e:reset-db` | Reset E2E DB without running tests |
 | `npm run test:e2e:report` | Open HTML report in browser (after a test run) |
@@ -394,6 +393,17 @@ Every `test:e2e*` script resets the E2E database to a clean seed state before la
 npm run test:e2e:report
 # opens http://localhost:9323 — shows screenshots and step-by-step traces
 ```
+
+> **Pitfall — `--reporter=html` on the CLI writes to the wrong folder.**
+> When you run `npx playwright test --reporter=html`, the CLI flag **replaces** the
+> entire reporter configuration from `playwright.config.js`. Playwright then falls back
+> to its built-in default output folder `playwright-report/` (in the project root),
+> ignoring the configured `outputFolder: 'reports/playwright-html'`.
+>
+> Always run tests without the `--reporter` override (e.g. `npm run test:e2e` or
+> plain `npx playwright test`), so that `playwright.config.js` controls both the
+> reporter and the output folder. Use `--reporter=dot` or `--reporter=line` only when
+> you explicitly **don't** want an HTML report (e.g. for quick smoke checks).
 
 **Alternative: VS Code Playwright Extension** (`ms-playwright.playwright`, recommended in `.vscode/extensions.json`)
 — shows results, screenshots and traces directly in the VS Code Testing sidebar without a browser server.

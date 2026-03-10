@@ -23,8 +23,6 @@ test.describe('Navigation – Board → Thread list → Message', () => {
         await board.boardByName('Test').click();
 
         // The thread list container must appear without a full page reload.
-        // Wait explicitly for the first thread row so that HTMX has time to
-        // deliver content even when the PHP server is under parallel-test load.
         await expect(threadList.container).toBeVisible({ timeout: 10000 });
         await expect(threadList.threadRows.first()).toBeVisible({ timeout: 10000 });
         const count = await threadList.count();
@@ -52,7 +50,7 @@ test.describe('Navigation – Board → Thread list → Message', () => {
 
     test('deep-link URL opens thread directly', async ({ page }) => {
         const thread = new ThreadPage(page);
-        await thread.goto(1 /* boardId */, 1 /* messageId – root message */);
+        await thread.goto(1 /* boardId */, 1 /* messageId – root message */, 1 /* threadId */);
 
         await expect(thread.container).toBeVisible();
         await expect(thread.messageArea).toBeVisible();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PXMBoard\Tests\TestCase;
 
+use PXMBoard\I18n\cTranslator;
 use PXMBoard\Model\cConfig;
 use PXMBoard\Model\cUserConfig;
 
@@ -37,6 +38,9 @@ abstract class ActionTestCase extends IntegrationTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Load translations so that i18n keys resolve to German strings in templates.
+        cTranslator::load('de');
 
         // Load real configuration from the test database.
         // cConfig::__construct() queries pxm_configuration via the real DB connection.
