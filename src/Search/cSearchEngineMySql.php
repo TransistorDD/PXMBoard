@@ -124,10 +124,9 @@ class cSearchEngineMySql extends cSearchEngine
 
         // Order by score and timestamp, limit results
         $sQuery .= ' ORDER BY score DESC, m_tstmp DESC';
-        $sQuery .= ' LIMIT ' . ($iLimit + 1); // +1 to detect overflow
 
         // Execute query
-        if ($objResultSet = $objDb->executeQuery($sQuery)) {
+        if ($objResultSet = $objDb->executeQuery($sQuery, $iLimit + 1)) { // +1 to detect overflow
             while ($objRow = $objResultSet->getNextResultRowObject()) {
                 $arrResults[] = [
                     'id' => (int) $objRow->m_id,

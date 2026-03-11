@@ -75,11 +75,10 @@ class cUserLoginTicket
 
         // Load ticket
         $sQuery = 'SELECT ult_userid FROM pxm_user_login_ticket '.
-                  'WHERE ult_token='.$objDb->quote($sToken).' '.
-                  'LIMIT 1';
+                  'WHERE ult_token='.$objDb->quote($sToken);
 
         $iUserId = 0;
-        if ($objResultSet = $objDb->executeQuery($sQuery)) {
+        if ($objResultSet = $objDb->executeQuery($sQuery, 1)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $iUserId = (int) $objResultRow->ult_userid;
 
@@ -112,10 +111,9 @@ class cUserLoginTicket
         $sQuery = 'SELECT ult_id, ult_userid, ult_token, ult_useragent, ult_ipaddress, '.
                   'ult_created_timestamp, ult_last_used_timestamp '.
                   'FROM pxm_user_login_ticket '.
-                  'WHERE ult_token='.$objDb->quote($sToken).' '.
-                  'LIMIT 1';
+                  'WHERE ult_token='.$objDb->quote($sToken);
 
-        if ($objResultSet = $objDb->executeQuery($sQuery)) {
+        if ($objResultSet = $objDb->executeQuery($sQuery, 1)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $this->_setDataFromDb($objResultRow);
                 $objResultSet->freeResult();
@@ -143,10 +141,9 @@ class cUserLoginTicket
         $sQuery = 'SELECT ult_id, ult_userid, ult_token, ult_useragent, ult_ipaddress, '.
                   'ult_created_timestamp, ult_last_used_timestamp '.
                   'FROM pxm_user_login_ticket '.
-                  'WHERE ult_id='.$iId.' '.
-                  'LIMIT 1';
+                  'WHERE ult_id='.$iId;
 
-        if ($objResultSet = $objDb->executeQuery($sQuery)) {
+        if ($objResultSet = $objDb->executeQuery($sQuery, 1)) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
                 $this->_setDataFromDb($objResultRow);
                 $objResultSet->freeResult();

@@ -183,8 +183,7 @@ class cUser
         $bReturn = false;
 
         if ($objResultSet = cDB::getInstance()->executeQuery('SELECT 1 FROM pxm_user WHERE u_username='.cDB::getInstance()->quote($this->m_sUserName).
-                                                          ($bUniqueRegistrationMail ? ' OR u_registrationmail='.cDB::getInstance()->quote($this->m_sRegistrationMail) : '').
-                                                          ' LIMIT 1')) {
+                                                          ($bUniqueRegistrationMail ? ' OR u_registrationmail='.cDB::getInstance()->quote($this->m_sRegistrationMail) : ''), 1)) {
             $bUserExists = (bool) $objResultSet->getNextResultRowObject();
             $objResultSet->freeResult();
             if (!$bUserExists) {

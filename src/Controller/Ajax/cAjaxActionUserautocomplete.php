@@ -59,10 +59,9 @@ class cAjaxActionUserautocomplete extends cAjaxAction
             $sSql .= ' AND u_id != '.intval($objActiveUser->getId());
         }
 
-        $sSql .= ' ORDER BY u_username ASC
-		           LIMIT 5';
+        $sSql .= ' ORDER BY u_username ASC';
 
-        $objResultSet = $objDb->executeQuery($sSql);
+        $objResultSet = $objDb->executeQuery($sSql, 5);
 
         $arrResults = [];
         while ($objRow = $objResultSet->getNextResultRowObject()) {

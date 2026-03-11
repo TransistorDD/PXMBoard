@@ -100,23 +100,50 @@ class cMessageReadTracker
     /**
      * Cleanup old entries
      *
+     * Deletes in batches of 10000 rows to prevent lock escalation.
+     * Loops until all eligible rows are deleted, with a short pause between
+     * batches to allow the database to flush undo logs and reduce I/O pressure.
+     *
+     * MySQL/MariaDB supports DELETE ... LIMIT natively.
+     * PostgreSQL requires a subquery workaround as DELETE ... LIMIT is not standard SQL.
+     *
      * @param int $iDaysOld Delete entries older than X days (default: 365)
-     * @return int Number of deleted rows
+     * @return int Total number of deleted rows
      */
     public function cleanup(int $iDaysOld = 365): int
     {
         $iCutoff = time() - ($iDaysOld * 86400);
+        $iTotal = 0;
+        $bIsMysql = $this->m_objDb->getDBType() === 'MySQL';
 
-        $sQuery = 'DELETE FROM pxm_message_read ' .
-                  'WHERE mr_timestamp < ' . (int) $iCutoff . ' ' .
-                  'LIMIT 10000'; // Prevent lock escalation
+        do {
+            if ($bIsMysql) {
+                // MySQL/MariaDB: DELETE ... LIMIT is supported natively
+                $objResultSet = $this->m_objDb->executeQuery(
+                    'DELETE FROM pxm_message_read WHERE mr_timestamp < ' . (int) $iCutoff,
+                    10000
+                );
+            } else {
+                // PostgreSQL: DELETE ... LIMIT is not supported; use a subquery instead
+                $sQuery = 'DELETE FROM pxm_message_read WHERE (mr_userid, mr_messageid) IN (' .
+                          'SELECT mr_userid, mr_messageid FROM pxm_message_read ' .
+                          'WHERE mr_timestamp < ' . (int) $iCutoff . ' LIMIT 10000)';
+                $objResultSet = $this->m_objDb->executeQuery($sQuery);
+            }
 
-        $objResultSet = $this->m_objDb->executeQuery($sQuery);
-        if (!$objResultSet) {
-            return 0;
-        }
-        $iAffected = $objResultSet->getAffectedRows();
-        $objResultSet->freeResult();
-        return $iAffected;
+            if (!$objResultSet) {
+                break;
+            }
+
+            $iAffected = $objResultSet->getAffectedRows();
+            $objResultSet->freeResult();
+            $iTotal += $iAffected;
+
+            if ($iAffected >= 10000) {
+                usleep(50000); // 50ms pause: let the DB flush undo logs between batches
+            }
+        } while ($iAffected >= 10000);
+
+        return $iTotal;
     }
 }

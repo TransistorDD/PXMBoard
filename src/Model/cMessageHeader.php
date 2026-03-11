@@ -139,7 +139,7 @@ class cMessageHeader
      */
     public function getSubject(string $sSubjectQuotePrefix = ''): string
     {
-        if (!empty($sSubjectQuotePrefix) && (strncasecmp($this->m_sSubject, $sSubjectQuotePrefix, strlen($sSubjectQuotePrefix)) != 0)) {
+        if (!empty($sSubjectQuotePrefix) && (mb_stripos($this->m_sSubject, $sSubjectQuotePrefix) !== 0)) {
             return $sSubjectQuotePrefix.$this->m_sSubject;
         }
         return $this->m_sSubject;

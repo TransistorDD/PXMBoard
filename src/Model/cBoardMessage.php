@@ -132,13 +132,13 @@ class cBoardMessage extends cMessage
 
         if (! empty($this->m_sSubject)) {
             // dupcheck
-            $objResultSet = cDB::getInstance()->executeQuery('SELECT COUNT(*) AS msgcount FROM pxm_message'.
+            $objResultSet = cDB::getInstance()->executeQuery('SELECT 1 FROM pxm_message'.
                                                                 " WHERE   m_parentid=$iParentId".
                                                                     ' AND m_userid='.$this->m_objAuthor->getId().
                                                                     ' AND m_tstmp>'.($this->m_iMessageTimestamp - 259200).
-                                                                    ' AND m_subject='.cDB::getInstance()->quote($this->m_sSubject));
-            if ($objResultSet && $objResultRow = $objResultSet->getNextResultRowObject()) {
-                if (((int) $objResultRow->msgcount) < 1) {
+                                                                    ' AND m_subject='.cDB::getInstance()->quote($this->m_sSubject), 1);
+            if ($objResultSet) {
+                if (!$objResultSet->getNextResultRowObject()) {
                     if ($iParentId < 1) {							// new thread
                         if (cDB::getInstance()->executeQuery("INSERT INTO pxm_thread (t_boardid,t_active,t_lastmsgtstmp) VALUES ($this->m_iBoardId,1,$this->m_iMessageTimestamp)")) {
                             if (($this->m_iThreadId = cDB::getInstance()->getInsertId('pxm_thread', 't_id')) > 0) {
@@ -658,15 +658,13 @@ class cBoardMessage extends cMessage
             return false;
         }
 
-        $sQuery = 'SELECT COUNT(*) AS count FROM pxm_message_notification '.
-                  'WHERE mn_messageid='.intval($this->m_iId).' AND mn_userid='.intval($iUserId);
-        $objResultSet = cDB::getInstance()->executeQuery($sQuery);
+        $sQuery = 'SELECT 1 FROM pxm_message_notification '.
+                  'WHERE mn_messageid = ' . (int)$this->m_iId . ' ' .
+                  'AND mn_userid = ' . (int)$iUserId;
 
-        if ($objRow = $objResultSet->getNextResultRowObject()) {
-            return $objRow->count > 0;
-        }
+        $objResultSet = cDB::getInstance()->executeQuery($sQuery, 1);
 
-        return false;
+        return (bool)$objResultSet->getNextResultRowObject();
     }
 
     /**
