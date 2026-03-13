@@ -76,10 +76,10 @@ RENAME TABLE `pxm_notification` TO `pxm_template`;
 
 -- Step 2: Rename columns in pxm_template (n_* -> te_*)
 ALTER TABLE `pxm_template`
-  CHANGE COLUMN `n_id` `te_id` MEDIUMINT(8) UNSIGNED NOT NULL AUTO_INCREMENT,
-  CHANGE COLUMN `n_message` `te_message` TEXT NOT NULL,
-  CHANGE COLUMN `n_name` `te_name` VARCHAR(50) NOT NULL DEFAULT '',
-  CHANGE COLUMN `n_description` `te_description` VARCHAR(255) NOT NULL DEFAULT '';
+  CHANGE COLUMN `n_id` `te_id` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Template ID',
+  CHANGE COLUMN `n_message` `te_message` TEXT NOT NULL COMMENT 'Template text (supports %placeholder% substitution)',
+  CHANGE COLUMN `n_name` `te_name` VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'Internal template name',
+  CHANGE COLUMN `n_description` `te_description` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Template description and placeholder reference';
 
 -- Step 3: Update table comment to clarify purpose
 ALTER TABLE `pxm_template`
@@ -87,7 +87,7 @@ ALTER TABLE `pxm_template`
 
 -- Step 4: Rename column in pxm_message (m_notification -> m_notify_on_reply)
 ALTER TABLE `pxm_message`
-  CHANGE COLUMN `m_notification` `m_notify_on_reply` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0;
+  CHANGE COLUMN `m_notification` `m_notify_on_reply` BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Send email notification on reply';
 
 -- ============================================================================
 -- USER NOTIFICATION SYSTEM: In-app notifications
@@ -100,17 +100,17 @@ ALTER TABLE `pxm_message`
 -- - Unread count cache in u_notification_unread_count for performance
 
 CREATE TABLE `pxm_notification` (
-  `n_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `n_userid` INT(10) UNSIGNED NOT NULL,
-  `n_type` VARCHAR(50) NOT NULL,
-  `n_status` ENUM('unread', 'read') NOT NULL DEFAULT 'unread',
-  `n_title` VARCHAR(255) NOT NULL,
-  `n_message` TEXT NOT NULL,
-  `n_link` VARCHAR(255) NOT NULL DEFAULT '',
-  `n_related_messageid` INT(10) UNSIGNED NULL DEFAULT NULL,
-  `n_related_pmid` INT(10) UNSIGNED NULL DEFAULT NULL,
-  `n_created_timestamp` INT(10) UNSIGNED NOT NULL,
-  `n_read_timestamp` INT(10) UNSIGNED NULL DEFAULT NULL,
+  `n_id`                INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Notification ID',
+  `n_userid`            MEDIUMINT UNSIGNED NOT NULL COMMENT 'Recipient user ID (FK: pxm_user)',
+  `n_type`              VARCHAR(50) NOT NULL COMMENT 'Notification type (eNotificationType)',
+  `n_status`            ENUM('unread', 'read') NOT NULL DEFAULT 'unread' COMMENT 'Read status',
+  `n_title`             VARCHAR(255) NOT NULL COMMENT 'Notification title',
+  `n_message`           TEXT NOT NULL COMMENT 'Notification message text',
+  `n_link`              VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Optional URL link',
+  `n_related_messageid` INT UNSIGNED NULL DEFAULT NULL COMMENT 'Related board message ID',
+  `n_related_pmid`      INT UNSIGNED NULL DEFAULT NULL COMMENT 'Related private message ID',
+  `n_created_timestamp` INT UNSIGNED NOT NULL COMMENT 'Unix timestamp when notification was created',
+  `n_read_timestamp`    INT UNSIGNED NULL DEFAULT NULL COMMENT 'Unix timestamp when notification was read',
   PRIMARY KEY (`n_id`),
   INDEX `idx_userid_status` (`n_userid`, `n_status`),
   INDEX `idx_created` (`n_created_timestamp`),
@@ -123,35 +123,11 @@ COMMENT='User notifications for forum events';
 
 -- Add unread count cache to pxm_user table (for badge display performance)
 ALTER TABLE `pxm_user`
-  ADD COLUMN `u_notification_unread_count` INT(10) UNSIGNED NOT NULL DEFAULT 0;
+  ADD COLUMN `u_notification_unread_count` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Cached count of unread in-app notifications';
 
 -- Add unread private message count cache to pxm_user table
 ALTER TABLE `pxm_user`
-  ADD COLUMN `u_priv_message_unread_count` INT(10) UNSIGNED NOT NULL DEFAULT 0;
-
--- ============================================================================
--- MESSAGE READ TRACKING: Server-side read status
--- ============================================================================
--- Tracks read messages per user for cross-device synchronization
---
--- This table stores which messages each logged-in user has viewed.
--- Guests use browser-side tracking, logged-in users use this table.
--- No foreign keys for performance on large forums.
---
--- INDEX STRATEGY:
--- - PRIMARY KEY (mr_userid, mr_messageid): Optimal for LEFT JOIN queries in cThreadList
---   WHERE mr_userid=? AND mr_messageid=? (covers both columns efficiently)
--- - idx_user_timestamp: For cleanup operations (delete old entries per user)
-
-CREATE TABLE IF NOT EXISTS `pxm_message_read` (
-  `mr_userid` INT(10) UNSIGNED NOT NULL,
-  `mr_messageid` INT(10) UNSIGNED NOT NULL,
-  `mr_timestamp` INT(10) UNSIGNED NOT NULL,
-  PRIMARY KEY (`mr_userid`, `mr_messageid`),
-  INDEX `idx_user_timestamp` (`mr_userid`, `mr_timestamp`),
-  INDEX `idx_messageid` (`mr_messageid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Tracks read messages per user (no foreign keys for performance). PRIMARY KEY optimal for LEFT JOIN queries.';
+  ADD COLUMN `u_priv_message_unread_count` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Cached count of unread private messages';
 
 -- ============================================================================
 -- MESSAGE DRAFTS: Draft functionality
@@ -202,13 +178,13 @@ ALTER TABLE `pxm_user`
 -- NOTE: u_lastlogin column remains in pxm_user table for performance
 
 CREATE TABLE `pxm_user_login_ticket` (
-  `ult_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `ult_userid` INT(10) UNSIGNED NOT NULL,
-  `ult_token` CHAR(32) NOT NULL COMMENT '32 chars hex from bin2hex(random_bytes(16))',
-  `ult_useragent` VARCHAR(255) NOT NULL DEFAULT '',
-  `ult_ipaddress` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'IPv4 or IPv6 address',
-  `ult_created_timestamp` INT(10) UNSIGNED NOT NULL,
-  `ult_last_used_timestamp` INT(10) UNSIGNED NOT NULL,
+  `ult_id`                  INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Login ticket ID',
+  `ult_userid`              MEDIUMINT UNSIGNED NOT NULL COMMENT 'User ID (FK: pxm_user)',
+  `ult_token`               CHAR(32) NOT NULL COMMENT 'Secure random login token',
+  `ult_useragent`           VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Browser User-Agent string',
+  `ult_ipaddress`           VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'Client IP address',
+  `ult_created_timestamp`   INT UNSIGNED NOT NULL COMMENT 'Unix timestamp when ticket was created',
+  `ult_last_used_timestamp` INT UNSIGNED NOT NULL COMMENT 'Unix timestamp of last use',
   PRIMARY KEY (`ult_id`),
   UNIQUE KEY `ult_token` (`ult_token`),
   INDEX `idx_userid` (`ult_userid`),
@@ -354,8 +330,8 @@ ALTER TABLE `pxm_search`
 --   * Finding all subscribers when a reply is posted
 
 CREATE TABLE `pxm_message_notification` (
-  `mn_messageid` int unsigned NOT NULL,
-  `mn_userid` int unsigned NOT NULL,
+  `mn_messageid` INT UNSIGNED NOT NULL COMMENT 'Message ID being watched',
+  `mn_userid`    MEDIUMINT UNSIGNED NOT NULL COMMENT 'Subscriber user ID',
   PRIMARY KEY (`mn_messageid`, `mn_userid`),
   KEY `mn_messageid` (`mn_messageid`),
   KEY `mn_userid` (`mn_userid`)
@@ -382,12 +358,12 @@ ALTER TABLE `pxm_user`
 UPDATE `pxm_user` SET `u_status` = 3 WHERE `u_status` = 4;
 
 -- Add documentation comment to u_status column
-ALTER TABLE `pxm_user` MODIFY COLUMN `u_status` tinyint(3) unsigned NOT NULL default '0' COMMENT '1=ACTIVE, 2=NOT_ACTIVATED, 3=DISABLED';
+ALTER TABLE `pxm_user` MODIFY COLUMN `u_status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '1=ACTIVE, 2=NOT_ACTIVATED, 3=DISABLED';
 
 -- ============================================================================
 -- CONVERT BOOLEAN-LIKE COLUMNS TO BOOLEAN
 -- ============================================================================
--- Convert tinyint(3) unsigned columns that represent boolean values
+-- Convert TINYINT columns that represent boolean values
 -- to proper BOOLEAN type for better semantic clarity.
 
 ALTER TABLE `pxm_user`
@@ -410,7 +386,7 @@ ALTER TABLE `pxm_user`
 
 -- Rename and modify b_active to b_status
 ALTER TABLE `pxm_board`
-  CHANGE COLUMN `b_active` `b_status` TINYINT(3) UNSIGNED NOT NULL DEFAULT 1
+  CHANGE COLUMN `b_active` `b_status` TINYINT UNSIGNED NOT NULL DEFAULT 1
   COMMENT '1=PUBLIC, 2=MEMBERS_ONLY, 3=READONLY_PUBLIC, 4=READONLY_MEMBERS, 5=CLOSED';
 
 -- Migrate existing values: active=1 -> PUBLIC(1), active=0 -> CLOSED(5)
@@ -455,7 +431,7 @@ ALTER TABLE `pxm_board`
   DROP COLUMN IF EXISTS `b_parsestyle`,
   DROP COLUMN IF EXISTS `b_parseurl`,
   CHANGE COLUMN `b_parseimg` `b_embed_external` BOOLEAN NOT NULL DEFAULT TRUE
-    COMMENT 'Einbettung externer Inhalte (Bilder, YouTube, Twitch)';
+    COMMENT 'Allow embedding external content (images, YouTube, Twitch)';
 
 ALTER TABLE `pxm_configuration`
   DROP COLUMN IF EXISTS `c_parseurl`,
@@ -465,7 +441,7 @@ ALTER TABLE `pxm_user`
   DROP COLUMN IF EXISTS `u_replacetext`,
   DROP COLUMN IF EXISTS `u_showsignatures`,
   CHANGE COLUMN `u_parseimg` `u_embed_external` BOOLEAN NOT NULL DEFAULT FALSE
-    COMMENT 'Einbettung externer Inhalte (Bilder, YouTube, Twitch)';
+    COMMENT 'Allow embedding external content (images, YouTube, Twitch)';
 
 
 -- ============================================================================
@@ -479,6 +455,218 @@ ALTER TABLE `pxm_configuration`
 
 
 -- ============================================================================
+-- SCHEMA CHANGE: pxm_message_read monthly range partitioning
+-- ============================================================================
+-- Replace the old timestamp-based read tracking table with a partitioned
+-- schema. mr_timestamp is dropped entirely; mr_year_month (YYMM, 2 bytes)
+-- replaces it as the partition key and must be part of the PRIMARY KEY
+-- (MySQL requirement §26.6.1).
+--
+-- A new helper table pxm_message_read_partition tracks managed months so
+-- that managePartitions() can use a fast PK-lookup instead of querying
+-- INFORMATION_SCHEMA (which is slow and often locked on shared hosts).
+--
+-- NOTE: This is a development-only upgrade. pxm_message_read was introduced
+-- in 3.0.0 and there are no production installations yet. The table is
+-- dropped and recreated; no data migration is necessary.
+
+DROP TABLE IF EXISTS `pxm_message_read`;
+
+CREATE TABLE `pxm_message_read` (
+  `mr_userid`     MEDIUMINT UNSIGNED NOT NULL COMMENT 'User ID who read the message',
+  `mr_messageid`  INT UNSIGNED NOT NULL COMMENT 'Read message ID',
+  `mr_year_month` SMALLINT UNSIGNED NOT NULL COMMENT 'YYMM, partition key',
+  PRIMARY KEY (`mr_userid`, `mr_messageid`, `mr_year_month`),
+  KEY `idx_messageid` (`mr_messageid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Tracks read messages per user. Monthly RANGE partitions; mr_year_month must be in PRIMARY KEY (MySQL 26.6.1).'
+  PARTITION BY RANGE (`mr_year_month`) (
+    PARTITION p_initial VALUES LESS THAN (2601)
+  );
+
+DROP TABLE IF EXISTS `pxm_message_read_partition`;
+
+CREATE TABLE `pxm_message_read_partition` (
+  `mrp_year_month`        SMALLINT UNSIGNED NOT NULL COMMENT 'YYMM, managed partition month',
+  `mrp_created_timestamp` INT UNSIGNED NOT NULL COMMENT 'Unix timestamp when partition was created',
+  PRIMARY KEY (`mrp_year_month`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Tracks managed months; INSERT IGNORE as concurrency gate avoids INFORMATION_SCHEMA queries.';
+
+-- Read tracking retention configuration
+ALTER TABLE `pxm_configuration`
+  ADD COLUMN IF NOT EXISTS `c_read_retention_months` TINYINT UNSIGNED NOT NULL DEFAULT 13
+  COMMENT 'Read tracking retention in months';
+
+-- ============================================================================
+-- COLUMN TYPE MODERNIZATION: Remove deprecated display widths, boolean cleanup,
+-- and right-size ID columns
+-- ============================================================================
+-- MySQL 8.0+ deprecates integer display widths (e.g. INT(10), TINYINT(3)).
+-- Boolean-typed TINYINT columns are converted to BOOLEAN for semantic clarity.
+-- Oversized ID columns are right-sized to save index and storage space.
+-- Missing column comments are added; German comments translated to English.
+--
+-- These changes are purely structural; no data migration is required.
+-- All new types can hold all existing values.
+
+-- ── pxm_board ────────────────────────────────────────────────────────────────
+ALTER TABLE `pxm_board`
+  MODIFY COLUMN `b_id`             SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Board ID',
+  MODIFY COLUMN `b_name`           VARCHAR(100) NOT NULL DEFAULT '' COMMENT 'Board display name',
+  MODIFY COLUMN `b_description`    VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Board description',
+  MODIFY COLUMN `b_position`       SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Display position for sorting boards',
+  MODIFY COLUMN `b_lastmsgtstmp`   INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Unix timestamp of the last message',
+  MODIFY COLUMN `b_skinid`         TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT 'Board-specific skin ID (FK: pxm_skin)',
+  MODIFY COLUMN `b_timespan`       SMALLINT UNSIGNED NOT NULL DEFAULT 100 COMMENT 'Days back for thread list (0=show all)',
+  MODIFY COLUMN `b_threadlistsort` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'Default thread list sort order',
+  MODIFY COLUMN `b_replacetext`    BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Enable text replacement (emoticons etc.)';
+
+-- ── pxm_configuration ────────────────────────────────────────────────────────
+ALTER TABLE `pxm_configuration`
+  MODIFY COLUMN `c_id`                  TINYINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Configuration ID (always 1)',
+  MODIFY COLUMN `c_quickpost`           BOOLEAN NOT NULL DEFAULT TRUE COMMENT 'Enable quick reply form on thread page',
+  MODIFY COLUMN `c_directregistration`  BOOLEAN NOT NULL DEFAULT TRUE COMMENT 'Allow direct registration without admin approval',
+  MODIFY COLUMN `c_uniquemail`          BOOLEAN NOT NULL DEFAULT TRUE COMMENT 'Require unique email address per user',
+  MODIFY COLUMN `c_dateformat`          VARCHAR(30) NOT NULL DEFAULT '' COMMENT 'Date format string (PHP date() style)',
+  MODIFY COLUMN `c_timeoffset`          TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Global time offset in hours',
+  MODIFY COLUMN `c_onlinetime`          SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Duration to show users as online in seconds (0=disabled)',
+  MODIFY COLUMN `c_closethreads`        SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Maximum messages per thread before closing (0=no limit)',
+  MODIFY COLUMN `c_usrperpage`          MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Users per page (online list, user search, admin)',
+  MODIFY COLUMN `c_msgheaderperpage`    MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Message headers per page (search results)',
+  MODIFY COLUMN `c_privatemsgperpage`   MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Private messages per page',
+  MODIFY COLUMN `c_thrdperpage`         MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Threads per page',
+  MODIFY COLUMN `c_mailwebmaster`       VARCHAR(100) NOT NULL DEFAULT '' COMMENT 'Webmaster email address',
+  MODIFY COLUMN `c_maxprofilepicsize`   MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Maximum profile image file size in bytes',
+  MODIFY COLUMN `c_maxprofilepicwidth`  SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Maximum profile image width in pixels',
+  MODIFY COLUMN `c_maxprofilepicheight` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Maximum profile image height in pixels',
+  MODIFY COLUMN `c_profileimgdir`       VARCHAR(100) NOT NULL DEFAULT '' COMMENT 'Directory for profile images',
+  MODIFY COLUMN `c_usesignatures`       BOOLEAN NOT NULL DEFAULT TRUE COMMENT 'Enable user signatures globally',
+  MODIFY COLUMN `c_skinid`              TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT 'Default skin ID (FK: pxm_skin)',
+  MODIFY COLUMN `c_quotesubject`        VARCHAR(10) NOT NULL DEFAULT 'Re:' COMMENT 'Prefix for quoted message subjects',
+  MODIFY COLUMN `c_skindir`             VARCHAR(100) NOT NULL DEFAULT '' COMMENT 'Base directory for skins';
+
+-- ── pxm_message ──────────────────────────────────────────────────────────────
+ALTER TABLE `pxm_message`
+  MODIFY COLUMN `m_id`              INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Message ID',
+  MODIFY COLUMN `m_threadid`        INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Parent thread ID',
+  MODIFY COLUMN `m_parentid`        INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Parent message ID (0=root message)',
+  MODIFY COLUMN `m_userid`          MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Author user ID (0=guest)',
+  MODIFY COLUMN `m_username`        VARCHAR(30) NOT NULL DEFAULT '' COMMENT 'Author username at time of posting',
+  MODIFY COLUMN `m_usermail`        VARCHAR(100) NOT NULL DEFAULT '' COMMENT 'Author email at time of posting',
+  MODIFY COLUMN `m_userhighlight`   BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Highlight this users messages',
+  MODIFY COLUMN `m_subject`         VARCHAR(100) NOT NULL DEFAULT '' COMMENT 'Message subject',
+  MODIFY COLUMN `m_tstmp`           INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Unix timestamp of posting',
+  MODIFY COLUMN `m_ip`              VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'Poster IP address',
+  MODIFY COLUMN `m_status`          TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '0=draft, 1=published, 2=archived, 3=deleted';
+
+-- ── pxm_message_notification ─────────────────────────────────────────────────
+ALTER TABLE `pxm_message_notification`
+  MODIFY COLUMN `mn_messageid` INT UNSIGNED NOT NULL COMMENT 'Message ID being watched',
+  MODIFY COLUMN `mn_userid`    MEDIUMINT UNSIGNED NOT NULL COMMENT 'Subscriber user ID';
+
+-- ── pxm_moderator ────────────────────────────────────────────────────────────
+ALTER TABLE `pxm_moderator`
+  MODIFY COLUMN `mod_userid`  MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Moderator user ID',
+  MODIFY COLUMN `mod_boardid` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Board ID';
+
+-- ── pxm_priv_message ─────────────────────────────────────────────────────────
+ALTER TABLE `pxm_priv_message`
+  MODIFY COLUMN `p_id`         INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Private message ID',
+  MODIFY COLUMN `p_touserid`   MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Recipient user ID',
+  MODIFY COLUMN `p_fromuserid` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Sender user ID',
+  MODIFY COLUMN `p_subject`    VARCHAR(100) NOT NULL DEFAULT '' COMMENT 'Message subject',
+  MODIFY COLUMN `p_tstmp`      INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Unix timestamp of sending',
+  MODIFY COLUMN `p_ip`         VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'Sender IP address',
+  MODIFY COLUMN `p_tostate`    TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1=UNREAD, 2=READ, 3=DELETED (recipient view)',
+  MODIFY COLUMN `p_fromstate`  TINYINT UNSIGNED NOT NULL DEFAULT 2 COMMENT '1=UNREAD, 2=READ, 3=DELETED (sender view)';
+
+-- ── pxm_profile_accept ───────────────────────────────────────────────────────
+ALTER TABLE `pxm_profile_accept`
+  MODIFY COLUMN `pa_name`   CHAR(15) NOT NULL DEFAULT '' COMMENT 'Profile field name',
+  MODIFY COLUMN `pa_type`   ENUM('s','a','i') NOT NULL DEFAULT 's' COMMENT 'Field type: s=string, a=alpha, i=integer',
+  MODIFY COLUMN `pa_length` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Maximum field length';
+
+-- ── pxm_search ───────────────────────────────────────────────────────────────
+ALTER TABLE `pxm_search`
+  MODIFY COLUMN `se_id`        INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Search query ID',
+  MODIFY COLUMN `se_userid`    MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'User ID who performed the search (0=guest)',
+  MODIFY COLUMN `se_message`   VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Search term',
+  MODIFY COLUMN `se_username`  VARCHAR(30) NOT NULL DEFAULT '' COMMENT 'Username filter',
+  MODIFY COLUMN `se_days`      INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Days back filter (0=all)',
+  MODIFY COLUMN `se_boardids`  VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Board ID filter (comma-separated)',
+  MODIFY COLUMN `se_tstmp`     INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Unix timestamp of search',
+  MODIFY COLUMN `se_ipaddress` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'Searcher IP address';
+
+-- ── pxm_skin ─────────────────────────────────────────────────────────────────
+ALTER TABLE `pxm_skin`
+  MODIFY COLUMN `s_id`         TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Skin ID',
+  MODIFY COLUMN `s_fieldname`  VARCHAR(15) NOT NULL DEFAULT '' COMMENT 'Skin configuration field name',
+  MODIFY COLUMN `s_fieldvalue` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Skin configuration field value';
+
+-- ── pxm_template ─────────────────────────────────────────────────────────────
+ALTER TABLE `pxm_template`
+  MODIFY COLUMN `te_id`          MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Template ID',
+  MODIFY COLUMN `te_message`     TEXT NOT NULL COMMENT 'Template text (supports %placeholder% substitution)',
+  MODIFY COLUMN `te_name`        VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'Internal template name',
+  MODIFY COLUMN `te_description` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Template description and placeholder reference';
+
+-- ── pxm_thread ───────────────────────────────────────────────────────────────
+ALTER TABLE `pxm_thread`
+  MODIFY COLUMN `t_id`           INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Thread ID',
+  MODIFY COLUMN `t_boardid`      SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Parent board ID',
+  MODIFY COLUMN `t_active`       BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether the thread is visible/active',
+  MODIFY COLUMN `t_fixed`        BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether the thread is pinned to top',
+  MODIFY COLUMN `t_lastmsgtstmp` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Unix timestamp of the last message',
+  MODIFY COLUMN `t_lastmsgid`    INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'ID of the last message',
+  MODIFY COLUMN `t_msgquantity`  INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total message count in this thread',
+  MODIFY COLUMN `t_views`        INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total view count';
+
+-- ── pxm_user: drop FKs before changing PK type ───────────────────────────────
+ALTER TABLE `pxm_user_login_ticket` DROP FOREIGN KEY `fk_login_ticket_user`;
+ALTER TABLE `pxm_notification`      DROP FOREIGN KEY `fk_notification_user`;
+
+ALTER TABLE `pxm_user`
+  MODIFY COLUMN `u_id`                         MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'User ID',
+  MODIFY COLUMN `u_registrationtstmp`          INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Unix timestamp of registration',
+  MODIFY COLUMN `u_msgquantity`                INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total number of messages posted',
+  MODIFY COLUMN `u_lastonlinetstmp`            INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Unix timestamp of last online visit',
+  MODIFY COLUMN `u_profilechangedtstmp`        INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Unix timestamp of last profile change',
+  MODIFY COLUMN `u_skinid`                     TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT 'User-selected skin ID (FK: pxm_skin)',
+  MODIFY COLUMN `u_timeoffset`                 SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Time offset in hours',
+  MODIFY COLUMN `u_notification_unread_count`  INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Cached count of unread in-app notifications',
+  MODIFY COLUMN `u_priv_message_unread_count`  INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Cached count of unread private messages';
+
+ALTER TABLE `pxm_user_login_ticket`
+  MODIFY COLUMN `ult_id`                  INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Login ticket ID',
+  MODIFY COLUMN `ult_userid`              MEDIUMINT UNSIGNED NOT NULL COMMENT 'User ID (FK: pxm_user)',
+  MODIFY COLUMN `ult_token`               CHAR(32) NOT NULL COMMENT 'Secure random login token',
+  MODIFY COLUMN `ult_created_timestamp`   INT UNSIGNED NOT NULL COMMENT 'Unix timestamp when ticket was created',
+  MODIFY COLUMN `ult_last_used_timestamp` INT UNSIGNED NOT NULL COMMENT 'Unix timestamp of last use';
+
+ALTER TABLE `pxm_notification`
+  MODIFY COLUMN `n_id`                 INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Notification ID',
+  MODIFY COLUMN `n_userid`             MEDIUMINT UNSIGNED NOT NULL COMMENT 'Recipient user ID (FK: pxm_user)',
+  MODIFY COLUMN `n_type`               VARCHAR(50) NOT NULL COMMENT 'Notification type (eNotificationType)',
+  MODIFY COLUMN `n_title`              VARCHAR(255) NOT NULL COMMENT 'Notification title',
+  MODIFY COLUMN `n_related_messageid`  INT UNSIGNED DEFAULT NULL COMMENT 'Related board message ID',
+  MODIFY COLUMN `n_related_pmid`       INT UNSIGNED DEFAULT NULL COMMENT 'Related private message ID',
+  MODIFY COLUMN `n_created_timestamp`  INT UNSIGNED NOT NULL COMMENT 'Unix timestamp when notification was created',
+  MODIFY COLUMN `n_read_timestamp`     INT UNSIGNED DEFAULT NULL COMMENT 'Unix timestamp when notification was read';
+
+-- Re-add FK constraints after type changes
+ALTER TABLE `pxm_user_login_ticket`
+  ADD CONSTRAINT `fk_login_ticket_user`
+    FOREIGN KEY (`ult_userid`) REFERENCES `pxm_user` (`u_id`)
+    ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `pxm_notification`
+  ADD CONSTRAINT `fk_notification_user`
+    FOREIGN KEY (`n_userid`) REFERENCES `pxm_user` (`u_id`)
+    ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+-- ============================================================================
 -- All changes for Release 3.0.0 have been applied successfully.
 --
 -- Summary of changes:
@@ -489,7 +677,17 @@ ALTER TABLE `pxm_configuration`
 -- - pxm_notification: new table for in-app user notifications
 -- - pxm_message_notification: new table for per-message notification subscriptions
 -- - pxm_message_read: new table for server-side read tracking with idx_messageid for read count queries
--- - pxm_configuration: c_banner, c_guestpost, c_countviews, c_quotechar, c_parseurl, c_parsestyle, c_msgperpage columns dropped
+-- - pxm_configuration: c_banner, c_guestpost, c_countviews, c_quotechar, c_parseurl, c_parsestyle, c_msgperpage columns dropped, c_read_retention_months added
+-- - pxm_configuration: c_quickpost, c_directregistration, c_uniquemail, c_usesignatures converted to BOOLEAN
+-- - pxm_configuration: c_id -> TINYINT UNSIGNED, c_skinid -> TINYINT UNSIGNED, numeric columns: display widths removed
+-- - pxm_board: b_id, b_position -> SMALLINT UNSIGNED; b_skinid -> TINYINT UNSIGNED; b_replacetext -> BOOLEAN
+-- - pxm_message: m_userid -> MEDIUMINT UNSIGNED; m_userhighlight, m_notify_on_reply -> BOOLEAN
+-- - pxm_moderator: mod_userid -> MEDIUMINT UNSIGNED, mod_boardid -> SMALLINT UNSIGNED
+-- - pxm_priv_message: p_touserid, p_fromuserid -> MEDIUMINT UNSIGNED; p_tostate/p_fromstate comments added
+-- - pxm_thread: t_boardid -> SMALLINT UNSIGNED; t_active, t_fixed -> BOOLEAN
+-- - pxm_user: u_id -> MEDIUMINT UNSIGNED; u_skinid -> TINYINT UNSIGNED; all integer display widths removed
+-- - pxm_skin: s_id -> TINYINT UNSIGNED; pxm_search: se_userid -> MEDIUMINT UNSIGNED
+-- - All German column comments translated to English; missing column comments added
 -- - pxm_error: table dropped (replaced by eError PHP enum)
 -- - pxm_skin: names updated, quoteprefix/quotesuffix removed (CSS-based quote styling), frame_top/frame_bottom removed
 -- - pxm_search: se_ipaddress added with idx_ratelimit index for search rate limiting

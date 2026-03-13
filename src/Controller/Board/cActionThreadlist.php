@@ -48,7 +48,7 @@ class cActionThreadlist extends cPublicAction
         $iUserId = $objActiveUser ? $objActiveUser->getId() : 0;
         $iLastLogin = $objActiveUser ? $this->_getLastLoginTimestamp() : 0;
 
-        $objThreadList = new cThreadList($objActiveBoard->getId(), $this->_getThreadListSortMode(), $this->m_objConfig->getAccessTimestamp() - $objActiveBoard->getThreadListTimeSpan() * 86400 + $this->m_objConfig->getTimeOffset() * 3600, $iUserId);
+        $objThreadList = new cThreadList($objActiveBoard->getId(), $this->_getThreadListSortMode(), $this->m_objConfig->getAccessTimestamp() - $objActiveBoard->getThreadListTimeSpan() * 86400 + $this->m_objConfig->getTimeOffset() * 3600, $iUserId, $this->m_objConfig->getReadRetentionMonths());
         $objThreadList->loadData($this->m_objInputHandler->getIntFormVar('page', true, true, true), $this->m_objConfig->getThreadsPerPage());
 
         $this->m_objTemplate->addData($this->getContextDataArray(['previd' => $objThreadList->getPrevPageId(),

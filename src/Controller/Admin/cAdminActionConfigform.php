@@ -62,6 +62,7 @@ class cAdminActionConfigform extends cAdminAction
         $this->m_sOutput .= $this->_getTextField('threadsperpage', 3, (string)$this->m_objConfig->getThreadsPerPage(), 'threads per page (msg index)');
         $this->m_sOutput .= $this->_getTextField('messageheaderperpage', 3, (string)$this->m_objConfig->getMessageHeaderPerPage(), 'messages per page (search)');
         $this->m_sOutput .= $this->_getTextField('privatemessagesperpage', 3, (string)$this->m_objConfig->getPrivateMessagesPerPage(), 'private messages per page');
+        $this->m_sOutput .= $this->_getTextField('read_retention_months', 3, (string)$this->m_objConfig->getReadRetentionMonths(), 'read tracking retention (months)');
         $this->m_sOutput .= $this->_getTextField('mailwebmaster', $this->m_objInputHandler->getInputSize('email'), $this->m_objConfig->getMailWebmaster(), 'mail webmaster');
         $this->m_sOutput .= $this->_getTextField('quotesubject', $this->m_objInputHandler->getInputSize('quotesubject'), $this->m_objConfig->getQuoteSubject(), 'quote subject');
         $this->m_sOutput .= $this->_getTextField('skindir', $this->m_objInputHandler->getInputSize('directory'), $this->m_objConfig->getSkinDirectory(), 'skin dir');

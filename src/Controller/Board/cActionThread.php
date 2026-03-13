@@ -49,7 +49,8 @@ class cActionThread extends cPublicAction
                 $this->m_objConfig->getTimeOffset() * 3600,
                 $this->m_objConfig->getDateFormat(),
                 $iLastLogin,
-                $iCurrentUserId
+                $iCurrentUserId,
+                $this->m_objConfig->getReadRetentionMonths()
             )]);
         }
     }

@@ -500,9 +500,23 @@ Every change to the application DB schema must be applied to all schema files:
 
 | File | Purpose |
 |------|---------|
-| `install/sql/pxmboard-mysql.sql` | Production install schema |
+| `install/sql/pxmboard-mysql.sql` | Production install schema — the authoritative source of truth |
 | `install/sql/upgrade-X.Y.Z.sql` | Incremental migration |
 | `tests/E2E/fixtures/e2e-seed.sql` | E2E schema + seed data |
 | `tests/bootstrap.php` | PHPUnit integration test schema |
 
 A story that changes the DB schema is not complete until all four files are updated and the tests are green.
+
+#### e2e-seed.sql must mirror pxmboard-mysql.sql exactly
+
+The `CREATE TABLE` definitions in `tests/E2E/fixtures/e2e-seed.sql` **must be identical** to those in `install/sql/pxmboard-mysql.sql`. "Identical" means:
+
+- Same column names, data types (`BOOLEAN`, `MEDIUMINT UNSIGNED`, `SMALLINT UNSIGNED`, `TINYINT UNSIGNED`, etc.) and sizes
+- Same `DEFAULT` values, `NULL`/`NOT NULL` constraints, and inline `COMMENT` strings
+- Same indexes (names and covered columns)
+- Same `ENGINE`, `DEFAULT CHARSET`, `COLLATE`, and table-level `COMMENT`
+- No extra columns that do not exist in the canonical schema
+
+Only the `INSERT` statements in the static-data and seed-data sections of `e2e-seed.sql` are allowed to differ (e.g., a valid webmaster email for E2E tests instead of an empty string).
+
+**When you change the schema:** update `pxmboard-mysql.sql` first, then copy the affected `CREATE TABLE` block verbatim into `e2e-seed.sql` (replacing the old one) and run `node tests/E2E/fixtures/reset-db.js` to verify the seed imports without errors.

@@ -4,7 +4,6 @@ namespace PXMBoard\Controller\Admin;
 
 use PXMBoard\Database\cDB;
 use PXMBoard\Model\cBoardList;
-use PXMBoard\Model\cMessageReadTracker;
 use PXMBoard\Model\cNotificationList;
 use PXMBoard\Model\cUser;
 use PXMBoard\Model\cUserLoginTicketList;
@@ -174,17 +173,6 @@ class cAdminActionDbclean extends cAdminAction
             }
         }
         $objBoardList->openBoards($arrClosedBoardIds);			// open boards
-
-        // cleanup old read tracking entries //////////////////////////////////////////
-
-        if ($this->m_objInputHandler->getIntFormVar('cleanread', true, true, true) > 0) {
-            $iCleanReadDays = $this->m_objInputHandler->getIntFormVar('cleanread_days', true, true, true);
-            if ($iCleanReadDays <= 0) {
-                $iCleanReadDays = 365;
-            }
-            $iDeleted = (new cMessageReadTracker(cDB::getInstance()))->cleanup($iCleanReadDays);
-            $this->m_sOutput .= $this->_getAlert('old read tracking entries deleted: '.$iDeleted, 'success');
-        }
 
         // cleanup old login tickets //////////////////////////////////////////////////
 

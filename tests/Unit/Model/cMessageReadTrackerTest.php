@@ -52,52 +52,65 @@ class cMessageReadTrackerTest extends PxmTestCase
     }
 
     /**
-     * Test markAsRead with valid IDs calls DB and returns true
+     * Test markAsRead with valid IDs calls DB and returns true.
+     * managePartitions() performs a SELECT first; the INSERT IGNORE for the
+     * partition tracking row returns 0 (race-condition path) so no DDL fires;
+     * then the actual INSERT IGNORE into pxm_message_read is executed.
      *
      * @return void
      */
     public function test_markAsRead_withValidIds_callsDbAndReturnsTrue(): void
     {
-        $stubResultSet = $this->createStub(cDBResultSet::class);
+        // Stub for the partition SELECT (returns no row → month not yet tracked)
+        $stubEmptyResult = $this->createStub(cDBResultSet::class);
+        $stubEmptyResult->method('getNextResultRowObject')->willReturn(false);
+
+        // Stub for the partition INSERT IGNORE (returns 0 affected → race condition won by other)
+        $stubInsertResult = $this->createMock(cDBResultSet::class);
+        $stubInsertResult->expects($this->once())->method('getAffectedRows')->willReturn(0);
+        $stubInsertResult->expects($this->once())->method('freeResult');
+
+        // Stub for final INSERT IGNORE into pxm_message_read
+        $stubReadResult = $this->createStub(cDBResultSet::class);
 
         $mockDb = $this->createMock(cDB::class);
-        $mockDb->expects($this->once())
+        $mockDb->expects($this->exactly(3))
                ->method('executeQuery')
-               ->willReturn($stubResultSet);
+               ->willReturnOnConsecutiveCalls(
+                   $stubEmptyResult, // SELECT from pxm_message_read_partition
+                   $stubInsertResult, // INSERT IGNORE into pxm_message_read_partition
+                   $stubReadResult    // INSERT IGNORE into pxm_message_read
+               );
 
         $objTracker = new cMessageReadTracker($mockDb);
         $this->assertTrue($objTracker->markAsRead(1, 2));
     }
 
     /**
-     * Test markAsRead returns false when DB query fails
+     * Test markAsRead returns false when the final INSERT into pxm_message_read fails.
+     * managePartitions runs (partition already tracked → single SELECT), then the INSERT fails.
      *
      * @return void
      */
     public function test_markAsRead_whenDbFails_returnsFalse(): void
     {
+        // Partition SELECT returns an existing row => managePartitions exits early
+        $stubRowObj = new \stdClass();
+        $stubRowObj->mrp_year_month = (int) date('ym');
+
+        $stubPartitionResult = $this->createStub(cDBResultSet::class);
+        $stubPartitionResult->method('getNextResultRowObject')->willReturn($stubRowObj);
+
         $mockDb = $this->createMock(cDB::class);
-        $mockDb->expects($this->once())
+        $mockDb->expects($this->exactly(2))
                ->method('executeQuery')
-               ->willReturn(null);
+               ->willReturnOnConsecutiveCalls(
+                   $stubPartitionResult, // SELECT from pxm_message_read_partition
+                   null                  // INSERT IGNORE into pxm_message_read fails
+               );
 
         $objTracker = new cMessageReadTracker($mockDb);
         $this->assertFalse($objTracker->markAsRead(1, 2));
-    }
-
-    /**
-     * Test markThreadAsRead with invalid user ID returns false without touching DB
-     *
-     * @return void
-     */
-    public function test_markThreadAsRead_withInvalidUserId_returnsFalse(): void
-    {
-        $mockDb = $this->createMock(cDB::class);
-        $mockDb->expects($this->never())->method('executeQuery');
-
-        $objTracker = new cMessageReadTracker($mockDb);
-        $this->assertFalse($objTracker->markThreadAsRead(0, 1));
-        $this->assertFalse($objTracker->markThreadAsRead(-1, 1));
     }
 
     /**
@@ -116,38 +129,64 @@ class cMessageReadTrackerTest extends PxmTestCase
     }
 
     /**
-     * Test cleanup calls DB and returns affected row count
+     * Test managePartitions returns early when partition row already exists
      *
      * @return void
      */
-    public function test_cleanup_withMockDb_returnsAffectedRows(): void
+    public function test_managePartitions_whenPartitionExists_skipsAllDdl(): void
     {
-        $mockResultSet = $this->createMock(cDBResultSet::class);
-        $mockResultSet->expects($this->once())->method('getAffectedRows')->willReturn(5);
-        $mockResultSet->expects($this->once())->method('freeResult');
+        $stubRowObj = new \stdClass();
+        $stubRowObj->mrp_year_month = (int) date('ym');
+
+        $stubResult = $this->createStub(cDBResultSet::class);
+        $stubResult->method('getNextResultRowObject')->willReturn($stubRowObj);
 
         $mockDb = $this->createMock(cDB::class);
+        // Only the one SELECT query is expected; no INSERT, no DDL
         $mockDb->expects($this->once())
                ->method('executeQuery')
-               ->willReturn($mockResultSet);
+               ->willReturn($stubResult);
 
         $objTracker = new cMessageReadTracker($mockDb);
-        $this->assertSame(5, $objTracker->cleanup(30));
+        $objTracker->managePartitions(); // Must not throw; no DDL executed
     }
 
     /**
-     * Test cleanup returns zero when DB query fails
+     * Test managePartitions creates the partition when INSERT IGNORE succeeds
+     * (no pre-existing partition, race won by current process)
      *
      * @return void
      */
-    public function test_cleanup_whenDbFails_returnsZero(): void
+    public function test_managePartitions_whenNewMonth_createsPartitionAndDropsOld(): void
     {
+        // SELECT: no row found (month not tracked yet)
+        $stubEmptyResult = $this->createStub(cDBResultSet::class);
+        $stubEmptyResult->method('getNextResultRowObject')->willReturn(false);
+
+        // INSERT IGNORE into pxm_message_read_partition: 1 row inserted (we won the race)
+        $stubInsertResult = $this->createStub(cDBResultSet::class);
+        $stubInsertResult->method('getAffectedRows')->willReturn(1);
+        $stubInsertResult->method('freeResult');
+
+        // ALTER TABLE ADD PARTITION
+        $stubAlterResult = $this->createStub(cDBResultSet::class);
+
+        // SELECT old partitions: none
+        $stubOldResult = $this->createStub(cDBResultSet::class);
+        $stubOldResult->method('getNextResultRowObject')->willReturn(false);
+
         $mockDb = $this->createMock(cDB::class);
-        $mockDb->expects($this->once())
+        $mockDb->method('getDBType')->willReturn('MySQL');
+        $mockDb->expects($this->exactly(4))
                ->method('executeQuery')
-               ->willReturn(null);
+               ->willReturnOnConsecutiveCalls(
+                   $stubEmptyResult, // SELECT from pxm_message_read_partition
+                   $stubInsertResult, // INSERT IGNORE into pxm_message_read_partition
+                   $stubAlterResult,  // ALTER TABLE ADD PARTITION
+                   $stubOldResult     // SELECT old partitions to drop (empty)
+               );
 
         $objTracker = new cMessageReadTracker($mockDb);
-        $this->assertSame(0, $objTracker->cleanup(30));
+        $objTracker->managePartitions();
     }
 }

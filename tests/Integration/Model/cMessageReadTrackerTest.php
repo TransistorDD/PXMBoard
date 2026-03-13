@@ -59,64 +59,51 @@ class cMessageReadTrackerTest extends IntegrationTestCase
     }
 
     /**
-     * Test markThreadAsRead marks all messages in the thread as read
+     * Test that marking the same message+user as read twice within the same month
+     * inserts only one row (INSERT IGNORE deduplication).
      *
      * @return void
      */
-    public function test_markThreadAsRead_marksAllMessagesInThread(): void
-    {
-        $iUserId   = $this->insertUser();
-        $iBoardId  = $this->insertBoard();
-        $iThreadId = $this->insertThread($iBoardId);
-        $iMsgId1   = $this->insertMessage($iThreadId, ['m_userid' => $iUserId]);
-        $iMsgId2   = $this->insertMessage($iThreadId, ['m_userid' => $iUserId, 'm_parentid' => $iMsgId1]);
-        $iMsgId3   = $this->insertMessage($iThreadId, ['m_userid' => $iUserId, 'm_parentid' => $iMsgId1]);
-
-        $objTracker = new cMessageReadTracker(cDB::getInstance());
-        $bResult = $objTracker->markThreadAsRead($iUserId, $iThreadId);
-
-        $this->assertTrue($bResult);
-
-        foreach ([$iMsgId1, $iMsgId2, $iMsgId3] as $iMsgId) {
-            $iCount = $objTracker->getReadCount($iMsgId);
-            $this->assertSame(1, $iCount, "Message $iMsgId should be marked as read");
-        }
-    }
-
-    /**
-     * Test markThreadAsRead with invalid userId returns false
-     *
-     * @return void
-     */
-    public function test_markThreadAsRead_withInvalidUserId_returnsFalse(): void
-    {
-        $objTracker = new cMessageReadTracker(cDB::getInstance());
-        $this->assertFalse($objTracker->markThreadAsRead(0, 1));
-    }
-
-    /**
-     * Test cleanup removes old entries and returns deleted count
-     *
-     * @return void
-     */
-    public function test_cleanup_removesOldEntries(): void
+    public function test_markAsRead_sameMessageSameMonth_noDuplicate(): void
     {
         $iUserId    = $this->insertUser();
         $iBoardId   = $this->insertBoard();
         $iThreadId  = $this->insertThread($iBoardId);
         $iMessageId = $this->insertMessage($iThreadId, ['m_userid' => $iUserId]);
 
-        // Insert a read record with an old timestamp directly (90 days ago)
-        $iOldTimestamp = time() - (90 * 86400);
-        cDB::getInstance()->executeQuery(
-            'INSERT INTO pxm_message_read (mr_userid, mr_messageid, mr_timestamp) VALUES ('
-            . $iUserId . ',' . $iMessageId . ',' . $iOldTimestamp . ')'
-        );
-
-        // Clean up records older than 60 days
         $objTracker = new cMessageReadTracker(cDB::getInstance());
-        $iDeleted = $objTracker->cleanup(60);
+        $objTracker->markAsRead($iUserId, $iMessageId);
+        $objTracker->markAsRead($iUserId, $iMessageId);
 
-        $this->assertGreaterThanOrEqual(1, $iDeleted);
+        $iCount = $objTracker->getReadCount($iMessageId);
+        $this->assertSame(1, $iCount, 'Duplicate read in same month must be silently ignored');
+    }
+
+    /**
+     * Test that managePartitions() is idempotent: calling it twice in the same
+     * month must not throw and must not insert a second partition tracking row.
+     *
+     * @return void
+     */
+    public function test_managePartitions_isIdempotent(): void
+    {
+        $objTracker = new cMessageReadTracker(cDB::getInstance());
+
+        $objTracker->managePartitions();
+        $objTracker->managePartitions(); // Second call must be a no-op
+
+        $iYearMonth = (int) date('Ym');
+        $objResultSet = cDB::getInstance()->executeQuery(
+            'SELECT COUNT(*) AS cnt FROM pxm_message_read_partition WHERE mrp_year_month=' . $iYearMonth
+        );
+        $this->assertNotNull($objResultSet);
+
+        $iCount = 0;
+        if ($objRow = $objResultSet->getNextResultRowObject()) {
+            $iCount = (int) $objRow->cnt;
+        }
+        $objResultSet->freeResult();
+
+        $this->assertSame(1, $iCount, 'Exactly one partition tracking row must exist for current month');
     }
 }

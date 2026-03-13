@@ -20,6 +20,7 @@ skins/pxm/cache/*
 
 # Legacy skins (maintained separately or to be removed)
 pp/
+pp-neu/
 
 # Legacy CSS / JS
 css/deprecated/

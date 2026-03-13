@@ -35,6 +35,7 @@ class cConfig
     protected int $m_iMessageHeaderPerPage = 50;			// display x messages per page (search)
     protected int $m_iPrivateMessagesPerPage = 20;			// display x private messages per page
     protected int $m_iThreadsPerPage = 50;					// display x threads per page
+    protected int $m_iReadRetentionMonths = 13;				// read tracking retention in months
 
     protected string $m_sQuoteSubject = 'Re:';				// prefix for quoted subjects
     protected string $m_sQuoteTag = 'blockquote';			// HTML tag for quoted text (blockquote)
@@ -92,6 +93,7 @@ class cConfig
                                                         'c_maxprofilepicsize,'.
                                                         'c_maxprofilepicwidth,'.
                                                         'c_maxprofilepicheight,'.
+                                                        'c_read_retention_months,'.
                                                         'c_profileimgdir'.
                                                     ' FROM pxm_configuration')) {
             if ($objResultRow = $objResultSet->getNextResultRowObject()) {
@@ -114,6 +116,7 @@ class cConfig
                 $this->m_iMessageHeaderPerPage = (int) $objResultRow->c_msgheaderperpage;
                 $this->m_iPrivateMessagesPerPage = (int) $objResultRow->c_privatemsgperpage;
                 $this->m_iThreadsPerPage = (int) $objResultRow->c_thrdperpage;
+                $this->m_iReadRetentionMonths = (int) $objResultRow->c_read_retention_months;
 
                 $this->m_sQuoteSubject = $objResultRow->c_quotesubject;
 
@@ -159,6 +162,7 @@ class cConfig
                                                                         "c_maxprofilepicsize=$this->m_iMaxProfileImgSize,".
                                                                         "c_maxprofilepicwidth=$this->m_iMaxProfileImgWidth,".
                                                                         "c_maxprofilepicheight=$this->m_iMaxProfileImgHeight,".
+                                                                        "c_read_retention_months=$this->m_iReadRetentionMonths,".
                                                                         'c_profileimgdir='.cDB::getInstance()->quote($this->m_sProfileImgDir))) {
             return true;
         }
@@ -479,6 +483,27 @@ class cConfig
     public function setThreadsPerPage(int $iThreadsPerPage): void
     {
         $this->m_iThreadsPerPage = $iThreadsPerPage;
+    }
+
+    /**
+     * get read tracking retention months
+     *
+     * @return int retention months
+     */
+    public function getReadRetentionMonths(): int
+    {
+        return $this->m_iReadRetentionMonths;
+    }
+
+    /**
+     * set read tracking retention months
+     *
+     * @param int $iMonths retention months
+     * @return void
+     */
+    public function setReadRetentionMonths(int $iMonths): void
+    {
+        $this->m_iReadRetentionMonths = $iMonths;
     }
 
     /**

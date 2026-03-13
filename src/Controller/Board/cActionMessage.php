@@ -43,7 +43,7 @@ class cActionMessage extends cPublicAction
             if ($objBoardMessage->loadDataById($iMessageId, $objActiveBoard->getId())) {
 
                 // Track read status for logged-in users
-                $objReadTracker = new cMessageReadTracker(cDB::getInstance());
+                $objReadTracker = new cMessageReadTracker(cDB::getInstance(), $this->m_objConfig->getReadRetentionMonths());
                 if (($objActiveUser = $this->getActiveUser()) && $objActiveUser->getId() > 0) {
                     $objReadTracker->markAsRead(
                         $objActiveUser->getId(),
@@ -63,8 +63,6 @@ class cActionMessage extends cPublicAction
 
                 $this->m_objTemplate = $this->_getTemplateObject('message');
                 $this->m_objTemplate->addData($this->getContextDataArray(['edit' => (int) $bEditAllowed]));
-
-                $objActiveSkin = $this->getActiveSkin();
 
                 // parse the message body
                 $objPxmParser = $this->_getPredefinedPxmParser(true);
