@@ -665,6 +665,16 @@ ALTER TABLE `pxm_notification`
     FOREIGN KEY (`n_userid`) REFERENCES `pxm_user` (`u_id`)
     ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- ============================================================================
+-- Add composite indexes on pxm_user for statistics queries (cUserStatistics)
+-- ============================================================================
+-- Enables index-range-scan + ordered traversal without filesort for:
+--   getNewestMember/getNewestMembers/getOldestMembers (ORDER BY u_registrationtstmp)
+--   getMostActiveUsers/getLeastActiveUsers             (ORDER BY u_msgquantity)
+ALTER TABLE `pxm_user`
+  ADD KEY `idx_status_registration` (`u_status`, `u_registrationtstmp`),
+  ADD KEY `idx_status_msgquantity`  (`u_status`, `u_msgquantity`);
+
 
 -- ============================================================================
 -- All changes for Release 3.0.0 have been applied successfully.

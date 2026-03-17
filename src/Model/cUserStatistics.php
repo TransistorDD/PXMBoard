@@ -96,9 +96,9 @@ class cUserStatistics
     {
         $arrUsers = [];
 
-        if ($objResultSet = cDB::getInstance()->executeQuery("SELECT u_id,u_username,u_city,u_publicmail,u_privatemail,u_registrationtstmp,u_msgquantity,u_highlight,u_highlight,u_status FROM pxm_user WHERE u_status='1' ORDER BY $sAttribute $sOrder", $iLimit)) {
-            $objUser = new cUser();
+        if ($objResultSet = cDB::getInstance()->executeQuery('SELECT u_id,u_username,u_city,u_publicmail,u_registrationtstmp,u_msgquantity,u_highlight,u_status FROM pxm_user WHERE u_status='.eUserStatus::ACTIVE->value." ORDER BY $sAttribute $sOrder", $iLimit)) {
             while ($objResultRow = $objResultSet->getNextResultRowObject()) {
+                $objUser = new cUser();
                 $objUser->setId($objResultRow->u_id);
                 $objUser->setUserName($objResultRow->u_username);
                 $objUser->setCity($objResultRow->u_city);

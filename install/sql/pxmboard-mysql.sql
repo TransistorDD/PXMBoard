@@ -260,7 +260,9 @@ CREATE TABLE `pxm_user` (
   PRIMARY KEY  (`u_id`),
   UNIQUE KEY `u_username` (`u_username`),
   UNIQUE KEY `u_passwordkey` (`u_passwordkey`),
-  KEY `u_lastonlinetstmp` (`u_lastonlinetstmp`)
+  KEY `u_lastonlinetstmp` (`u_lastonlinetstmp`),
+  KEY `idx_status_registration` (`u_status`, `u_registrationtstmp`),
+  KEY `idx_status_msgquantity`  (`u_status`, `u_msgquantity`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 # --------------------------------------------------------
