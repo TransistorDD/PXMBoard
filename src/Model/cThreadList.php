@@ -53,7 +53,7 @@ class cThreadList extends cScrollList
                 break;
             case 'replies':	$this->m_sSortMode = 't_msgquantity';
                 break;
-            default: 		$this->m_sSortMode = 'm_tstmp';
+            default: 		$this->m_sSortMode = 't_lastmsgtstmp';
                 break;
         }
         $this->m_iBoardId = $iBoardId;
@@ -69,60 +69,53 @@ class cThreadList extends cScrollList
      */
     protected function _getQuery(): string
     {
-        $objDb = cDB::getInstance();
-
-        // For logged-in users: add read status via correlated EXISTS subqueries.
-        // Using EXISTS (not LEFT JOIN) is mandatory: the new PRIMARY KEY includes
-        // mr_year_month, so a JOIN would produce one row per partition month each
-        // user has a read record in. mr_year_month >= cutoff enables partition pruning.
-        $sReadSelectThreadMsg = '';
-        $sReadSelectLastMsg = '';
-
+        // Guests can never have drafts — use a simple equality filter for better index usage
         if ($this->m_iUserId > 0) {
-            $iUserId = (int) $this->m_iUserId;
-            // Cutoff keeps the EXISTS within live partitions and enables partition pruning
-            $iCutoffYearMonth = (int) date('ym', strtotime('-' . $this->m_iReadRetentionMonths . ' months'));
-
-            $sReadSelectThreadMsg = ', (EXISTS ('
-                . 'SELECT 1 FROM pxm_message_read'
-                . ' WHERE mr_messageid = pxm_message.m_id'
-                . ' AND mr_userid = ' . $iUserId
-                . ' AND mr_year_month >= ' . $iCutoffYearMonth
-                . ')) AS thread_msg_read';
-
-            $sReadSelectLastMsg = ', (EXISTS ('
-                . 'SELECT 1 FROM pxm_message_read'
-                . ' WHERE mr_messageid = pxm_thread.t_lastmsgid'
-                . ' AND mr_userid = ' . $iUserId
-                . ' AND mr_year_month >= ' . $iCutoffYearMonth
-                . ')) AS last_msg_read';
+            $sStatusFilter = '(m_status=' . eMessageStatus::PUBLISHED->value
+                . ' OR (m_status=' . eMessageStatus::DRAFT->value
+                . ' AND m_userid=' . $this->m_iUserId . '))';
+        } else {
+            $sStatusFilter = 'm_status=' . eMessageStatus::PUBLISHED->value;
         }
 
-        $sStatusFilter = '(m_status='.eMessageStatus::PUBLISHED->value.' OR (m_status='.eMessageStatus::DRAFT->value.' AND m_userid='.$this->m_iUserId.'))';
+        // Read status is not fetched inline; it is resolved in a single batch query in _doPostQuery()
+        $sCols = 'SELECT m_id,'
+            . 'm_subject,'
+            . 'm_tstmp,'
+            . 'm_threadid,'
+            . 't_active,'
+            . 't_lastmsgid,'
+            . 't_lastmsgtstmp,'
+            . 't_msgquantity,'
+            . 't_views,'
+            . 't_fixed,'
+            . 'm_userid,'
+            . 'm_username,'
+            . 'm_userhighlight';
 
-        return 'SELECT    m_id,'
-                    .'m_subject,'
-                    .'m_tstmp,'
-                    .'m_threadid,'
-                    .'t_active,'
-                    .'t_lastmsgid,'
-                    .'t_lastmsgtstmp,'
-                    .'t_msgquantity,'
-                    .'t_views,'
-                    .'t_fixed,'
-                    .'m_userid,'
-                    .'m_username,'
-                    .'m_userhighlight'
-                    .$sReadSelectThreadMsg
-                    .$sReadSelectLastMsg
-            .' FROM   pxm_thread'
-            .' INNER JOIN pxm_message ON t_id=m_threadid'
-            .' WHERE  m_parentid=0'
-            .' AND 	  t_boardid='.$this->m_iBoardId
-            .' AND 	  (t_lastmsgtstmp>'.$this->m_iTimeSpan.' OR t_fixed=1)'
-            .' AND    '.$sStatusFilter
-            .' ORDER BY t_fixed DESC,'.$this->m_sSortMode
-            .' '.$this->m_sSortDirection;
+        $sFromJoinWhere = ' FROM pxm_thread'
+            . ' INNER JOIN pxm_message ON t_id=m_threadid'
+            . ' WHERE m_parentid=0'
+            . ' AND t_boardid=' . $this->m_iBoardId
+            . ' AND ' . $sStatusFilter;
+
+        // Split pinned and non-pinned threads into two UNION ALL branches instead of using
+        // (t_lastmsgtstmp > ? OR t_fixed = 1). Since t_fixed is a boolean the two branches
+        // are mutually exclusive and produce no duplicates. Each branch allows the optimizer to
+        // use the threadlist_lastmsgtstmp index cleanly without a Filesort on the full result.
+        // Branch 1: pinned threads — always visible regardless of time span
+        $sQueryPinned = '(' . $sCols . $sFromJoinWhere . ' AND t_fixed=1)';
+
+        // Branch 2: non-pinned threads within the configured time span
+        $sQueryRecent = '(' . $sCols . $sFromJoinWhere
+            . ' AND t_fixed=0'
+            . ' AND t_lastmsgtstmp>' . $this->m_iTimeSpan . ')';
+
+        // ORDER BY applies to the complete UNION ALL result; LIMIT/OFFSET is appended by executeQuery()
+        return $sQueryPinned
+            . ' UNION ALL '
+            . $sQueryRecent
+            . ' ORDER BY t_fixed DESC,' . $this->m_sSortMode . ' ' . $this->m_sSortDirection;
     }
 
     /**
@@ -149,14 +142,64 @@ class cThreadList extends cScrollList
         $objThreadHeader->getAuthor()->setUserName($objResultRow->m_username);
         $objThreadHeader->getAuthor()->setHighlightUser($objResultRow->m_userhighlight);
 
-        // Set read status for logged-in users
-        if ($this->m_iUserId > 0) {
-            $objThreadHeader->setThreadMsgRead(isset($objResultRow->thread_msg_read) ? (bool)$objResultRow->thread_msg_read : false);
-            $objThreadHeader->setLastMsgRead(isset($objResultRow->last_msg_read) ? (bool)$objResultRow->last_msg_read : false);
-        }
-
+        // Read status is resolved after the page is loaded; see _doPostQuery()
         $this->m_arrResultList[] = $objThreadHeader;
         return true;
+    }
+
+    /**
+     * Batch-fetch read status for all threads on the current page in a single query.
+     *
+     * Collects the root message ID and the last-message ID from every loaded
+     * cThreadHeader, issues one SELECT DISTINCT against pxm_message_read and
+     * distributes the result back onto each header object.
+     *
+     * @return void
+     */
+    protected function _doPostQuery(): void
+    {
+        if ($this->m_iUserId <= 0 || empty($this->m_arrResultList)) {
+            return;
+        }
+
+        // Gather all message IDs that need a read-status check (root + lastmsg per thread)
+        $arrAllIds = [];
+        /** @var cThreadHeader $objThreadHeader */
+        foreach ($this->m_arrResultList as $objThreadHeader) {
+            $arrAllIds[] = $objThreadHeader->getId();
+            $arrAllIds[] = $objThreadHeader->getLastMessageId();
+        }
+        $arrAllIds = array_values(array_unique($arrAllIds));
+
+        $iUserId = (int) $this->m_iUserId;
+        // Cutoff ensures the query stays within live partitions (enables partition pruning)
+        $iCutoffYearMonth = (int) date('ym', strtotime('-' . $this->m_iReadRetentionMonths . ' months'));
+        $sIdList = implode(',', $arrAllIds);
+
+        $objDb = cDB::getInstance();
+        $sQuery = 'SELECT DISTINCT mr_messageid FROM pxm_message_read'
+            . ' WHERE mr_userid=' . $iUserId
+            . ' AND mr_messageid IN (' . $sIdList . ')'
+            . ' AND mr_year_month>=' . $iCutoffYearMonth;
+
+        $objResultSet = $objDb->executeQuery($sQuery);
+        if ($objResultSet === null) {
+            return;
+        }
+
+        // Build a fast integer-keyed lookup set
+        $arrReadIds = [];
+        while ($objRow = $objResultSet->getNextResultRowObject()) {
+            $arrReadIds[(int) $objRow->mr_messageid] = true;
+        }
+        $objResultSet->freeResult();
+
+        // Distribute read status back to each thread header
+        /** @var cThreadHeader $objThreadHeader */
+        foreach ($this->m_arrResultList as $objThreadHeader) {
+            $objThreadHeader->setThreadMsgRead(isset($arrReadIds[$objThreadHeader->getId()]));
+            $objThreadHeader->setLastMsgRead(isset($arrReadIds[$objThreadHeader->getLastMessageId()]));
+        }
     }
 
     /**

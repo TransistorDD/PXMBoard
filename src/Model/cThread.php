@@ -350,7 +350,14 @@ class cThread
     public function getDataArray(int $iTimeOffset, string $sDateFormat, int $iLastLoginTimestamp, int $iCurrentUserId = 0, int $iReadRetentionMonths = 13): array
     {
         if ($this->m_iId > 0) {
-            $sStatusFilter = '(m_status='.eMessageStatus::PUBLISHED->value.' OR (m_status='.eMessageStatus::DRAFT->value.' AND m_userid='.$iCurrentUserId.'))';
+            // Guests can never have drafts — use a simple equality filter for better index usage
+            if ($iCurrentUserId > 0) {
+                $sStatusFilter = '(m_status=' . eMessageStatus::PUBLISHED->value
+                    . ' OR (m_status=' . eMessageStatus::DRAFT->value
+                    . ' AND m_userid=' . $iCurrentUserId . '))';
+            } else {
+                $sStatusFilter = 'm_status=' . eMessageStatus::PUBLISHED->value;
+            }
             if ($iCurrentUserId > 0) {
                 $iCutoffYearMonth = (int) date('ym', strtotime('-' . $iReadRetentionMonths . ' months'));
                 // Using EXISTS (not LEFT JOIN): the PRIMARY KEY includes mr_year_month, so a JOIN
@@ -428,17 +435,17 @@ class cThread
         if (isset($this->m_arrThreadMessages[$iParentId]) && is_array($this->m_arrThreadMessages[$iParentId]) && ($iLevelArraySize = sizeof($this->m_arrThreadMessages[$iParentId])) > 0) {		//if there is at least one answer to parent message
             for ($iMessagePointer = 0; $iMessagePointer < $iLevelArraySize; $iMessagePointer++) {//recursive call to getMsgTreeArray for every answer
                 if ($iMessagePointer < $iLevelArraySize - 1) {	//if it is not the last answer...
-                    $this->m_arrThreadMessages[$iParentId][$iMessagePointer] = array_merge($this->m_arrThreadMessages[$iParentId][$iMessagePointer], ['tree_lines' => $sTreeLines.'├']);
+                    $this->m_arrThreadMessages[$iParentId][$iMessagePointer]['tree_lines'] = $sTreeLines.'├';
 
                     if ($arrChildren = $this->getMessageTreeArray($this->m_arrThreadMessages[$iParentId][$iMessagePointer]['id'], $sTreeLines.'│')) {
-                        $this->m_arrThreadMessages[$iParentId][$iMessagePointer] = array_merge($this->m_arrThreadMessages[$iParentId][$iMessagePointer], ['msg' => $arrChildren]);
+                        $this->m_arrThreadMessages[$iParentId][$iMessagePointer]['msg'] = $arrChildren;
                     }
                 } else {										//...else draw gif for endpart
                     if ($iParentId > 0) {
-                        $this->m_arrThreadMessages[$iParentId][$iMessagePointer] = array_merge($this->m_arrThreadMessages[$iParentId][$iMessagePointer], ['tree_lines' => $sTreeLines.'└']);
+                        $this->m_arrThreadMessages[$iParentId][$iMessagePointer]['tree_lines'] = $sTreeLines.'└';
                     }
                     if ($arrChildren = $this->getMessageTreeArray($this->m_arrThreadMessages[$iParentId][$iMessagePointer]['id'], $sTreeLines.' ')) {
-                        $this->m_arrThreadMessages[$iParentId][$iMessagePointer] = array_merge($this->m_arrThreadMessages[$iParentId][$iMessagePointer], ['msg' => $arrChildren]);
+                        $this->m_arrThreadMessages[$iParentId][$iMessagePointer]['msg'] = $arrChildren;
                     }
                 }
             }
