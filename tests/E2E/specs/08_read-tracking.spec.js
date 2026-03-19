@@ -88,6 +88,12 @@ test.beforeEach(async () => {
             'DELETE FROM pxm_message_read WHERE mr_userid = ?',
             [READTESTER_USER_ID]
         );
+        // Keep m_id=5 always in the future so is_new=1 holds regardless of when
+        // the seed was originally loaded.
+        await conn.execute(
+            'UPDATE pxm_message SET m_tstmp = UNIX_TIMESTAMP() + 86400 WHERE m_id = 5',
+            []
+        );
         await conn.execute(
             'UPDATE pxm_thread SET t_lastmsgtstmp = UNIX_TIMESTAMP() + 86400 WHERE t_id = 1',
             []

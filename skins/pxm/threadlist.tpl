@@ -22,11 +22,11 @@
 	</span>
 	<a class="htmx-col-subject hover:underline"
 	   href="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.threadid}&msgid={$thread.id}"
-	   hx-get="pxmboard.php?mode=message&brdid={$config.board.id}&msgid={$thread.id}"
-	   hx-target="#message-container"
+	   hx-get="pxmboard.php?mode=thread&brdid={$config.board.id}&thrdid={$thread.threadid}"
+	   hx-target="#thread-container"
 	   hx-swap="innerHTML"
 	   hx-push-url="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.threadid}&msgid={$thread.id}"
-	   onclick="handleCachedThreadLoad({$config.board.id},{$thread.id},{$thread.threadid})">{$thread.subject}</a>
+	   onclick="handleThreadlistSubjectClick({$config.board.id},{$thread.id},{$thread.threadid})">{$thread.subject}</a>
 	<span class="htmx-col-author text-content-secondary">
 		{if $thread.user.id > 0}<a href="pxmboard.php?mode=userprofile&usrid={$thread.user.id}"
 		   hx-get="pxmboard.php?mode=userprofile&usrid={$thread.user.id}"
@@ -55,8 +55,8 @@
 		   hx-target="#message-container"
 		   hx-swap="innerHTML"
 		   hx-push-url="pxmboard.php?mode=board&brdid={$config.board.id}&thrdid={$thread.threadid}&msgid={$thread.lastid}"
-		   onclick="handleCachedThreadLoad({$config.board.id},{$thread.lastid},{$thread.threadid})"
-	   class="htmx-content-link">{$thread.lastdate}</a>
+		   onclick="handleThreadlistLastMsgClick({$config.board.id},{$thread.lastid},{$thread.threadid})"
+		   class="htmx-content-link">{$thread.lastdate}</a>
 		{if $config.logedin == 1 && $thread.msgquan > 0 && $thread.lastnew == 1}<span title="Neue Antwort" class="text-accent-danger"><svg class="w-2 h-2 inline-block" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg></span>{/if}
 	</span>
 </div>

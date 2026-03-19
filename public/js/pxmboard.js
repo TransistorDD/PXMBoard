@@ -966,11 +966,11 @@
   };
 
   /**
-   * Side-effect handler for message link clicks (threadlist, search results).
+   * Side-effect handler for message link clicks in search results / message list.
    * The message itself is loaded by HTMX (hx-get + hx-push-url on the <a>).
-   * This handler additionally loads the thread tree only if not already loaded
-   * (smart caching), and handles the mobile page switch.
-   * IMPORTANT: Does NOT return false — HTMX must still process the click.
+   * Loads the thread tree only if a different thread is currently shown (smart caching).
+   * NOT used by threadlist subject/last-message links — those use
+   * handleThreadlistSubjectClick / handleThreadlistLastMsgClick instead.
    */
   window.handleCachedThreadLoad = function (brdid, msgid, thrdid) {
     currentMsgId = msgid;
@@ -990,6 +990,72 @@
         { target: '#thread-container', swap: 'innerHTML' }
       );
     }
+    if (isMobileView()) showMobileDetailPage();
+  };
+
+  /**
+   * Threadlist subject link side-effect handler.
+   * HTMX loads the thread tree via hx-get (primary action + URL history).
+   * This handler additionally loads the root message only when it has not been
+   * read yet (htmx-msg-read absent on the thread row), which also covers guests.
+   * IMPORTANT: Does NOT return false — HTMX must still process the click.
+   * @param {number} brdid  - board id
+   * @param {number} msgid  - root message id
+   * @param {number} thrdid - thread id
+   */
+  window.handleThreadlistSubjectClick = function (brdid, msgid, thrdid) {
+    currentThrdId = thrdid;
+    var row = document.getElementById('thread_' + thrdid);
+    var isRead = row && row.classList.contains('htmx-msg-read');
+
+    currentMsgId = isRead ? 0 : msgid;
+
+    if (row) {
+      var icon = row.querySelector('.thread-status-icon');
+      var spinner = row.querySelector('.thread-status-spinner');
+      if (icon) icon.hidden = true;
+      if (spinner) spinner.hidden = false;
+    }
+
+    if (!isRead) {
+      htmx.ajax('GET',
+        'pxmboard.php?mode=message&brdid=' + brdid + '&msgid=' + msgid,
+        { target: '#message-container', swap: 'innerHTML' }
+      );
+    } else {
+      var msgContainer = document.getElementById('message-container');
+      if (msgContainer) msgContainer.innerHTML = '';
+    }
+
+    if (isMobileView()) showMobileDetailPage();
+  };
+
+  /**
+   * Threadlist last-message link side-effect handler.
+   * HTMX loads the message via hx-get (primary action + URL history).
+   * This handler additionally always loads the thread tree.
+   * IMPORTANT: Does NOT return false — HTMX must still process the click.
+   * @param {number} brdid  - board id
+   * @param {number} msgid  - last message id
+   * @param {number} thrdid - thread id
+   */
+  window.handleThreadlistLastMsgClick = function (brdid, msgid, thrdid) {
+    currentMsgId = msgid;
+    currentThrdId = thrdid;
+    var row = document.getElementById('thread_' + thrdid);
+
+    if (row) {
+      var icon = row.querySelector('.thread-status-icon');
+      var spinner = row.querySelector('.thread-status-spinner');
+      if (icon) icon.hidden = true;
+      if (spinner) spinner.hidden = false;
+    }
+
+    htmx.ajax('GET',
+      'pxmboard.php?mode=thread&brdid=' + brdid + '&thrdid=' + thrdid,
+      { target: '#thread-container', swap: 'innerHTML' }
+    );
+
     if (isMobileView()) showMobileDetailPage();
   };
 
@@ -1291,10 +1357,13 @@
   document.addEventListener('htmx:afterSwap', function (evt) {
     if (evt.detail.target && evt.detail.target.id === 'message-container') {
       var elt = evt.detail.elt;
+      // Update currentMsgId from the triggering element when available (e.g. thread.tpl links).
+      // For links without data-msgid (e.g. messagelist.tpl), currentMsgId was already set
+      // synchronously by handleCachedThreadLoad() / handleThreadlistLastMsgClick() before the request.
       if (elt && elt.dataset && elt.dataset.msgid) {
         currentMsgId = parseInt(elt.dataset.msgid, 10);
-        updateThreadHighlight();
       }
+      updateThreadHighlight();
       if (typeof MessageMove !== 'undefined') {
         MessageMove.updateDropdownOptions();
       }
